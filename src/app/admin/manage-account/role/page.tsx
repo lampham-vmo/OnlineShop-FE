@@ -25,7 +25,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import api from '../../../../../lib/api';
 
 interface Permission {
   id: string;
@@ -55,7 +55,7 @@ const ManageAccountPage = () => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get('/api/roles');
+      const response = await api.get('/role')
       setRoles(response.data);
     } catch (error) {
       console.error('Failed to fetch roles:', error);
@@ -64,7 +64,7 @@ const ManageAccountPage = () => {
 
   const fetchPermissions = async () => {
     try {
-      const response = await axios.get('/api/permissions');
+      const response = await api.get('/permission')
       setPermissions(response.data);
     } catch (error) {
       console.error('Failed to fetch permissions:', error);
@@ -83,7 +83,7 @@ const ManageAccountPage = () => {
 
   const handleSubmit = async () => {
     try {
-      await axios.post('/api/roles', {
+      await api.post('/api/roles', {
         name: roleName,
         permissions: selectedPermissions,
       });
