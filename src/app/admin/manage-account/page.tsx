@@ -20,14 +20,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import api from '../../../../lib/api';
 
 interface Account {
-  id: string;
-  username: string;
+  id: number;
+  fullName: string;
   email: string;
   role: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
+  status: boolean;
+  createdAt: Date;
 }
 
 const ManageAccountPage = () => {
@@ -40,9 +41,9 @@ const ManageAccountPage = () => {
 
   const fetchAccounts = async () => {
     try {
-      const response = await axios.get('/users');
+      const response = await api.get('/users');
       console.log(response);
-      setAccounts(response.data);
+      setAccounts(response.data.accounts);
     } catch (error) {
       console.error('Failed to fetch accounts:', error);
     }
@@ -52,12 +53,12 @@ const ManageAccountPage = () => {
     router.push('/admin/manage-account/role');
   };
 
-  const handleEditAccount = (id: string) => {
+  const handleEditAccount = (id: number) => {
     // Implement edit functionality
     console.log('Edit account:', id);
   };
 
-  const handleDeleteAccount = async (id: string) => {
+  const handleDeleteAccount = async (id: number) => {
     try {
       await axios.delete(`/api/accounts/${id}`);
       fetchAccounts();
@@ -86,7 +87,7 @@ const ManageAccountPage = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Username</TableCell>
+                <TableCell>Fullname</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Role</TableCell>
                 <TableCell>Status</TableCell>
@@ -97,13 +98,13 @@ const ManageAccountPage = () => {
             <TableBody>
               {accounts.map((account) => (
                 <TableRow key={account.id}>
-                  <TableCell>{account.username}</TableCell>
+                  <TableCell>{account.fullName}</TableCell>
                   <TableCell>{account.email}</TableCell>
                   <TableCell>{account.role}</TableCell>
                   <TableCell>
                     <Chip 
-                      label={account.status === 'active' ? 'Active' : 'Inactive'} 
-                      color={account.status === 'active' ? 'success' : 'error'}
+                      label={account.status === true ? 'Active' : 'Inactive'} 
+                      color={account.status === true ? 'success' : 'error'}
                       size="small"
                     />
                   </TableCell>
