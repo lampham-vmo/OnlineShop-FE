@@ -21,15 +21,20 @@ import {
   Box,
   List,
   ListItem,
+  IconButton,
+  Modal,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useRouter } from 'next/navigation';
 import api from '../../../../../lib/api';
 
 interface Permission {
   id: string;
   name: string;
+  path: string;
+  method: string;
   description: string;
 }
 
@@ -46,8 +51,9 @@ const ManageAccountPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [roleName, setRoleName] = useState('');
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
-  // Fetch roles and permissions
   useEffect(() => {
     fetchRoles();
     fetchPermissions();
@@ -98,6 +104,18 @@ const ManageAccountPage = () => {
     router.push('/admin/manage-account');
   };
 
+  const handleViewPermissions = (role: Role) => {
+    console.log('Selected Role:', role);
+    console.log('Role Permissions:', role.permissions);
+    setSelectedRole(role);
+    setIsViewModalOpen(true);
+  };
+
+  const handleCloseViewModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedRole(null);
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Paper sx={{ p: 2 }}>
@@ -129,6 +147,7 @@ const ManageAccountPage = () => {
               <TableRow>
                 <TableCell>Role Name</TableCell>
                 <TableCell>Permissions</TableCell>
+                <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -136,13 +155,21 @@ const ManageAccountPage = () => {
                 <TableRow key={role.id}>
                   <TableCell>{role.name}</TableCell>
                   <TableCell>
-                    <List dense>
-                      {role.permissions.map((permission) => (
-                        <ListItem key={permission.id}>
-                          {permission.name}
-                        </ListItem>
-                      ))}
-                    </List>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography>
+                        {role.permissions.length} permissions
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleViewPermissions(role)}
+                        color="primary"
+                      >
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center">
+                    {/* Other actions if needed */}
                   </TableCell>
                 </TableRow>
               ))}
@@ -196,6 +223,52 @@ const ManageAccountPage = () => {
             </Button>
           </DialogActions>
         </Dialog>
+
+        <Modal
+          open={isViewModalOpen}
+          onClose={handleCloseViewModal}
+          aria-labelledby="view-permissions-modal"
+        >
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 1,
+            color: 'black'
+          }}>
+            <Typography variant="h6" component="h2" gutterBottom color="black">
+              {selectedRole?.name} Permissions
+            </Typography>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Path</TableCell>
+                    <TableCell>Method</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedRole?.permissions?.map((permission) => (
+                    <TableRow key={permission.id}>
+                      <TableCell>{permission.name}</TableCell>
+                      <TableCell>{permission.path}</TableCell>
+                      <TableCell>{permission.method}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button onClick={handleCloseViewModal}>Close</Button>
+            </Box>
+          </Box>
+        </Modal>
       </Paper>
     </Box>
   );

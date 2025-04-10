@@ -51,7 +51,7 @@ api.interceptors.response.use(
   
         // Update the Authorization header
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
-        // Retry the original request, if still failed (invalid RT => relogin)
+        // Retry the original request, if still failed (invalid RT => relog)
         return api(originalRequest)
       } catch (refreshError) {
        // If refresh token fails, redirect to login
