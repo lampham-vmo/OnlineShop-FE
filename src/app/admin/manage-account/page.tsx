@@ -14,25 +14,31 @@ import {
   Box,
   IconButton,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import api from '../../../../lib/api';
 
 interface Account {
-  id: string;
-  username: string;
+  id: number;
+  fullName: string;
   email: string;
   role: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
+  status: boolean;
+  createdAt: Date;
 }
 
 const ManageAccountPage = () => {
   const router = useRouter();
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchAccounts();
@@ -40,9 +46,8 @@ const ManageAccountPage = () => {
 
   const fetchAccounts = async () => {
     try {
-      const response = await axios.get('/users');
-      console.log(response);
-      setAccounts(response.data);
+      const response = await api.get('/users');
+      setAccounts(response.data.accounts);
     } catch (error) {
       console.error('Failed to fetch accounts:', error);
     }
@@ -52,18 +57,28 @@ const ManageAccountPage = () => {
     router.push('/admin/manage-account/role');
   };
 
-  const handleEditAccount = (id: string) => {
-    // Implement edit functionality
-    console.log('Edit account:', id);
+  const handleDeleteClick = (id: number) => {
+    setSelectedAccountId(id);
+    setOpenDialog(true);
   };
 
-  const handleDeleteAccount = async (id: string) => {
+  const confirmDelete = async () => {
+    if (selectedAccountId === null) return;
+
     try {
-      await axios.delete(`/api/accounts/${id}`);
+      await api.delete(`/users/${selectedAccountId}`);
       fetchAccounts();
     } catch (error) {
       console.error('Failed to delete account:', error);
+    } finally {
+      setOpenDialog(false);
+      setSelectedAccountId(null);
     }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedAccountId(null);
   };
 
   return (
@@ -86,24 +101,24 @@ const ManageAccountPage = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Username</TableCell>
+                <TableCell>Fullname</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Role</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Created At</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell>Remove accounts</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {accounts.map((account) => (
                 <TableRow key={account.id}>
-                  <TableCell>{account.username}</TableCell>
+                  <TableCell>{account.fullName}</TableCell>
                   <TableCell>{account.email}</TableCell>
-                  <TableCell>{account.role}</TableCell>
+<TableCell>{account.role}</TableCell>
                   <TableCell>
                     <Chip 
-                      label={account.status === 'active' ? 'Active' : 'Inactive'} 
-                      color={account.status === 'active' ? 'success' : 'error'}
+                      label={account.status ? 'Active' : 'Inactive'} 
+                      color={account.status ? 'success' : 'error'}
                       size="small"
                     />
                   </TableCell>
@@ -111,14 +126,7 @@ const ManageAccountPage = () => {
                   <TableCell>
                     <IconButton 
                       size="small" 
-                      onClick={() => handleEditAccount(account.id)}
-                      color="primary"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleDeleteAccount(account.id)}
+                      onClick={() => handleDeleteClick(account.id)}
                       color="error"
                     >
                       <DeleteIcon />
@@ -130,6 +138,20 @@ const ManageAccountPage = () => {
           </Table>
         </TableContainer>
       </Paper>
+
+      {/* Confirm Delete Dialog */}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this account?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

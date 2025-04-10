@@ -97,6 +97,7 @@ export default function SignUpPage() {
       setSuccess('Account created successfully!')
       setOpenSuccess(true)
       setError('')
+      window.location.href = '/login'
     } catch (err: any) {
       console.error(err)
       const message =
