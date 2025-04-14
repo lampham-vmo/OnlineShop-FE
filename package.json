@@ -13,10 +13,12 @@
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^7.0.2",
     "@mui/styled-engine-sc": "^7.0.2",
+    "axios": "^1.8.4",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "styled-components": "^6.1.17"
+    "styled-components": "^6.1.17",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
