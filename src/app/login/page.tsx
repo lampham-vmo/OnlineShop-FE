@@ -50,10 +50,11 @@ export default function LoginPage() {
     try {
       setError(null);
       const response = await authApi.authControllerLogin(data);
+      const result = response.data
       
       // Store tokens in localStorage
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('accessToken', result.accessToken);
+      localStorage.setItem('refreshToken', result.refreshToken);
       
       // Redirect to admin dashboard
       router.push('/');
