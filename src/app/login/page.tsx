@@ -1,160 +1,161 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
+import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
-  Container,
-  TextField,
-  Button,
-  Typography,
   Box,
   Paper,
-  Snackbar,
+  Typography,
+  TextField,
+  Button,
+  Container,
+  InputAdornment,
+  IconButton,
   Alert,
-} from "@mui/material";
-import { useRouter } from "next/navigation";
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
+import { getAuth } from '@/api/endpoints/auth/auth';
+import { authControllerLoginBody } from '@/api/endpoints/auth/auth.zod';
+import type { LoginUserDTO } from '@/api/models/loginUserDTO';
 
-const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [isClient, setIsClient] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+// Use the Orval-generated zod schema
+const loginSchema = authControllerLoginBody;
+
+// Infer TypeScript type from schema
+type LoginFormData = LoginUserDTO;
+
+export default function LoginPage() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const authApi = getAuth();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // Initialize react-hook-form with zod resolver
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      const response = await fetch("http://localhost:3000/api/v1/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-      console.log(data);
-      if (!response.ok) {
-        let errorMessage = "";
-        let errorMessageArray;
-        if (Array.isArray(data.error.message)) {
-          errorMessageArray = data.error.message;
-        } else {
-          errorMessageArray = [data.error.message];
-        }
-
-        errorMessage = errorMessageArray
-          .map((content: string) => {
-            switch (content) {
-              case "email should not be empty":
-                return "email should not be empty";
-                break;
-              case "email must be an email":
-                return "email must be an email";
-                break;
-              case "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character":
-                return "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character";
-                break;
-              case "password must be longer than or equal to 4 characters":
-                return "password must be longer than or equal to 4 characters";
-                break;
-              case "password should not be empty":
-                return "password should not be empty";
-                break;
-              case "password not match!":
-                return "password not match!";
-                break;
-              case "user not found!":
-                return "user not found!";
-                break;
-              default:
-                return content;
-                break;
-            }
-          })
-          .join("\n");
-
-        setError(errorMessage);
-        setOpenSnackbar(true);
-        return;
-      }
-
-      // Lưu tokens vào localStorage
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
-
-      // Chuyển hướng sau khi đăng nhập thành công
-      router.push("/"); // hoặc trang bạn muốn chuyển hướng đến
-    } catch (err) {
-      setError("Có lỗi xảy ra, vui lòng thử lại sau");
-      setOpenSnackbar(true);
+      setError(null);
+      const response = await authApi.authControllerLogin(data);
+      
+      // Store tokens in localStorage
+      localStorage.setItem('accessToken', response.data.accessToken);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      
+      // Redirect to admin dashboard
+      router.push('/');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  return isClient ? (
-    <>
-      <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ padding: 4, mt: 10 }}>
-          <Typography variant="h4" align="center" gutterBottom>
-            Log in
+  return (
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            padding: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+          }}
+        >
+          <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
+            Login
           </Typography>
-          <Box component="form" onSubmit={handleLogin} noValidate>
-            <TextField
-              label="Email"
-              variant="outlined"
-              fullWidth
-              required
-              margin="normal"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+
+          {error && (
+            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ width: '100%' }}>
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  autoComplete="email"
+                  autoFocus
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                />
+              )}
             />
-            <TextField
-              label="password"
-              variant="outlined"
-              type="password"
-              fullWidth
-              required
-              margin="normal"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+
+            <Controller
+              name="password"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  margin="normal"
+                  required
+                  fullWidth
+                  label="Password"
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  autoComplete="current-password"
+                  error={!!errors.password}
+                  helperText={errors.password?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
             />
+
             <Button
               type="submit"
-              variant="contained"
-              color="primary"
               fullWidth
-              sx={{ mt: 2 }}
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={isSubmitting}
             >
-              Log in
+              {isSubmitting ? 'Signing in...' : 'Sign In'}
             </Button>
           </Box>
         </Paper>
-      </Container>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity="error">
-          <Typography sx={{ whiteSpace: "pre-line" }}>
-            {error}
-          </Typography>
-        </Alert>
-      </Snackbar>
-    </>
-  ) : (
-    "loading..."
+      </Box>
+    </Container>
   );
-};
-
-export default LoginPage;
+}
