@@ -1,10 +1,10 @@
-import React from 'react'
-import ProductListBreadcrumbs from './ProductListBreadcrumbs'
+import React from 'react';
+import ProductListBreadcrumbs from './ProductListBreadcrumbs';
 
 export default function ProductList() {
   return (
     <div>
-      <ProductListBreadcrumbs/>
+      <ProductListBreadcrumbs />
     </div>
-  )
+  );
 }
