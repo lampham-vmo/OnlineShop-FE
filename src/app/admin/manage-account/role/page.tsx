@@ -23,12 +23,15 @@ import {
   ListItem,
   IconButton,
   Modal,
+  Chip,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
 import { useRouter } from 'next/navigation';
 import api from '../../../../../lib/api';
+import { Description } from '@mui/icons-material';
 
 interface Permission {
   id: string;
@@ -42,15 +45,56 @@ interface Role {
   id: string;
   name: string;
   permissions: Permission[];
+  description: string;
 }
+
+const MethodChip = ({ method }: { method: string }) => {
+  const getMethodColor = (method: string) => {
+    switch (method.toLowerCase()) {
+      case 'get':
+        return { bg: '#4CAF50', color: '#fff' }; // Green
+      case 'post':
+        return { bg: '#FFC107', color: '#000' }; // Yellow
+      case 'put':
+        return { bg: '#2196F3', color: '#fff' }; // Blue
+      case 'delete':
+        return { bg: '#f44336', color: '#fff' }; // Red
+      case 'patch':
+        return { bg: '#9C27B0', color: '#fff' }; // Purple
+      default:
+        return { bg: '#999', color: '#fff' };
+    }
+  };
+
+  const colors = getMethodColor(method);
+
+  return (
+    <Chip
+      label={method.toUpperCase()}
+      size="small"
+      sx={{
+        backgroundColor: colors.bg,
+        color: colors.color,
+        fontWeight: 'bold',
+        minWidth: '80px',
+        borderRadius: '4px',
+        '& .MuiChip-label': {
+          px: 1,
+        },
+      }}
+    />
+  );
+};
 
 const ManageAccountPage = () => {
   const router = useRouter();
   const [roles, setRoles] = useState<Role[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [roleName, setRoleName] = useState('');
+  const [roleDescription, setRoleDescription] = useState('');
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
@@ -84,14 +128,20 @@ const ManageAccountPage = () => {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setRoleName('');
+    setRoleDescription('');
     setSelectedPermissions([]);
   };
 
   const handleSubmit = async () => {
+    if (!roleName.trim()) {
+      return;
+    }
+    console.log(roleName, roleDescription, selectedPermissions);
     try {
-      await api.post('/api/roles', {
+      await api.post('/role', {
         name: roleName,
-        permissions: selectedPermissions,
+        description: roleDescription,
+        permissionIds: selectedPermissions,
       });
       handleModalClose();
       fetchRoles();
@@ -114,6 +164,39 @@ const ManageAccountPage = () => {
   const handleCloseViewModal = () => {
     setIsViewModalOpen(false);
     setSelectedRole(null);
+  };
+
+  const handleEditRole = (role: Role) => {
+    setSelectedRole(role);
+    setRoleName(role.name);
+    setRoleDescription(role.description || '');
+    setSelectedPermissions(role.permissions.map(p => p.id));
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedRole(null);
+    setRoleName('');
+    setRoleDescription('');
+    setSelectedPermissions([]);
+  };
+
+  const handleEditSubmit = async () => {
+    if (!roleName.trim() || !selectedRole) {
+      return;
+    }
+    try {
+      await api.put(`/roles/${selectedRole.id}`, {
+        name: roleName,
+        description: roleDescription,
+        permissions: selectedPermissions,
+      });
+      handleEditModalClose();
+      fetchRoles();
+    } catch (error) {
+      console.error('Failed to update role:', error);
+    }
   };
 
   return (
@@ -169,7 +252,13 @@ const ManageAccountPage = () => {
                     </Box>
                   </TableCell>
                   <TableCell align="center">
-                    {/* Other actions if needed */}
+                    <IconButton
+                      size="small"
+                      onClick={() => handleEditRole(role)}
+                      color="primary"
+                    >
+                      <EditIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
@@ -189,37 +278,144 @@ const ManageAccountPage = () => {
               autoFocus
               margin="dense"
               label="Role Name"
+              required
               fullWidth
               value={roleName}
               onChange={(e) => setRoleName(e.target.value)}
+              error={!roleName}
+              helperText={!roleName ? "Role name is required" : ""}
+            />
+            <TextField
+              margin="dense"
+              label="Description"
+              fullWidth
+              multiline
+              rows={3}
+              value={roleDescription}
+              onChange={(e) => setRoleDescription(e.target.value)}
+              sx={{ mt: 2 }}
             />
             <Box sx={{ mt: 2, maxHeight: 300, overflow: 'auto' }}>
-              {permissions.map((permission) => (
-                <FormControlLabel
-                  key={permission.id}
-                  control={
-                    <Checkbox
-                      checked={selectedPermissions.includes(permission.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedPermissions([...selectedPermissions, permission.id]);
-                        } else {
-                          setSelectedPermissions(
-                            selectedPermissions.filter((id) => id !== permission.id)
-                          );
-                        }
-                      }}
-                    />
-                  }
-                  label={`${permission.name} - ${permission.description}`}
-                />
-              ))}
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox"></TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Path</TableCell>
+                      <TableCell>Method</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {permissions.map((permission) => (
+                      <TableRow key={permission.id}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedPermissions.includes(permission.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedPermissions([...selectedPermissions, permission.id]);
+                              } else {
+                                setSelectedPermissions(
+                                  selectedPermissions.filter((id) => id !== permission.id)
+                                );
+                              }
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>{permission.name}</TableCell>
+                        <TableCell>{permission.path}</TableCell>
+                        <TableCell>
+                          <MethodChip method={permission.method} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Box>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleModalClose}>Cancel</Button>
             <Button onClick={handleSubmit} variant="contained">
               Add Role
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog 
+          open={isEditModalOpen} 
+          onClose={handleEditModalClose}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>Edit Role</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Role Name"
+              required
+              fullWidth
+              value={roleName}
+              onChange={(e) => setRoleName(e.target.value)}
+              error={!roleName}
+              helperText={!roleName ? "Role name is required" : ""}
+            />
+            <TextField
+              margin="dense"
+              label="Description"
+              fullWidth
+              multiline
+              rows={3}
+              value={roleDescription}
+              onChange={(e) => setRoleDescription(e.target.value)}
+              sx={{ mt: 2 }}
+            />
+            <Box sx={{ mt: 2, maxHeight: 300, overflow: 'auto' }}>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox"></TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Path</TableCell>
+                      <TableCell>Method</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {permissions.map((permission) => (
+                      <TableRow key={permission.id}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedPermissions.includes(permission.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedPermissions([...selectedPermissions, permission.id]);
+                              } else {
+                                setSelectedPermissions(
+                                  selectedPermissions.filter((id) => id !== permission.id)
+                                );
+                              }
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>{permission.name}</TableCell>
+                        <TableCell>{permission.path}</TableCell>
+                        <TableCell>
+                          <MethodChip method={permission.method} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleEditModalClose}>Cancel</Button>
+            <Button onClick={handleEditSubmit} variant="contained">
+              Update Role
             </Button>
           </DialogActions>
         </Dialog>
@@ -234,12 +430,15 @@ const ManageAccountPage = () => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 400,
+            width: '80%',
+            maxWidth: 'md',
             bgcolor: 'background.paper',
             boxShadow: 24,
             p: 4,
             borderRadius: 1,
-            color: 'black'
+            color: 'black',
+            maxHeight: '90vh',
+            overflow: 'auto'
           }}>
             <Typography variant="h6" component="h2" gutterBottom color="black">
               {selectedRole?.name} Permissions
@@ -258,7 +457,9 @@ const ManageAccountPage = () => {
                     <TableRow key={permission.id}>
                       <TableCell>{permission.name}</TableCell>
                       <TableCell>{permission.path}</TableCell>
-                      <TableCell>{permission.method}</TableCell>
+                      <TableCell>
+                        <MethodChip method={permission.method} />
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
