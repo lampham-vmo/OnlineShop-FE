@@ -32,6 +32,7 @@ interface Account {
   role: string;
   status: boolean;
   createdAt: Date;
+  role_id: number;
 }
 
 const ManageAccountPage = () => {
