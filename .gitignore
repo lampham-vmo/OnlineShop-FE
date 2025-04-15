@@ -46,4 +46,3 @@ next-env.d.ts
 
 #generateOrval
 /src/generated
-/src/lib
