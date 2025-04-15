@@ -4,7 +4,8 @@ import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Box, Toolbar 
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import InventoryIcon from '@mui/icons-material/Inventory'
-import GroupIcon from '@mui/icons-material/Group'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';import GroupIcon from '@mui/icons-material/Group'
+
 import { useRouter, usePathname } from 'next/navigation'
 
 const menuItems = [
@@ -12,6 +13,7 @@ const menuItems = [
   { label: 'Orders', icon: <ShoppingCartIcon />, path: '/admin/order' },
   { label: 'Products', icon: <InventoryIcon />, path: '/admin/product' },
   { label: 'Users', icon: <GroupIcon />, path: '/admin/user' },
+  { label: 'Roles', icon: <AdminPanelSettingsIcon/>, path: '/admin/role'}
 ]
 
 const drawerWidth = 240

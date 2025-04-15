@@ -21,6 +21,7 @@ export interface AuthState {
     clearTokens: () => void
     initAuth: () => void
     refreshAccessToken: () => Promise<boolean>
+    getTokens: () => AuthState
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -97,4 +98,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         // Kiểm tra nếu token sẽ hết hạn trong 5 phút tới
         return Date.now() >= (user.exp * 1000) - (5 * 60 * 1000);
     },
+
+    getTokens: () => {
+       return get()
+    }
 }))

@@ -36,7 +36,6 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const authApi = getAuth();
   const setTokens = useAuthStore((state: AuthState) => state.setTokens);
-
   // Initialize react-hook-form with zod resolver
   const {
     control,
@@ -57,10 +56,12 @@ export default function Login() {
       const result = response.data;
 
       // Sử dụng authStore để lưu tokens
+     
       setTokens({
         accessToken: result.accessToken,
         refreshToken: result.refreshToken
       });
+  
       
       // Redirect sau khi đăng nhập thành công
       router.push('/');
