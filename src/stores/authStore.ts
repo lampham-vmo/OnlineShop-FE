@@ -1,8 +1,8 @@
 import {create} from 'zustand'
 import {jwtDecode} from 'jwt-decode'
 import { getAuth } from '@/generated/api/endpoints/auth/auth'
-// import { getAuth } from '@/api/endpoints/auth/auth'
-// getAuth
+import { persist } from 'zustand/middleware'
+
 interface JwtPayload {
     sub: string
     exp: number
@@ -24,83 +24,68 @@ export interface AuthState {
     refreshAccessToken: () => Promise<boolean>
     getTokens: () => AuthState
 }
+export const useAuthStore = create<AuthState>()( 
+  persist(
+    (set, get) => ({
+      accessToken: null,
+      refreshToken: null,
+      user: null,
+      isRefreshing: false,
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-    accessToken: null,
-    refreshToken: null,
-    user: null,
-    isRefreshing: false,
-
-    setTokens: ({accessToken, refreshToken}) => {
-        localStorage.setItem('accessToken', accessToken)
-        localStorage.setItem('refreshToken', refreshToken)
+      setTokens: ({ accessToken, refreshToken }) => {
         const user = jwtDecode<JwtPayload>(accessToken)
-        set({accessToken, refreshToken, user})
-    },
-    clearTokens: () => {
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
-        set({accessToken: null, refreshToken: null, user: null})
-    },
-    initAuth: () => {
-        const accessToken = localStorage.getItem('accessToken')
-        const refreshToken = localStorage.getItem('refreshToken')
-        let user : JwtPayload | null = null
-        if(accessToken){
-            try{
-                user = jwtDecode<JwtPayload>(accessToken)
-            }catch(err){
-                console.log(err);
-            }
-        }
-        set({accessToken, refreshToken, user})
-    },
-    refreshAccessToken: async () => {
-        if (useAuthStore.getState().isRefreshing) {
-            return false;
-        }
-        
-        const refreshToken = localStorage.getItem('refreshToken')
-        if(!refreshToken) return false
-        
-        try {
-            set({ isRefreshing: true });
-            
-            const auth = getAuth();
-            const response = await auth.authControllerRefreshAcessToken();
-            console.log('rat: ', response);
-           
-            const data = response.data
-            const newAccessToken = data.accessToken
-            const decoded = jwtDecode<JwtPayload>(newAccessToken)
-            localStorage.setItem('accessToken', newAccessToken)
-            set({
-                accessToken: newAccessToken,
-                user: decoded,
-                isRefreshing: false
-            })
-            return true
-        } catch(err) {
-            console.log('lỗi refresh token!', err);
-            window.alert(err)
-            set({ isRefreshing: false });
-            useAuthStore.getState().clearTokens()
-            return false
-        }
-    },
-    isTokenExpired: () => {
-        const { user } = get();
-        if (!user?.exp) return true;
-        return Date.now() >= user.exp * 1000;
-    },
-    isTokenExpiringSoon: () => {
-        const { user } = get();
-        if (!user?.exp) return true;
-        // Kiểm tra nếu token sẽ hết hạn trong 5 phút tới
-        return Date.now() >= (user.exp * 1000) - (5 * 60 * 1000);
-    },
+        set({ accessToken, refreshToken, user })
+      },
+      clearTokens: () => {
+        set({ accessToken: null, refreshToken: null, user: null })
+      },
+      initAuth: () => {
+        // không cần thiết nữa nếu dùng persist
+      },
+      refreshAccessToken: async () => {
+        if (get().isRefreshing) return false
+        const refreshToken = get().refreshToken
+        if (!refreshToken) return false
 
-    getTokens: () => {
-       return get()
+        try {
+          set({ isRefreshing: true })
+          const auth = getAuth()
+          const response = await auth.authControllerRefreshAcessToken()
+          const data = response.data
+          const newAccessToken = data.accessToken
+          const decoded = jwtDecode<JwtPayload>(newAccessToken)
+          set({
+            accessToken: newAccessToken,
+            user: decoded,
+            isRefreshing: false,
+          })
+          return true
+        } catch (err) {
+          console.error('Refresh token error:', err)
+          set({ isRefreshing: false })
+          get().clearTokens()
+          return false
+        }
+      },
+      isTokenExpired: () => {
+        const { user } = get()
+        if (!user?.exp) return true
+        return Date.now() >= user.exp * 1000
+      },
+      isTokenExpiringSoon: () => {
+        const { user } = get()
+        if (!user?.exp) return true
+        return Date.now() >= user.exp * 1000 - 5 * 60 * 1000
+      },
+      getTokens: () => get(),
+    }),
+    {
+      name: 'auth-storage', // key trong localStorage
+      partialize: (state) => ({
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        user: state.user,
+      }),
     }
-}))
+  )
+)

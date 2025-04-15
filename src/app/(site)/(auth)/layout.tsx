@@ -35,10 +35,15 @@ export default function RootLayout({
 
   }, [])
   return (
-    <div>
+    <html lang="en" suppressHydrationWarning>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+          
+            {children}
+           
+          </body>
+        </html>
     
-      {children}
-     
-    </div>
   );
 }
