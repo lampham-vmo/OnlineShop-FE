@@ -1,14 +1,15 @@
 // lib/api.ts
+import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
-// import { useAuthStore } from './authStore';
+
 
 // Biến để theo dõi số lần retry
 let refreshRetryCount = 0;
 const MAX_REFRESH_RETRIES = 1;
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
 });
  
 // Request interceptor
@@ -22,7 +23,7 @@ axiosInstance.interceptors.request.use(async (config) => {
     if (refreshToken) {
       config.headers['x-refresh-token'] = refreshToken;
     }
-  
+        
 
   return config;
 });

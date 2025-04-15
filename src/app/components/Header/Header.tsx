@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function Header() {
+  
   useEffect(()=> {
     const {initAuth} = useAuthStore.getState()
     initAuth()

@@ -7,7 +7,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { useEffect } from "react";
 import Header from "@/app/components/Header/Header";
 import Footer from "@/app/components/Footer/Footer";
-import { useAuthStore } from "../../../../lib/authStore";
+import { useAuthStore } from "@/stores/authStore";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,9 +36,9 @@ export default function RootLayout({
   }, [])
   return (
     <div>
-      <Header />
+    
       {children}
-      <Footer />
+     
     </div>
   );
 }

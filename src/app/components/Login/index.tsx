@@ -17,12 +17,16 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
-import { getAuth } from '@/api/endpoints/auth/auth';
-import { authControllerLoginBody } from '@/api/endpoints/auth/auth.zod';
-import type { LoginUserDTO } from '@/api/models/loginUserDTO';
+import { getAuth } from '@/generated/api/endpoints/auth/auth';
+import { authControllerLoginBody } from '@/generated/api/schemas/auth/auth.zod';
+// import { getAuth } from '@/api/endpoints/auth/auth';
+// import { authControllerLoginBody } from '@/api/endpoints/auth/auth.zod';
+// import type { LoginUserDTO } from '@/api/models/loginUserDTO';
 
-import type { AuthState } from '../../../../lib/authStore';
-import { useAuthStore } from '../../../../lib/authStore';
+// import type { AuthState } from '../../../../lib/authStore';
+// import { useAuthStore } from '../../../../lib/authStore';
+import type { LoginUserDTO } from '@/generated/api/models';
+import { useAuthStore, type AuthState } from '@/stores/authStore';
 
 // Use the Orval-generated zod schema
 const loginSchema = authControllerLoginBody;

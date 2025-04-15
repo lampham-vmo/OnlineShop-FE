@@ -31,13 +31,14 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import { useRouter } from 'next/navigation';
 import { Description } from '@mui/icons-material';
-import { getRole } from '@/api/endpoints/role/role';
 
+import { PermissionDTO } from '@/generated/api/models';
+import { Permission } from '@/generated/api/models';
+import {Role} from '@/generated/api/models/role';
 
-import { Role, RoleListResponseDto } from '@/api/models';
-import { getPermission } from '@/api/endpoints/permission/permission';
-import {Permission } from '@/api/models/permission';
-import { useAuthStore } from '../../../../../lib/authStore';
+import { getRole } from '@/generated/api/endpoints/role/role';
+import { useAuthStore } from '@/stores/authStore';
+import { getPermission } from '@/generated/api/endpoints/permission/permission';
 const MethodChip = ({ method }: { method: string }) => {
   const getMethodColor = (method: string) => {
     switch (method.toLowerCase()) {
