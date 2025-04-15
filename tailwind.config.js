@@ -316,11 +316,5 @@ module.exports = {
         },
     },
     plugins: [],
-    <<
-    << << < HEAD
-}
 
-===
-=== =
-}; >>>
->>> > login - signup
+}
