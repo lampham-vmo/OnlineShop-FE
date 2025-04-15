@@ -1,3 +1,1 @@
-export default function ProductSearch() {
-
-}
+export default function ProductSearch() {}
