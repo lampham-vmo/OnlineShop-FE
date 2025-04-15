@@ -9,7 +9,7 @@ let refreshRetryCount = 0;
 const MAX_REFRESH_RETRIES = 1;
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
 });
  
 // Request interceptor
