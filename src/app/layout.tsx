@@ -1,14 +1,18 @@
-// app/layout.tsx
-import '../app/globals.css'
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
+import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
+import ScrollToTop from './components/Common/ScrollToTop';
 
-const inter = Inter({ subsets: ['latin'] })
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+});
 
-export const metadata: Metadata = {
-  title: 'Main root layout',
-  description: 'Root layout for everything',
-}
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
 
 export default function RootLayout({
   children,
@@ -16,9 +20,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <Header />
         {children}
+        <ScrollToTop />
+        <Footer />
       </body>
     </html>
   )
