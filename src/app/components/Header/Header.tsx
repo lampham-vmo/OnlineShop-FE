@@ -1,9 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function Header() {
+  
+  useEffect(()=> {
+    const {initAuth} = useAuthStore.getState()
+    initAuth()
+  }, [])
   return (
     <header className="sticky left-0 top-0 w-full z-9999 bg-white shadow">
       <div className="max-w-[1170px] mx-auto px-4 xl:px-0">
