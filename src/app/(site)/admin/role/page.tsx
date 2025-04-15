@@ -1,5 +1,5 @@
 `use client`
-import {ManageRole} from '@/app/components/Role'
+import {ManageRole} from '@/app/components/Admin/AdminRole'
 import React from 'react'
 
 export default function ManageRolePage() {
