@@ -2,10 +2,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "./components/Header/Header";
-import Footer from "./components/Footer/Footer";
+
+
 import { useEffect } from "react";
-import { useAuthStore } from "../../lib/authStore";
+import Header from "@/app/components/Header/Header";
+import Footer from "@/app/components/Footer/Footer";
+import { useAuthStore } from "../../../../lib/authStore";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
