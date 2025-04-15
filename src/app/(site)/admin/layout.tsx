@@ -4,7 +4,10 @@ import { Box, Toolbar } from '@mui/material'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Box sx={{ display: 'flex' }}>
+    <html>
+      <body>
+        
+      <Box sx={{ display: 'flex' }}>
       <AdminSidebar />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <AdminHeader />
@@ -12,5 +15,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <Box p={3}>{children}</Box>
       </Box>
     </Box>
+      </body>
+    </html>
+   
   )
 }
