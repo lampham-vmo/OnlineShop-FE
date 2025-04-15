@@ -476,4 +476,3 @@ export const ManageRole = () => {
   );
 };
 
-export default ManageAccountPage;
