@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -30,5 +30,5 @@ export default function RootLayout({
         <Footer />
       </body>
     </html>
-  )
+  );
 }
