@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono } from 'next/font/google';
-import './globals.css';
-import Header from './components/Header/Header';
-import Footer from './components/Footer/Footer';
-import ScrollToTop from './components/Common/ScrollToTop';
+import '../../globals.css';
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
+import ScrollToTop from '../../components/Common/ScrollToTop';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -30,5 +30,5 @@ export default function RootLayout({
         <Footer />
       </body>
     </html>
-  );
+  )
 }
