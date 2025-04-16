@@ -1,26 +1,35 @@
-'use client'
+'use client';
 
-import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Box, Toolbar } from '@mui/material'
-import DashboardIcon from '@mui/icons-material/Dashboard'
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
-import InventoryIcon from '@mui/icons-material/Inventory'
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';import GroupIcon from '@mui/icons-material/Group'
+import {
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Box,
+  Toolbar,
+} from '@mui/material';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import GroupIcon from '@mui/icons-material/Group';
 
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation';
 
 const menuItems = [
   { label: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard' },
   { label: 'Orders', icon: <ShoppingCartIcon />, path: '/admin/order' },
   { label: 'Products', icon: <InventoryIcon />, path: '/admin/product' },
   { label: 'Users', icon: <GroupIcon />, path: '/admin/user' },
-  { label: 'Roles', icon: <AdminPanelSettingsIcon/>, path: '/admin/role'}
-]
+  { label: 'Roles', icon: <AdminPanelSettingsIcon />, path: '/admin/role' },
+];
 
-const drawerWidth = 240
+const drawerWidth = 240;
 
 export default function AdminSidebar() {
-  const router = useRouter()
-  const pathname = usePathname()
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <Drawer
@@ -50,5 +59,5 @@ export default function AdminSidebar() {
         </List>
       </Box>
     </Drawer>
-  )
+  );
 }

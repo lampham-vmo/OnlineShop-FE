@@ -1,22 +1,21 @@
-'use client'
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+'use client';
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
 // import "../globals.css";
 
-
-import { useEffect } from "react";
-import Header from "@/app/components/Header/Header";
-import Footer from "@/app/components/Footer/Footer";
-import { useAuthStore } from "@/stores/authStore";
+import { useEffect } from 'react';
+import Header from '@/app/components/Header/Header';
+import Footer from '@/app/components/Footer/Footer';
+import { useAuthStore } from '@/stores/authStore';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 // export const metadata: Metadata = {
@@ -29,21 +28,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   useEffect(() => {
     useAuthStore.getState().initAuth();
-
-  }, [])
+  }, []);
   return (
     <html lang="en" suppressHydrationWarning>
-          <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-          >
-          
-            {children}
-           
-          </body>
-        </html>
-    
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {children}
+      </body>
+    </html>
   );
 }

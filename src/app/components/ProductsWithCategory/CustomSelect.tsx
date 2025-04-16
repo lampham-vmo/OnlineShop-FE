@@ -77,7 +77,9 @@ const CustomSelect = ({ options, setParams }: ICustomSelectProps) => {
             key={index}
             onClick={() => handleOptionClick(option)}
             className={`select-item ${
-              selectedOption === option ? '!bg-gray-1 !text-dark' : ''
+              selectedOption.value === option.value
+                ? '!bg-gray-1 !text-dark'
+                : ''
             }`}
           >
             {option.label}

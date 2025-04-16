@@ -13,7 +13,10 @@ import {
 
 import { useRouter } from 'next/navigation';
 import { getProduct } from '@/generated/api/endpoints/product/product';
-import { ProductControllerSearchProductByNameParams, ProductResponse } from '@/generated/api/models';
+import {
+  ProductControllerSearchProductByNameParams,
+  ProductResponse,
+} from '@/generated/api/models';
 
 export default function Header() {
   const { productControllerSearchProductByName } = getProduct();
@@ -42,7 +45,7 @@ export default function Header() {
     const delayDebounce = setTimeout(() => {
       if (text.text) {
         getAllProductByText();
-        console.log(options)
+        console.log(options);
       }
     }, 300);
 
@@ -67,13 +70,14 @@ export default function Header() {
                   disablePortal
                   disableClearable
                   getOptionLabel={(option) => option?.name || ''}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
                   onChange={(event, value) => {
-                    if (value&&value.id) {
-                      console.log(value.id)
+                    if (value && value.id) {
+                      console.log(value.id);
                       router.push(`/product-details/${value.id}`);
-                      setOpen(false)
-                      
+                      setOpen(false);
                     }
                   }}
                   options={options}
@@ -82,11 +86,11 @@ export default function Header() {
                     setText({ text: newInputValue });
                     setOpen(!!newInputValue);
                     if (!newInputValue) setOption([]);
-                  }}                  
+                  }}
                   sx={{ width: 400 }}
                   renderOption={(props, option) => {
                     const { key, ...rest } = props;
-                    console.log(option)
+                    console.log(option);
                     return (
                       <Box
                         {...rest}
@@ -101,22 +105,25 @@ export default function Header() {
                         }}
                         // className="cursor-pointer hover:bg-blue-300"
                       >
-                      <div key={option.id} className='flex items-center gap-1 px-2 py-1 '>
-                      <Avatar
-                          src={option.image}
-                          alt={option.name}
-                          sx={{ width: 40, height: 40 }}
-                          variant="rounded"
-                        />
-                        <Box>
-                          <Typography fontWeight="bold">
-                            {option.name}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {option.priceAfterDis}$
-                          </Typography>
-                        </Box>
-                      </div>
+                        <div
+                          key={option.id}
+                          className="flex items-center gap-1 px-2 py-1 "
+                        >
+                          <Avatar
+                            src={option.image}
+                            alt={option.name}
+                            sx={{ width: 40, height: 40 }}
+                            variant="rounded"
+                          />
+                          <Box>
+                            <Typography fontWeight="bold">
+                              {option.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {option.priceAfterDis}$
+                            </Typography>
+                          </Box>
+                        </div>
                       </Box>
                     );
                   }}
