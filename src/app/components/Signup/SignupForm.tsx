@@ -134,9 +134,7 @@ export default function SignUpForm() {
               </Button>
             </Grid>
             {/* Add the "Already have an account? Sign in" text */}
-            <Grid
-              size={12}
-            >
+            <Grid size={12}>
               <Typography variant="body2" align="center">
                 Already have an account?{' '}
                 <a

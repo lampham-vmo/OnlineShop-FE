@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import AdminSidebar from '../../components/Admin/AdminSidebar';
 import AdminHeader from '../../components/Admin/AdminHeader';
 import { Box, Toolbar } from '@mui/material';
@@ -9,13 +9,9 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  
   useEffect(() => {
-      // Initialize any necessary state or perform side effects here  
-  },[]);
-
-
-
+    // Initialize any necessary state or perform side effects here
+  }, []);
 
   return (
     <html>

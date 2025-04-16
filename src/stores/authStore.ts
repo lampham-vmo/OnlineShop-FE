@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       permission: null,
       isRefreshing: false,
-      
+
       setPermission: (permission) => {
         set({ permission });
       },
@@ -82,8 +82,8 @@ export const useAuthStore = create<AuthState>()(
         // if (!accessToken) return false;
         // const decoded = jwtDecode<JwtPayload>(accessToken);
         // if (!decoded.exp) return false;
-        // const currentTime = Date.now() / 1000; // Thời gian hiện tại tính bằng giây   
-        return true
+        // const currentTime = Date.now() / 1000; // Thời gian hiện tại tính bằng giây
+        return true;
       },
       isTokenExpired: () => {
         const { user } = get();
@@ -98,12 +98,11 @@ export const useAuthStore = create<AuthState>()(
       isAcceptPermission: (permissionName: string[]) => {
         const { permission } = get();
         if (!Array.isArray(permission) || permission.length === 0) return false;
-      
-        return permissionName.every(name =>
-          permission.some(p => p.name === name)
+
+        return permissionName.every((name) =>
+          permission.some((p) => p.name === name),
         );
-      }
-      ,
+      },
       getTokens: () => get(),
     }),
     {
@@ -112,7 +111,7 @@ export const useAuthStore = create<AuthState>()(
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
         user: state.user,
-        permission: state.permission
+        permission: state.permission,
       }),
     },
   ),
