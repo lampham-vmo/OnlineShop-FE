@@ -3,11 +3,12 @@
 import { Box, Button, Container, Grid, TextField, Typography, Alert } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {authControllerCreateBody} from '@/api/endpoints/auth/auth.zod'
-import {getAuth} from '@/api/endpoints/auth/auth'
+
 import { z } from 'zod'
 import { useState } from 'react'
 import { useUserStore } from '@/stores/useUserStore'
+import { authControllerCreateBody } from '@/generated/api/schemas/auth/auth.zod'
+import { getAuth } from '@/generated/api/endpoints/auth/auth'
 
 type FormData = z.infer<typeof authControllerCreateBody>
 

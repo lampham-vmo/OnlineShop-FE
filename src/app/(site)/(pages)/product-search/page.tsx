@@ -1,5 +1,10 @@
 import React from 'react';
+import ProductList from '@/app/components/ProductList';
 
 export default function ProductSearchPage() {
-  return <div></div>;
+  return (
+    <div>
+      <ProductList />
+    </div>
+  );
 }
