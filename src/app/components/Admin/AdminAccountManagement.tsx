@@ -20,22 +20,22 @@ import {
   DialogActions,
   Button,
   Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useEffect, useState } from 'react'
 import { getUsers } from '@/generated/api/endpoints/users/users'
+import { GetUserAccountDTO, UpdateUserRoleDTO } from '@/generated/api/models'
 
-const { userControllerFindAll, userControllerDelete, userControllerUpdateUserRole } = getUsers()
-
-type GetUserAccountDTO = {
-  id: number
-  fullname: string
-  email: string
-  roleName: string
-  status: boolean
-  createdAt: string
-}
+const {
+  userControllerFindAll,
+  userControllerDelete,
+  userControllerUpdateUserRole,
+} = getUsers()
 
 export default function AccountPage() {
   const [accounts, setAccounts] = useState<GetUserAccountDTO[]>([])
@@ -46,12 +46,11 @@ export default function AccountPage() {
   const [selectedRoleId, setSelectedRoleId] = useState<number>(2)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
 
-
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
         const res = await userControllerFindAll()
-        setAccounts(res.data.accounts) // NOTE: change this if your data shape differs
+        setAccounts(res.data.accounts)
       } catch (err) {
         console.error('Failed to fetch accounts:', err)
       } finally {
@@ -61,14 +60,6 @@ export default function AccountPage() {
 
     fetchAccounts()
   }, [])
-
-  const handleEdit = (id: number) => {
-    const account = accounts.find((a) => a.id === id)
-    if (!account) return
-    setEditAccountId(id)
-    setSelectedRoleId(account.roleName === 'Admin' ? 1 : 2) // adjust mapping logic
-    setEditDialogOpen(true)
-  }
 
   const handleConfirmDelete = (id: number) => {
     setSelectedAccountId(id)
@@ -85,6 +76,30 @@ export default function AccountPage() {
     } finally {
       setOpenDialog(false)
       setSelectedAccountId(null)
+    }
+  }
+
+  const handleRoleUpdate = async () => {
+    if (!editAccountId) return
+    try {
+      await userControllerUpdateUserRole(String(editAccountId), {
+        role_id: selectedRoleId,
+      })
+      setAccounts((prev) =>
+        prev.map((acc) =>
+          acc.id === editAccountId
+            ? {
+                ...acc,
+                roleName: selectedRoleId === 1 ? 'admin' : 'user',
+              }
+            : acc
+        )
+      )
+    } catch (err) {
+      console.error('Failed to update role', err)
+    } finally {
+      setEditDialogOpen(false)
+      setEditAccountId(null)
     }
   }
 
@@ -129,13 +144,23 @@ export default function AccountPage() {
                   <TableCell>{account.status ? 'Active' : 'Inactive'}</TableCell>
                   <TableCell>{new Date(account.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell align="center">
-                    <Tooltip title="Edit">
-                      <IconButton onClick={() => handleEdit(account.id)} color="primary">
+                    <Tooltip title="Edit Role">
+                      <IconButton
+                        onClick={() => {
+                          setEditAccountId(account.id)
+                          setSelectedRoleId(account.roleName === 'Admin' ? 1 : 2)
+                          setEditDialogOpen(true)
+                        }}
+                        color="primary"
+                      >
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Delete">
-                      <IconButton onClick={() => handleConfirmDelete(account.id)} color="error">
+                      <IconButton
+                        onClick={() => handleConfirmDelete(account.id)}
+                        color="error"
+                      >
                         <DeleteIcon />
                       </IconButton>
                     </Tooltip>
@@ -147,6 +172,7 @@ export default function AccountPage() {
         </Table>
       </TableContainer>
 
+      {/* Delete Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
@@ -168,54 +194,32 @@ export default function AccountPage() {
         </DialogActions>
       </Dialog>
 
+      {/* Edit Role Dialog */}
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
         <DialogTitle>Edit User Role</DialogTitle>
         <DialogContent>
           <DialogContentText>Select a new role for this user.</DialogContentText>
           <Box mt={2}>
-            <select
-              value={selectedRoleId}
-              onChange={(e) => setSelectedRoleId(Number(e.target.value))}
-              style={{ width: '100%', padding: '8px', borderRadius: 4 }}
-            >
-              <option value={1}>Admin</option>
-              <option value={2}>User</option>
-            </select>
+            <FormControl fullWidth>
+              <InputLabel id="role-select-label">Role</InputLabel>
+              <Select
+                labelId="role-select-label"
+                value={selectedRoleId}
+                onChange={(e) => setSelectedRoleId(Number(e.target.value))}
+              >
+                <MenuItem value={1}>Admin</MenuItem>
+                <MenuItem value={2}>User</MenuItem>
+              </Select>
+            </FormControl>
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={async () => {
-              if (!editAccountId) return
-              try {
-                await userControllerUpdateUserRole(String(editAccountId), {
-                  role_id: selectedRoleId,
-                })
-                setAccounts((prev) =>
-                  prev.map((acc) =>
-                    acc.id === editAccountId
-                      ? {
-                        ...acc,
-                        roleName: selectedRoleId === 1 ? 'Admin' : 'User',
-                      }
-                      : acc
-                  )
-                )
-              } catch (err) {
-                console.error('Failed to update role', err)
-              } finally {
-                setEditDialogOpen(false)
-                setEditAccountId(null)
-              }
-            }}
-            variant="contained"
-          >
+          <Button onClick={handleRoleUpdate} variant="contained">
             Save
           </Button>
         </DialogActions>
       </Dialog>
-
     </Box>
   )
 }
