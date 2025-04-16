@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { Box, Typography, Container, Paper } from '@mui/material'
+import { Box, Typography, Container, Paper } from '@mui/material';
 
 export default function AdminDashboardMain() {
   return (
@@ -10,9 +10,10 @@ export default function AdminDashboardMain() {
           Welcome, Admin 👋
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          This is your dashboard. From here, you can manage users, view reports, and control system settings.
+          This is your dashboard. From here, you can manage users, view reports,
+          and control system settings.
         </Typography>
       </Paper>
     </Container>
-  )
+  );
 }

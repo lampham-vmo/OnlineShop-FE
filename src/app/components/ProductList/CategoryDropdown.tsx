@@ -1,6 +1,5 @@
 'use client';
 
-
 import { CategoryResponseDto } from '@/generated/api/models';
 import { useState } from 'react';
 
