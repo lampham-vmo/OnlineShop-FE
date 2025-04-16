@@ -24,12 +24,13 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  TablePagination,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useEffect, useState } from 'react'
 import { getUsers } from '@/generated/api/endpoints/users/users'
-import { GetUserAccountDTO, UpdateUserRoleDTO } from '@/generated/api/models'
+import { GetUserAccountDTO } from '@/generated/api/models'
 
 const {
   userControllerFindAll,
@@ -45,6 +46,9 @@ export default function AccountPage() {
   const [editAccountId, setEditAccountId] = useState<number | null>(null)
   const [selectedRoleId, setSelectedRoleId] = useState<number>(2)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(5)
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -103,6 +107,15 @@ export default function AccountPage() {
     }
   }
 
+  const handleChangePage = (_: unknown, newPage: number) => {
+    setPage(newPage)
+  }
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10))
+    setPage(0)
+  }
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={4}>
@@ -136,40 +149,52 @@ export default function AccountPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              accounts.map((account) => (
-                <TableRow key={account.id}>
-                  <TableCell>{account.fullname}</TableCell>
-                  <TableCell>{account.email}</TableCell>
-                  <TableCell>{account.roleName}</TableCell>
-                  <TableCell>{account.status ? 'Active' : 'Inactive'}</TableCell>
-                  <TableCell>{new Date(account.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="Edit Role">
-                      <IconButton
-                        onClick={() => {
-                          setEditAccountId(account.id)
-                          setSelectedRoleId(account.roleName === 'Admin' ? 1 : 2)
-                          setEditDialogOpen(true)
-                        }}
-                        color="primary"
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                      <IconButton
-                        onClick={() => handleConfirmDelete(account.id)}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))
+              accounts
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((account) => (
+                  <TableRow key={account.id}>
+                    <TableCell>{account.fullname}</TableCell>
+                    <TableCell>{account.email}</TableCell>
+                    <TableCell>{account.roleName}</TableCell>
+                    <TableCell>{account.status ? 'Active' : 'Inactive'}</TableCell>
+                    <TableCell>{new Date(account.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell align="center">
+                      <Tooltip title="Edit Role">
+                        <IconButton
+                          onClick={() => {
+                            setEditAccountId(account.id)
+                            setSelectedRoleId(account.roleName === 'Admin' ? 1 : 2)
+                            setEditDialogOpen(true)
+                          }}
+                          color="primary"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <IconButton
+                          onClick={() => handleConfirmDelete(account.id)}
+                          color="error"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))
             )}
           </TableBody>
         </Table>
+
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={accounts.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </TableContainer>
 
       {/* Delete Dialog */}
