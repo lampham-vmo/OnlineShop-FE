@@ -1,6 +1,7 @@
 import { ProductResponse } from '@/generated/api/models';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface IProductItemProps {
   item: ProductResponse;
@@ -8,6 +9,12 @@ interface IProductItemProps {
 }
 
 const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
+  const router = useRouter();
+
+  const handleViewDetail = (id: number) => {
+    router.push(`/product-details/${id}`);
+  };
+
   return (
     <div className="group">
       <div
@@ -17,10 +24,9 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
 
         <div className="absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0">
           <button
-            // onClick={() => {
-            //   openModal();
-            //   handleQuickViewUpdate();
-            // }}
+            onClick={() => {
+              handleViewDetail(item.id);
+            }}
             id="newOne"
             aria-label="button for quick view"
             className="flex items-center justify-center w-18 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white hover:text-white hover:bg-blue"
@@ -105,7 +111,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
         className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5"
         // onClick={() => handleProductDetails()}
       >
-        <Link href={`/product/${item.id}`}> {item.name} </Link>
+        <Link href={`/product-details/${item.id}`}> {item.name} </Link>
       </h3>
 
       <span className="flex items-center gap-2 font-medium text-lg">

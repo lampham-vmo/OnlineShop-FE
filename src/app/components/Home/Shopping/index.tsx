@@ -1,10 +1,10 @@
 'use client';
 
+import { getProduct } from '@/generated/api/endpoints/product/product';
+import { ProductResponse } from '@/generated/api/models';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import ProductItem from '../../Common/ProductItem';
-import { ProductResponse } from '@/api/models';
-import { getProduct } from '@/api/endpoints/product/product';
 
 const Shopping = () => {
   const [products, setProducts] = useState<ProductResponse[]>([]);

@@ -1,17 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import CategoryDropdown from './CategoryDropdown';
-import { getCategory } from '@/api/endpoints/category/category';
-import { getProduct } from '@/api/endpoints/product/product';
-import {
-  ApiResponse,
-  Category,
-  CategoryResponseDto,
-  PaginationDTO,
-  ProductControllerGetAllProductParams,
-  ProductPagingResponse,
-  ProductResponse,
-} from '@/api/models';
+
 import ProductItem from '../Common/ProductItem';
 import {
   FormControl,
@@ -24,6 +14,9 @@ import {
 import { number } from 'zod';
 import CustomSelect from '../ProductsWithCategory/CustomSelect';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { getCategory } from '@/generated/api/endpoints/category/category';
+import { getProduct } from '@/generated/api/endpoints/product/product';
+import { CategoryResponseDto, ProductControllerGetAllProductParams, ProductResponse } from '@/generated/api/models';
 
 const ShopWithSidebar = () => {
   const router = useRouter();

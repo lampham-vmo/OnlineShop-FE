@@ -1,15 +1,14 @@
 export default {
   api: {
-    input: 'http://localhost:3001/api-json',
+    input: 'http://localhost:4000/api-json',
     output: {
       mode: 'tags-split',
-      target: './src/api/endpoints',
-      schemas: './src/api/models',
+      target: './src/generated/api/endpoints',
+      schemas: './src/generated/api/models',
       client: 'axios',
-      baseUrl: 'http://localhost:3001',
       override: {
         mutator: {
-          path: './lib/api.ts',
+          path: './src/lib/api.ts',
           name: 'api',
         },
       },
@@ -17,10 +16,10 @@ export default {
   },
 
   apiZod: {
-    input: 'http://localhost:3001/api-json',
+    input: 'http://localhost:4000/api-json',
     output: {
       mode: 'tags-split',
-      target: './src/api/endpoints',
+      target: './src/generated/api/schemas',
       client: 'zod',
       fileExtension: '.zod.ts',
     },

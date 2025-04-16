@@ -60,3 +60,18 @@
 .custom-select-common .select-selected.select-arrow-active:after {
   @apply -mt-0.5;
 }
+
+.common-carousel .swiper-button-next:after,
+.common-carousel .swiper-button-prev:after {
+  @apply hidden;
+}
+
+.common-carousel .swiper-button-next,
+.common-carousel .swiper-button-prev {
+  @apply !static h-9 w-9 rounded-lg bg-white text-dark border border-gray-3 m-0 ease-out duration-200 hover:bg-blue hover:text-white hover:border-blue;
+}
+
+.common-carousel .swiper-button-next svg,
+.common-carousel .swiper-button-prev svg {
+  @apply w-auto h-auto;
+}

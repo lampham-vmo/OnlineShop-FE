@@ -1,6 +1,7 @@
 'use client';
 
-import { CategoryResponseDto } from '@/api/models';
+
+import { CategoryResponseDto } from '@/generated/api/models';
 import { useState } from 'react';
 
 interface PropCateCard {

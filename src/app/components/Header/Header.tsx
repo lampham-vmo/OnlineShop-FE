@@ -10,12 +10,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {
-  ProductControllerSearchProductByNameParams,
-  ProductResponse,
-} from '@/api/models';
-import { getProduct } from '@/api/endpoints/product/product';
+
 import { useRouter } from 'next/navigation';
+import { getProduct } from '@/generated/api/endpoints/product/product';
+import { ProductControllerSearchProductByNameParams, ProductResponse } from '@/generated/api/models';
 
 export default function Header() {
   const { productControllerSearchProductByName } = getProduct();
@@ -24,7 +22,7 @@ export default function Header() {
     text: '',
   });
   const [open, setOpen] = useState(false);
-
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const router = useRouter();
 
   const getAllProductByText = async () => {
@@ -44,6 +42,7 @@ export default function Header() {
     const delayDebounce = setTimeout(() => {
       if (text.text) {
         getAllProductByText();
+        console.log(options)
       }
     }, 300);
 
@@ -66,35 +65,33 @@ export default function Header() {
                   onOpen={() => setOpen(true)}
                   onClose={() => setOpen(false)}
                   disablePortal
+                  disableClearable
+                  getOptionLabel={(option) => option?.name || ''}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
                   onChange={(event, value) => {
-                    if (value) {
-                      router.push(`/product/${value.id}`);
+                    if (value&&value.id) {
+                      console.log(value.id)
+                      router.push(`/product-details/${value.id}`);
+                      setOpen(false)
+                      
                     }
                   }}
                   options={options}
-                  getOptionLabel={(option) => option.name}
                   popupIcon={null}
                   onInputChange={(event, newInputValue) => {
                     setText({ text: newInputValue });
-                    if (newInputValue === '') {
-                      setOption([]);
-                      setOpen(false);
-                    } else {
-                      setOpen(true);
-                      setText({ text: newInputValue });
-                    }
-                  }}
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value.id
-                  }
+                    setOpen(!!newInputValue);
+                    if (!newInputValue) setOption([]);
+                  }}                  
                   sx={{ width: 400 }}
                   renderOption={(props, option) => {
-                    console.log(props);
+                    const { key, ...rest } = props;
+                    console.log(option)
                     return (
                       <Box
-                        onClick={props.onClick}
-                        key={option.id}
+                        {...rest}
                         component="li"
+                        key={key}
                         sx={{
                           display: 'flex',
                           alignItems: 'center',
@@ -102,9 +99,10 @@ export default function Header() {
                           px: 2,
                           py: 1,
                         }}
-                        className="cursor-pointer hover:bg-blue-300"
+                        // className="cursor-pointer hover:bg-blue-300"
                       >
-                        <Avatar
+                      <div key={option.id} className='flex items-center gap-1 px-2 py-1 '>
+                      <Avatar
                           src={option.image}
                           alt={option.name}
                           sx={{ width: 40, height: 40 }}
@@ -118,6 +116,7 @@ export default function Header() {
                             {option.priceAfterDis}$
                           </Typography>
                         </Box>
+                      </div>
                       </Box>
                     );
                   }}

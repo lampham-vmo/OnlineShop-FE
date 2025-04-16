@@ -1,4 +1,4 @@
-import { ProductControllerGetAllProductParams } from '@/api/models';
+import { ProductControllerGetAllProductParams } from '@/generated/api/models';
 import React, {
   useState,
   useEffect,
