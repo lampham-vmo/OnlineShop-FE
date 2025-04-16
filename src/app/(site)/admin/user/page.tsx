@@ -1,11 +1,12 @@
 `use client`;
-// import ManageAccount from '@/app/components/ManageAccount'
-// import React from 'react'
 
-// export default function ManageAccountPage() {
-//   return (
-//     <div>
-//       <ManageAccount />
-//     </div>
-//   )
-// }
+import React from 'react'
+import AccountManagement from '@/app/components/Admin/AdminAccountManagement';
+
+export default function ManageAccountPage() {
+  return (
+    <div>
+      <AccountManagement />
+    </div>
+  )
+}
