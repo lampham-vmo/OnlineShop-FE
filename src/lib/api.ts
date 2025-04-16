@@ -13,8 +13,9 @@ const axiosInstance = axios.create({
 
 // Request interceptor
 axiosInstance.interceptors.request.use(async (config) => {
+  
   const store = useAuthStore.getState();
-  const { accessToken, refreshToken } = store;
+  const { accessToken, refreshToken} = store;
 
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -33,7 +34,7 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // Kiểm tra nếu đây là request refresh token, không retry
-    const isRefreshRequest = originalRequest.url?.includes('/auth/refreshAT');
+    const isRefreshRequest = await originalRequest.url?.includes('/auth/refreshAT');
 
     if (
       error.response?.status === 401 &&

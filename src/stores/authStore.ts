@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { jwtDecode } from 'jwt-decode';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { persist } from 'zustand/middleware';
+import { Permission } from '@/generated/api/models';
 
 interface JwtPayload {
   sub: string;
@@ -14,10 +15,14 @@ export interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   user: JwtPayload | null;
+  permission: Permission[] | null;
   isRefreshing: boolean;
   isTokenExpired: () => boolean;
   isTokenExpiringSoon: () => boolean;
+  isValidToken: () => boolean;
+  isAcceptPermission: (permissionName: string[]) => boolean;
 
+  setPermission: (permission: Permission[]) => void;
   setTokens: (tokens: { accessToken: string; refreshToken: string }) => void;
   clearTokens: () => void;
   initAuth: () => void;
@@ -30,7 +35,12 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       user: null,
+      permission: null,
       isRefreshing: false,
+      
+      setPermission: (permission) => {
+        set({ permission });
+      },
 
       setTokens: ({ accessToken, refreshToken }) => {
         const user = jwtDecode<JwtPayload>(accessToken);
@@ -67,6 +77,14 @@ export const useAuthStore = create<AuthState>()(
           return false;
         }
       },
+      isValidToken: () => {
+        // const accessToken = get().accessToken;
+        // if (!accessToken) return false;
+        // const decoded = jwtDecode<JwtPayload>(accessToken);
+        // if (!decoded.exp) return false;
+        // const currentTime = Date.now() / 1000; // Thời gian hiện tại tính bằng giây   
+        return true
+      },
       isTokenExpired: () => {
         const { user } = get();
         if (!user?.exp) return true;
@@ -77,6 +95,15 @@ export const useAuthStore = create<AuthState>()(
         if (!user?.exp) return true;
         return Date.now() >= user.exp * 1000 - 5 * 60 * 1000;
       },
+      isAcceptPermission: (permissionName: string[]) => {
+        const { permission } = get();
+        if (!Array.isArray(permission) || permission.length === 0) return false;
+      
+        return permissionName.every(name =>
+          permission.some(p => p.name === name)
+        );
+      }
+      ,
       getTokens: () => get(),
     }),
     {
@@ -85,6 +112,7 @@ export const useAuthStore = create<AuthState>()(
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
         user: state.user,
+        permission: state.permission
       }),
     },
   ),

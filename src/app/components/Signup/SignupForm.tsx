@@ -133,6 +133,20 @@ export default function SignUpForm() {
                 Sign Up
               </Button>
             </Grid>
+            {/* Add the "Already have an account? Sign in" text */}
+            <Grid
+              size={12}
+            >
+              <Typography variant="body2" align="center">
+                Already have an account?{' '}
+                <a
+                  href="/signin"
+                  style={{ textDecoration: 'none', color: '#1976d2' }}
+                >
+                  Sign in
+                </a>
+              </Typography>
+            </Grid>
           </Grid>
         </form>
       </Box>
