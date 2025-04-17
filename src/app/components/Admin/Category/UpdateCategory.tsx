@@ -81,7 +81,7 @@ const UpdateCategory = ({ category, onSuccess }: IUpdateCategoryProps) => {
         onSuccess();
       }
     } catch (error: any) {
-      toast.error(error.message || 'Update failed!');
+      toast.error(error.message[0] || 'Update failed!');
     } finally {
       setLoading(false);
     }

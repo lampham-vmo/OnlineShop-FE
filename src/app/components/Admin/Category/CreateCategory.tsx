@@ -64,7 +64,7 @@ const CreateCategory = ({ onSuccess }: ICreateCategoryProps) => {
         onSuccess();
       }
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message[0]);
     } finally {
       setLoading(false);
     }
