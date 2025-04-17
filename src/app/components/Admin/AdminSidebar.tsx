@@ -14,12 +14,14 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import GroupIcon from '@mui/icons-material/Group';
+import CategoryIcon from '@mui/icons-material/Category';
 
 import { useRouter, usePathname } from 'next/navigation';
 
 const menuItems = [
-  { label: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard' },
+  { label: 'Dashboard', icon: <DashboardIcon />, path: '/admin' },
   { label: 'Orders', icon: <ShoppingCartIcon />, path: '/admin/order' },
+  { label: 'Categories', icon: <CategoryIcon />, path: '/admin/category' },
   { label: 'Products', icon: <InventoryIcon />, path: '/admin/product' },
   { label: 'Users', icon: <GroupIcon />, path: '/admin/user' },
   { label: 'Roles', icon: <AdminPanelSettingsIcon />, path: '/admin/role' },
