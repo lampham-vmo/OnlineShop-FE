@@ -89,6 +89,7 @@ export const ManageRole = () => {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const {isAcceptPermission} = useAuthStore.getState();
   const {
     roleControllerFindAll,
     roleControllerAddRole,
@@ -219,13 +220,15 @@ export const ManageRole = () => {
               Role Management
             </Typography>
           </Box>
+          {isAcceptPermission(["add new role"]) &&   
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleAddRole}
           >
             Add New Role
-          </Button>
+          </Button>}
+        
         </Box>
 
         <TableContainer>

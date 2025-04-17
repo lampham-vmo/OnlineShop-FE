@@ -6,27 +6,29 @@ import { useEffect } from 'react';
 
 import '../../globals.css';
 import { Toaster } from 'react-hot-toast';
-
+import { useAuthStore } from '@/stores/authStore';
+import { Roles } from '@/constant/roles';
+import RoleGuard from '@/HOC/withRoleGuardComponent';
+import { AllowedRoleForAdminLayout } from '@/constant/AllowedRole/Admin.allowed-role';
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  useEffect(() => {
-    // Initialize any necessary state or perform side effects here
-  }, []);
-
   return (
     <html suppressHydrationWarning>
       <body>
-        <Box sx={{ display: 'flex' }}>
-          <AdminSidebar />
-          <Box component="main" sx={{ flexGrow: 1 }}>
-            <AdminHeader />
-            <Toolbar /> {/* Pushes content below header */}
-            <Box p={3}>{children}</Box>
+        <RoleGuard allowedRoles={AllowedRoleForAdminLayout}>
+          <Box sx={{ display: 'flex' }}>
+            <AdminSidebar />
+            <Box component="main" sx={{ flexGrow: 1 }}>
+              <AdminHeader />
+              <Toolbar /> {/* Pushes content below header */}
+              <Box p={3}>{children}</Box>
+            </Box>
           </Box>
-        </Box>
+        </RoleGuard>
+
         <Toaster />
       </body>
     </html>
