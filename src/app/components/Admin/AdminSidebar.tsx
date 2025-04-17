@@ -22,7 +22,7 @@ const menuItems = [
   { label: 'Dashboard', icon: <DashboardIcon />, path: '/admin' },
   { label: 'Orders', icon: <ShoppingCartIcon />, path: '/admin/order' },
   { label: 'Categories', icon: <CategoryIcon />, path: '/admin/category' },
-  { label: 'Products', icon: <InventoryIcon />, path: '/admin/product' },
+  { label: 'Products', icon: <InventoryIcon />, path: '/admin/products' },
   { label: 'Users', icon: <GroupIcon />, path: '/admin/user' },
   { label: 'Roles', icon: <AdminPanelSettingsIcon />, path: '/admin/role' },
 ];

@@ -10,6 +10,7 @@ interface IProductItemProps {
 
 const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
   const router = useRouter();
+  const listImage: string[] = JSON.parse(item.image);
 
   const handleViewDetail = (id: number) => {
     router.push(`/product-details/${id}`);
@@ -20,7 +21,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
       <div
         className={`relative overflow-hidden flex items-center justify-center rounded-lg min-h-[270px] mb-4 ${bgWhite ? 'bg-white' : 'bg-[#F6F7FB]'}`}
       >
-        <img src={item.image} alt="" className="w-2/3 object-cover" />
+        <img src={listImage[0]} alt="" className="w-2/3 object-cover" />
 
         <div className="absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0">
           <button
