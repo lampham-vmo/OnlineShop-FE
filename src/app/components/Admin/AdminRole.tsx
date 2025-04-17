@@ -39,6 +39,7 @@ import { Role } from '@/generated/api/models/role';
 import { getRole } from '@/generated/api/endpoints/role/role';
 import { useAuthStore } from '@/stores/authStore';
 import { getPermission } from '@/generated/api/endpoints/permission/permission';
+
 const MethodChip = ({ method }: { method: string }) => {
   const getMethodColor = (method: string) => {
     switch (method.toLowerCase()) {
