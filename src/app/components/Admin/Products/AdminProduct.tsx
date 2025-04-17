@@ -27,6 +27,7 @@ import {
 } from '@/generated/api/models';
 import { getProduct } from '@/generated/api/endpoints/product/product';
 import UpdateButton from './UpdateButton';
+import DeleteProduct from './DeleteButton';
 
 interface TablePaginationActionsProps {
   count: number;
@@ -146,6 +147,7 @@ const rows = [
   createData('Gingerbread', 356, 16.0, 49, 3.9),
 ];
 
+
 export default function CustomizedTables() {
   const [params, setParams] =
     React.useState<ProductControllerGetAllProductParams>({
@@ -159,6 +161,9 @@ export default function CustomizedTables() {
   const [totalItems, setTotalItems] = React.useState(0);
   const handleDelete = (id: number) => {
     console.log(id);
+  };
+  const handleUpdateSuccess = () => {
+    getListProduct(); // Hàm này refetch lại danh sách
   };
   const handleChangePage = (_: React.ChangeEvent<unknown>, value: number) => {
     setParams((prev) => ({ ...prev, page: value }));
@@ -185,7 +190,6 @@ export default function CustomizedTables() {
               <StyledTableCell>Id</StyledTableCell>
               <StyledTableCell>Name</StyledTableCell>
               <StyledTableCell>Image</StyledTableCell>
-              <StyledTableCell>Description</StyledTableCell>
               <StyledTableCell>Stock</StyledTableCell>
               <StyledTableCell>Price</StyledTableCell>
               <StyledTableCell>Discount</StyledTableCell>
@@ -218,7 +222,6 @@ export default function CustomizedTables() {
                     }
                   })()}
                 </StyledTableCell>
-                <StyledTableCell>{row.description}</StyledTableCell>
                 <StyledTableCell>{row.stock}</StyledTableCell>
                 <StyledTableCell>{row.price}$</StyledTableCell>
                 <StyledTableCell>{row.discount}%</StyledTableCell>
@@ -227,15 +230,8 @@ export default function CustomizedTables() {
                 <StyledTableCell>{row.createdAt}</StyledTableCell>
                 <StyledTableCell>
                   <div className="flex gap-x-2">
-                    <UpdateButton initialData={row} />
-                    <Button
-                      variant="contained"
-                      color="error"
-                      onClick={() => handleDelete(row.id)}
-                      className="bg-red-500 hover:bg-red-600 normal-case"
-                    >
-                      Delete
-                    </Button>
+                    <UpdateButton initialData={row} onSuccess={handleUpdateSuccess} />
+                    <DeleteProduct id={row.id} name={row.name} onSuccess={handleUpdateSuccess} />
                   </div>
                 </StyledTableCell>
               </StyledTableRow>
