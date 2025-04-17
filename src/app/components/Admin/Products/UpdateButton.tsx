@@ -114,7 +114,9 @@ export default function UpdateProductModal({
 
   
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleChange = (field: string) => (e: any) => {
     let value =
@@ -159,41 +161,79 @@ export default function UpdateProductModal({
 
   const handleSubmit = async () => {
     const errors: Record<string, string> = {};
-    if (imageLink.length === 0) errors.image = 'Image must have at least 1';
-    if (formData.categoryId === -1) errors.categoryId = 'You must select one';
-
+  
+    // Check image
+    if (imageLink.length === 0) {
+      errors.image = 'Image must have at least 1';
+    }
+    if (formData.categoryId === -1) {
+      errors.categoryId = 'You must select one';
+    }
+  
+    // Validate với Zod
     try {
+      console.log(formData)
+      if(formData.name.trim()==""){
+        errors.name = "Name should not be empty"
+      }
+      if(formData.description.trim() == ""){
+        errors.description = "Description should not be empty"
+      }
       productControllerCreateProductBody.parse(formData);
-    } catch (err) {
-      if (err instanceof ZodError) {
-        err.errors.forEach((e) => {
-          if (e.path?.[0]) errors[e.path[0]] = e.message;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        error.errors.forEach((err) => {
+          if (err.path && err.path.length > 0) {
+            errors[err.path[0] as string] = err.message;
+          }
         });
       }
     }
-
-    if (Object.keys(errors).length) {
+  
+    if (Object.keys(errors).length > 0) {
+      console.log(errors)
       setFormErrors(errors);
-      toast.error('Vui lòng kiểm tra lại thông tin!');
+      toast.error('Please check again');
       return;
     }
-
+  
+    // Gọi API tạo sản phẩm
     try {
       setFormErrors({});
-      await toast.promise(
-        productControllerUpdateProductDetail(initialData.id, formData),
-        {
-          loading: 'Đang cập nhật...',
-          success: 'Cập nhật thành công!',
-          error: 'Cập nhật thất bại',
-        },
-      );
+      await toast.promise(productControllerUpdateProductDetail(initialData.id, formData), {
+        loading: 'Updating....',
+        success: 'Update Successful',
+      });
+  
+      // Reset form sau khi thành công
+      setFormData({
+        name: '',
+        description: '',
+        stock: 0,
+        price: 0,
+        discount: 0,
+        image: '',
+        categoryId: -1,
+      })
+      setImageLink([]);
+      setFormErrors({});
       onSuccess?.();
-      setTimeout(handleClose, 300);
-    } catch (e: any) {
-      toast.error(e?.response?.data?.error?.message || 'Error');
+      setTimeout(() => {
+        handleClose();
+      }, 600);
+    } catch (error: any) {
+      // ✅ Xử lý lỗi trả về từ API (message là array hoặc string)
+      const message = error?.message;
+  
+      if (Array.isArray(message)) {
+        toast.error(message.join('\n'));
+      } else if (typeof message === 'string') {
+        toast.error(message);
+      } else {
+        toast.error('Đã xảy ra lỗi khi tạo sản phẩm.');
+      }
     }
-  };
+  };  
 
   return (
     <React.Fragment>

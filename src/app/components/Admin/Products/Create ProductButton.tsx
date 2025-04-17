@@ -136,6 +136,7 @@ export default function BasicModal() {
       event.target.type === 'checkbox'
         ? event.target.checked
         : event.target.value;
+      setFormErrors({});
     if (['stock', 'price', 'discount', 'categoryId'].includes(field)) {
       value = Number(value);
     }
@@ -301,7 +302,7 @@ export default function BasicModal() {
             type="number"
             inputProps={{ min: 0, max: 100 }}
             error={!!formErrors.discount}
-            value={formData.discount == 0 ? '' : formData.discount}
+            value={formData.discount}
             onChange={handleChange('discount')}
           />
 
@@ -343,8 +344,9 @@ export default function BasicModal() {
           )}
 
           <FormControl fullWidth>
-            <InputLabel id="category-label">Category</InputLabel>
+            <InputLabel error={!!formErrors.categoryId} id="category-label">Category</InputLabel>
             <Select
+              error={!!formErrors.categoryId}
               labelId="category-label"
               id="category"
               value={formData.categoryId}
