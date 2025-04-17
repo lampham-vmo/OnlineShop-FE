@@ -65,10 +65,11 @@ const style = {
 
 interface UpdateProductModalProps {
   initialData: ProductResponse;
+  onSuccess?: () => void;
 }
 
 export default function UpdateProductModal({
-  initialData,
+  initialData,onSuccess
 }: UpdateProductModalProps) {
   const { productControllerUpdateProductDetail } = getProduct();
   const { categoryControllerGetAll } = getCategory();
@@ -111,6 +112,7 @@ export default function UpdateProductModal({
     setImageLink(parsedImages);
   }, [open]);
 
+  
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -186,6 +188,7 @@ export default function UpdateProductModal({
           error: 'Cập nhật thất bại',
         },
       );
+      onSuccess?.();
       setTimeout(handleClose, 300);
     } catch (e: any) {
       toast.error(e?.response?.data?.error?.message || 'Error');
@@ -243,7 +246,7 @@ export default function UpdateProductModal({
           <TextField
             label="Discount (%)"
             type="number"
-            value={formData.discount === 0 ? '' : formData.discount}
+            value={formData.discount}
             onChange={handleChange('discount')}
             error={!!formErrors.discount}
             helperText={formErrors.discount}

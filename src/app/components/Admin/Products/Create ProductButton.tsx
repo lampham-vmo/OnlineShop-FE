@@ -147,7 +147,7 @@ export default function BasicModal() {
 
   const handleSubmit = async () => {
     const errors: Record<string, string> = {};
-
+  
     // Check image
     if (imageLink.length === 0) {
       errors.image = 'Image must have at least 1';
@@ -155,9 +155,17 @@ export default function BasicModal() {
     if (formData.categoryId === -1) {
       errors.categoryId = 'You must select one';
     }
-
+  
+    // Validate với Zod
     try {
-      const validData = productControllerCreateProductBody.parse(formData);
+      console.log(formData)
+      if(formData.name.trim()==""){
+        errors.name = "Name should not be empty"
+      }
+      if(formData.description.trim() == ""){
+        errors.description = "Description should not be empty"
+      }
+      productControllerCreateProductBody.parse(formData);
     } catch (error) {
       if (error instanceof ZodError) {
         error.errors.forEach((err) => {
@@ -167,21 +175,23 @@ export default function BasicModal() {
         });
       }
     }
-
+  
     if (Object.keys(errors).length > 0) {
+      console.log(errors)
       setFormErrors(errors);
       toast.error('Vui lòng kiểm tra lại thông tin!');
       return;
     }
-
-    // Nếu không có lỗi thì gọi API
-    // Gọi API nếu không có lỗi
+  
+    // Gọi API tạo sản phẩm
     try {
       setFormErrors({});
       await toast.promise(productControllerCreateProduct(formData), {
         loading: 'Đang tạo sản phẩm...',
         success: 'Tạo sản phẩm thành công!',
       });
+  
+      // Reset form sau khi thành công
       setFormData({
         name: '',
         description: '',
@@ -195,15 +205,21 @@ export default function BasicModal() {
       setFormErrors({});
       setTimeout(() => {
         handleClose();
-      }, 600); // 100ms delay
+      }, 600);
     } catch (error: any) {
-      // 🧠 Bắt lỗi từ API
-      const apiMessage =
-        error?.response?.data?.error?.message ||
-        'Đã xảy ra lỗi khi tạo sản phẩm.';
-      toast.error(apiMessage);
+      // ✅ Xử lý lỗi trả về từ API (message là array hoặc string)
+      const message = error?.message;
+  
+      if (Array.isArray(message)) {
+        toast.error(message.join('\n'));
+      } else if (typeof message === 'string') {
+        toast.error(message);
+      } else {
+        toast.error('Đã xảy ra lỗi khi tạo sản phẩm.');
+      }
     }
   };
+  
 
   React.useEffect(() => {
     getAllCategory();
@@ -238,6 +254,8 @@ export default function BasicModal() {
           <TextField
             fullWidth
             label="Description"
+            multiline
+            rows={4}
             value={formData.description}
             onChange={handleChange('description')}
             error={!!formErrors.description}
