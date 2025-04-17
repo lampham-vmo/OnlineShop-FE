@@ -150,7 +150,7 @@ export const ManageRole = () => {
       handleModalClose();
       fetchRoles();
     } catch (error) {
-      window.alert(error.response.data.error.message);
+      window.alert(error);
 
       // setError(error.response.data.error.message)
       //   console.error('Failed to add role:', error.response.data.error.message);
