@@ -33,7 +33,8 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // Kiểm tra nếu đây là request refresh token, không retry
-    const isRefreshRequest = originalRequest.url?.includes('/auth/refreshAT');
+    const isRefreshRequest =
+      await originalRequest.url?.includes('/auth/refreshAT');
 
     if (
       error.response?.status === 401 &&
@@ -55,12 +56,12 @@ axiosInstance.interceptors.response.use(
         throw new Error('Refresh token failed');
       } catch (refreshError) {
         useAuthStore.getState().clearTokens();
-        window.location.href = '/login';
+        window.location.href = '/signin';
         return Promise.reject(refreshError);
       }
     }
 
-    return Promise.reject(error);
+    return Promise.reject(error.response.data.error);
   },
 );
 

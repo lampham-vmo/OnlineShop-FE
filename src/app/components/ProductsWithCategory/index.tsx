@@ -86,17 +86,28 @@ const ProductsWithCategory = () => {
     setProducts(data.result.products);
     setTotalPages(data.result.pagination.totalPages || 1);
     setTotalItems(data.result.pagination.totalItems || 0);
-    setCategoryName(data.result.products[0].categoryName);
+    setCategoryName(data.result.products[0]?.categoryName);
   };
 
   const handleChangePage = (_: React.ChangeEvent<unknown>, value: number) => {
     setParams((prev) => ({ ...prev, page: value }));
   };
 
+  const scrollToSortBlock = () => {
+    if (sortBlockRef.current) {
+      const yOffset = -100;
+      const y =
+        sortBlockRef.current.getBoundingClientRect().top +
+        window.pageYOffset +
+        yOffset;
+
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
   useEffect(() => {
     getListProduct();
-
-    sortBlockRef.current?.scrollIntoView({ behavior: 'smooth' });
+    scrollToSortBlock();
   }, [params]);
 
   if (!products) {
@@ -123,7 +134,7 @@ const ProductsWithCategory = () => {
               {/* Sort Block */}
               <div
                 ref={sortBlockRef}
-                className="rounded-lg bg-white shadow-1 pl-3 pr-2.5 py-2.5 mb-6 scroll-mt-21"
+                className="rounded-lg bg-white shadow-1 pl-3 pr-2.5 py-2.5 mb-6"
               >
                 <div className="flex items-center gap-4">
                   <CustomSelect options={options} setParams={setParams} />

@@ -32,7 +32,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useRouter } from 'next/navigation';
 import { Description } from '@mui/icons-material';
 
+import { PermissionDTO } from '@/generated/api/models';
+import { Permission } from '@/generated/api/models';
+import { Role } from '@/generated/api/models/role';
+
+import { getRole } from '@/generated/api/endpoints/role/role';
 import { useAuthStore } from '@/stores/authStore';
+import { getPermission } from '@/generated/api/endpoints/permission/permission';
 
 const MethodChip = ({ method }: { method: string }) => {
   const getMethodColor = (method: string) => {
@@ -145,7 +151,7 @@ export const ManageRole = () => {
       handleModalClose();
       fetchRoles();
     } catch (error) {
-      window.alert(error.response.data.error.message);
+      window.alert(error);
 
       // setError(error.response.data.error.message)
       //   console.error('Failed to add role:', error.response.data.error.message);
