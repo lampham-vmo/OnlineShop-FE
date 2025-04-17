@@ -21,6 +21,7 @@ export interface AuthState {
   isTokenExpiringSoon: () => boolean;
   isValidToken: () => boolean;
   isAcceptPermission: (permissionName: string[]) => boolean;
+  isAcceptRole: (roleId : number[]) => boolean;
 
   setPermission: (permission: Permission[]) => void;
   setTokens: (tokens: { accessToken: string; refreshToken: string }) => void;
@@ -102,6 +103,12 @@ export const useAuthStore = create<AuthState>()(
         return permissionName.every((name) =>
           permission.some((p) => p.name === name),
         );
+      },
+      isAcceptRole: (roleId: number[]) => {
+        if(roleId.length == 0) return true
+        const { user } = get();
+        if (!user || !user.role) return false;
+        return roleId.includes(user.role);
       },
       getTokens: () => get(),
     }),

@@ -4,15 +4,12 @@ import React, { useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 
 export default function ManageRolePage() {
-  const { isAcceptPermission } = useAuthStore.getState();
+  const { isAcceptPermission, isAcceptRole } = useAuthStore.getState();
   // Nếu không có quyền, chuyển hướng ngay lập tức (tránh render component)
-  const isAccept = isAcceptPermission([
-    'get all permission',
-    'admin get all role',
-  ]);
-  if (!isAccept) {
+  if (!isAcceptRole([1])) {
+    console.log(isAcceptRole([1]));
     if (typeof window !== 'undefined') {
-      window.location.href = '/403';
+      window.location.href = '/';
     }
     return null; // Tránh render bất kỳ nội dung nào
   }
