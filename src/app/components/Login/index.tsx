@@ -21,6 +21,7 @@ import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { authControllerLoginBody } from '@/generated/api/schemas/auth/auth.zod';
 import type { LoginUserDTO } from '@/generated/api/models';
 import { useAuthStore, type AuthState } from '@/stores/authStore';
+import { jwtDecode } from 'jwt-decode';
 
 // Use the Orval-generated zod schema
 const loginSchema = authControllerLoginBody;
@@ -33,8 +34,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const authApi = getAuth();
-  const setTokens = useAuthStore((state: AuthState) => state.setTokens);
-  const setPermission = useAuthStore((state: AuthState) => state.setPermission);
+  
+  const {user, setTokens, setPermission} = useAuthStore.getState()
   // Initialize react-hook-form with zod resolver
   // Check for authentication on component mount
 
@@ -70,7 +71,14 @@ export default function Login() {
       });
 
       // Redirect sau khi đăng nhập thành công
-      router.push('/');
+      const payload: any = jwtDecode(result.accessToken)
+      if(payload.role == 1){
+        router.push('/admin')
+      }else{
+        router.push('/')
+      }
+      // router.push('/')
+
     } catch (err: any) {
       setError(
         err.response?.data?.message || 'Login failed. Please try again.',
