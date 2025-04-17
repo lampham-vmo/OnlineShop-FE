@@ -32,13 +32,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useRouter } from 'next/navigation';
 import { Description } from '@mui/icons-material';
 
-import { PermissionDTO } from '@/generated/api/models';
-import { Permission } from '@/generated/api/models';
-import {Role} from '@/generated/api/models/role';
-
-import { getRole } from '@/generated/api/endpoints/role/role';
 import { useAuthStore } from '@/stores/authStore';
-import { getPermission } from '@/generated/api/endpoints/permission/permission';
+
 const MethodChip = ({ method }: { method: string }) => {
   const getMethodColor = (method: string) => {
     switch (method.toLowerCase()) {
@@ -89,19 +84,21 @@ export const ManageRole = () => {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { roleControllerFindAll, roleControllerAddRole, roleControllerUpdateRole } = getRole();
-  const {permissionControllerFindAll} = getPermission();
-  
+  const {
+    roleControllerFindAll,
+    roleControllerAddRole,
+    roleControllerUpdateRole,
+  } = getRole();
+  const { permissionControllerFindAll } = getPermission();
+
   useEffect(() => {
-  
     fetchRoles();
     fetchPermissions();
-    
   }, []);
 
   const fetchRoles = async () => {
     try {
-      const response = await roleControllerFindAll()
+      const response = await roleControllerFindAll();
       setRoles(response.data);
     } catch (error) {
       console.error('Failed to fetch roles:', error);
@@ -110,7 +107,7 @@ export const ManageRole = () => {
 
   const fetchPermissions = async () => {
     try {
-      const response = await permissionControllerFindAll()
+      const response = await permissionControllerFindAll();
       setPermissions(response.data);
     } catch (error) {
       console.error('Failed to fetch permissions:', error);
@@ -134,28 +131,27 @@ export const ManageRole = () => {
     }
     console.log(roleName, roleDescription, selectedPermissions);
     try {
-        await roleControllerAddRole({
-            name: roleName,
-            description: roleDescription,
-            permissionIds: selectedPermissions,
-        })
+      await roleControllerAddRole({
+        name: roleName,
+        description: roleDescription,
+        permissionIds: selectedPermissions,
+      });
 
-    //   await api.post('/role', {
-    //     name: roleName,
-    //     description: roleDescription,
-    //     permissionIds: selectedPermissions,
-    //   });
+      //   await api.post('/role', {
+      //     name: roleName,
+      //     description: roleDescription,
+      //     permissionIds: selectedPermissions,
+      //   });
       handleModalClose();
       fetchRoles();
     } catch (error) {
-    window.alert(error.response.data.error.message)
-    
-    // setError(error.response.data.error.message)
-    //   console.error('Failed to add role:', error.response.data.error.message);
+      window.alert(error.response.data.error.message);
+
+      // setError(error.response.data.error.message)
+      //   console.error('Failed to add role:', error.response.data.error.message);
     }
   };
 
-  
   const handleViewPermissions = (role: Role) => {
     console.log('Selected Role:', role);
     console.log('Role Permissions:', role.permissions);
@@ -172,7 +168,7 @@ export const ManageRole = () => {
     setSelectedRole(role);
     setRoleName(role.name);
     setRoleDescription(role.description || '');
-    setSelectedPermissions(role.permissions.map(p => p.id));
+    setSelectedPermissions(role.permissions.map((p) => p.id));
     setIsEditModalOpen(true);
   };
 
@@ -189,12 +185,12 @@ export const ManageRole = () => {
       return;
     }
     try {
-        await roleControllerUpdateRole({
-            id: selectedRole.id,
-            name: roleName,
-            description: roleDescription,
-            permissionIds: selectedPermissions,
-        })
+      await roleControllerUpdateRole({
+        id: selectedRole.id,
+        name: roleName,
+        description: roleDescription,
+        permissionIds: selectedPermissions,
+      });
       handleEditModalClose();
       fetchRoles();
     } catch (error) {
@@ -205,9 +201,15 @@ export const ManageRole = () => {
   return (
     <Box sx={{ p: 1 }}>
       <Paper sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2,
+          }}
+        >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-           
             <Typography variant="h5" component="h2">
               Role Management
             </Typography>
@@ -231,40 +233,43 @@ export const ManageRole = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              { roles && roles.map((role) => (
-                <TableRow key={role.id}>
-                  <TableCell>{role.name}</TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography>
-                        {role.permissions.length} permissions
-                      </Typography>
+              {roles &&
+                roles.map((role) => (
+                  <TableRow key={role.id}>
+                    <TableCell>{role.name}</TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
+                        <Typography>
+                          {role.permissions.length} permissions
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleViewPermissions(role)}
+                          color="primary"
+                        >
+                          <VisibilityIcon />
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                    <TableCell align="center">
                       <IconButton
                         size="small"
-                        onClick={() => handleViewPermissions(role)}
+                        onClick={() => handleEditRole(role)}
                         color="primary"
                       >
-                        <VisibilityIcon />
+                        <EditIcon />
                       </IconButton>
-                    </Box>
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton
-                      size="small"
-                      onClick={() => handleEditRole(role)}
-                      color="primary"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
 
-        <Dialog 
-          open={isModalOpen} 
+        <Dialog
+          open={isModalOpen}
           onClose={handleModalClose}
           maxWidth="md"
           fullWidth
@@ -280,7 +285,7 @@ export const ManageRole = () => {
               value={roleName}
               onChange={(e) => setRoleName(e.target.value)}
               error={!roleName}
-              helperText={!roleName ? "Role name is required" : ""}
+              helperText={!roleName ? 'Role name is required' : ''}
             />
             <TextField
               margin="dense"
@@ -308,13 +313,20 @@ export const ManageRole = () => {
                       <TableRow key={permission.id}>
                         <TableCell padding="checkbox">
                           <Checkbox
-                            checked={selectedPermissions.includes(permission.id)}
+                            checked={selectedPermissions.includes(
+                              permission.id,
+                            )}
                             onChange={(e) => {
                               if (e.target.checked) {
-                                setSelectedPermissions([...selectedPermissions, permission.id]);
+                                setSelectedPermissions([
+                                  ...selectedPermissions,
+                                  permission.id,
+                                ]);
                               } else {
                                 setSelectedPermissions(
-                                  selectedPermissions.filter((id) => id !== permission.id)
+                                  selectedPermissions.filter(
+                                    (id) => id !== permission.id,
+                                  ),
                                 );
                               }
                             }}
@@ -340,8 +352,8 @@ export const ManageRole = () => {
           </DialogActions>
         </Dialog>
 
-        <Dialog 
-          open={isEditModalOpen} 
+        <Dialog
+          open={isEditModalOpen}
           onClose={handleEditModalClose}
           maxWidth="md"
           fullWidth
@@ -357,11 +369,9 @@ export const ManageRole = () => {
               value={roleName}
               onChange={(e) => setRoleName(e.target.value)}
               error={!roleName}
-              helperText={!roleName ? "Role name is required" : ""}
+              helperText={!roleName ? 'Role name is required' : ''}
             />
-          
-             
-            
+
             <TextField
               margin="dense"
               label="Description"
@@ -388,13 +398,20 @@ export const ManageRole = () => {
                       <TableRow key={permission.id}>
                         <TableCell padding="checkbox">
                           <Checkbox
-                            checked={selectedPermissions.includes(permission.id)}
+                            checked={selectedPermissions.includes(
+                              permission.id,
+                            )}
                             onChange={(e) => {
                               if (e.target.checked) {
-                                setSelectedPermissions([...selectedPermissions, permission.id]);
+                                setSelectedPermissions([
+                                  ...selectedPermissions,
+                                  permission.id,
+                                ]);
                               } else {
                                 setSelectedPermissions(
-                                  selectedPermissions.filter((id) => id !== permission.id)
+                                  selectedPermissions.filter(
+                                    (id) => id !== permission.id,
+                                  ),
                                 );
                               }
                             }}
@@ -425,21 +442,23 @@ export const ManageRole = () => {
           onClose={handleCloseViewModal}
           aria-labelledby="view-permissions-modal"
         >
-          <Box sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '80%',
-            maxWidth: 'md',
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 1,
-            color: 'black',
-            maxHeight: '90vh',
-            overflow: 'auto'
-          }}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '80%',
+              maxWidth: 'md',
+              bgcolor: 'background.paper',
+              boxShadow: 24,
+              p: 4,
+              borderRadius: 1,
+              color: 'black',
+              maxHeight: '90vh',
+              overflow: 'auto',
+            }}
+          >
             <Typography variant="h6" component="h2" gutterBottom color="black">
               {selectedRole?.name} Permissions
             </Typography>
@@ -468,11 +487,9 @@ export const ManageRole = () => {
             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
               <Button onClick={handleCloseViewModal}>Close</Button>
             </Box>
-            
           </Box>
         </Modal>
       </Paper>
     </Box>
   );
 };
-

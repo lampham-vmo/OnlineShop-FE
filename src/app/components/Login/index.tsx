@@ -60,17 +60,18 @@ export default function Login() {
       const result = response.data;
 
       // Sử dụng authStore để lưu tokens
-     
+
       setTokens({
         accessToken: result.accessToken,
-        refreshToken: result.refreshToken
+        refreshToken: result.refreshToken,
       });
-  
-      
+
       // Redirect sau khi đăng nhập thành công
       router.push('/');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      setError(
+        err.response?.data?.message || 'Login failed. Please try again.',
+      );
     }
   };
 
@@ -104,7 +105,11 @@ export default function Login() {
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ width: '100%' }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit(onSubmit)}
+            sx={{ width: '100%' }}
+          >
             <Controller
               name="email"
               control={control}

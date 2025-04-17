@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import {
   AppBar,
@@ -9,27 +9,30 @@ import {
   Menu,
   MenuItem,
   Box,
-} from '@mui/material'
-import { useState } from 'react'
+} from '@mui/material';
+import { useState } from 'react';
 
 export default function AdminHeader() {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   const handleLogout = () => {
     // TODO: logout logic
-    handleMenuClose()
-  }
+    handleMenuClose();
+  };
 
   return (
-    <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    <AppBar
+      position="fixed"
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+    >
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Typography variant="h6" noWrap component="div">
           Admin Dashboard
@@ -59,5 +62,5 @@ export default function AdminHeader() {
         </Box>
       </Toolbar>
     </AppBar>
-  )
+  );
 }

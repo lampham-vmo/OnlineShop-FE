@@ -16,7 +16,11 @@ import CustomSelect from '../ProductsWithCategory/CustomSelect';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { getCategory } from '@/generated/api/endpoints/category/category';
 import { getProduct } from '@/generated/api/endpoints/product/product';
-import { CategoryResponseDto, ProductControllerGetAllProductParams, ProductResponse } from '@/generated/api/models';
+import {
+  CategoryResponseDto,
+  ProductControllerGetAllProductParams,
+  ProductResponse,
+} from '@/generated/api/models';
 
 const ShopWithSidebar = () => {
   const router = useRouter();
