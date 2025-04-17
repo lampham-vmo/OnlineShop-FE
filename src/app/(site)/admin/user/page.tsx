@@ -1,6 +1,6 @@
 `use client`;
 
-import React from 'react'
+import React from 'react';
 import AccountManagement from '@/app/components/Admin/AdminAccountManagement';
 
 export default function ManageAccountPage() {
@@ -8,5 +8,5 @@ export default function ManageAccountPage() {
     <div>
       <AccountManagement />
     </div>
-  )
+  );
 }

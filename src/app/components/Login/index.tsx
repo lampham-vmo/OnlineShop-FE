@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,14 +19,9 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { authControllerLoginBody } from '@/generated/api/schemas/auth/auth.zod';
-// import { getAuth } from '@/api/endpoints/auth/auth';
-// import { authControllerLoginBody } from '@/api/endpoints/auth/auth.zod';
-// import type { LoginUserDTO } from '@/api/models/loginUserDTO';
-
-// import type { AuthState } from '../../../../lib/authStore';
-// import { useAuthStore } from '../../../../lib/authStore';
 import type { LoginUserDTO } from '@/generated/api/models';
 import { useAuthStore, type AuthState } from '@/stores/authStore';
+import { jwtDecode } from 'jwt-decode';
 
 // Use the Orval-generated zod schema
 const loginSchema = authControllerLoginBody;
@@ -39,8 +34,17 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const authApi = getAuth();
-  const setTokens = useAuthStore((state: AuthState) => state.setTokens);
+  
+  const {user, setTokens, setPermission} = useAuthStore.getState()
   // Initialize react-hook-form with zod resolver
+  // Check for authentication on component mount
+
+  // useEffect(() => {
+  //   const auth = localStorage.getItem('auth-storage'); // Adjust according to your auth key
+  //   if (auth) {
+  //     router.push('/'); // Navigate to home if authenticated
+  //   }
+  // }, [router]);
   const {
     control,
     handleSubmit,
@@ -60,14 +64,21 @@ export default function Login() {
       const result = response.data;
 
       // Sử dụng authStore để lưu tokens
-
+      setPermission(result.permission);
       setTokens({
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
       });
 
       // Redirect sau khi đăng nhập thành công
-      router.push('/');
+      const payload: any = jwtDecode(result.accessToken)
+      if(payload.role == 1){
+        router.push('/admin')
+      }else{
+        router.push('/')
+      }
+      // router.push('/')
+
     } catch (err: any) {
       setError(
         err.response?.data?.message || 'Login failed. Please try again.',
@@ -170,6 +181,16 @@ export default function Login() {
             >
               {isSubmitting ? 'Signing in...' : 'Sign In'}
             </Button>
+            {/* Add the signup link here */}
+            <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+              Don't have an account?{' '}
+              <a
+                href="/signup"
+                style={{ textDecoration: 'none', color: '#1976d2' }}
+              >
+                Sign up
+              </a>
+            </Typography>
           </Box>
         </Paper>
       </Box>

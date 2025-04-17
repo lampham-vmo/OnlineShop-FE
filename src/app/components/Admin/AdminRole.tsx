@@ -16,29 +16,26 @@ import {
   DialogActions,
   TextField,
   Checkbox,
-  FormControlLabel,
   Typography,
   Box,
-  List,
-  ListItem,
   IconButton,
   Modal,
   Chip,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import { useRouter } from 'next/navigation';
-import { Description } from '@mui/icons-material';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { PermissionDTO } from '@/generated/api/models';
 import { Permission } from '@/generated/api/models';
 import { Role } from '@/generated/api/models/role';
-
 import { getRole } from '@/generated/api/endpoints/role/role';
 import { useAuthStore } from '@/stores/authStore';
 import { getPermission } from '@/generated/api/endpoints/permission/permission';
+import { roleControllerUpdateRoleBody, roleControllerAddRoleBody } from '@/generated/api/schemas/role/role.zod';
+
 const MethodChip = ({ method }: { method: string }) => {
   const getMethodColor = (method: string) => {
     switch (method.toLowerCase()) {
@@ -88,7 +85,7 @@ export const ManageRole = () => {
   const [roleDescription, setRoleDescription] = useState('');
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { isAcceptPermission } = useAuthStore.getState();
   const {
     roleControllerFindAll,
     roleControllerAddRole,
@@ -130,36 +127,7 @@ export const ManageRole = () => {
     setSelectedPermissions([]);
   };
 
-  const handleSubmit = async () => {
-    if (!roleName.trim()) {
-      return;
-    }
-    console.log(roleName, roleDescription, selectedPermissions);
-    try {
-      await roleControllerAddRole({
-        name: roleName,
-        description: roleDescription,
-        permissionIds: selectedPermissions,
-      });
-
-      //   await api.post('/role', {
-      //     name: roleName,
-      //     description: roleDescription,
-      //     permissionIds: selectedPermissions,
-      //   });
-      handleModalClose();
-      fetchRoles();
-    } catch (error) {
-      window.alert(error.response.data.error.message);
-
-      // setError(error.response.data.error.message)
-      //   console.error('Failed to add role:', error.response.data.error.message);
-    }
-  };
-
   const handleViewPermissions = (role: Role) => {
-    console.log('Selected Role:', role);
-    console.log('Role Permissions:', role.permissions);
     setSelectedRole(role);
     setIsViewModalOpen(true);
   };
@@ -171,36 +139,278 @@ export const ManageRole = () => {
 
   const handleEditRole = (role: Role) => {
     setSelectedRole(role);
-    setRoleName(role.name);
-    setRoleDescription(role.description || '');
-    setSelectedPermissions(role.permissions.map((p) => p.id));
     setIsEditModalOpen(true);
   };
 
   const handleEditModalClose = () => {
     setIsEditModalOpen(false);
     setSelectedRole(null);
-    setRoleName('');
-    setRoleDescription('');
-    setSelectedPermissions([]);
   };
 
-  const handleEditSubmit = async () => {
-    if (!roleName.trim() || !selectedRole) {
-      return;
-    }
-    try {
-      await roleControllerUpdateRole({
-        id: selectedRole.id,
-        name: roleName,
-        description: roleDescription,
-        permissionIds: selectedPermissions,
-      });
-      handleEditModalClose();
-      fetchRoles();
-    } catch (error) {
-      console.error('Failed to update role:', error);
-    }
+  const AddRoleForm = () => {
+    const {
+      control,
+      handleSubmit,
+      reset,
+      formState: { errors },
+    } = useForm({
+      resolver: zodResolver(
+        roleControllerAddRoleBody.refine(
+          (data) => data.permissionIds.length > 0,
+          { message: 'At least one permission must be selected', path: ['permissionIds'] }
+        )
+      ),
+      defaultValues: {
+        name: '',
+        description: '',
+        permissionIds: [],
+      },
+    });
+
+    const onSubmit = async (data: any) => {
+      try {
+        await roleControllerAddRole(data);
+        handleModalClose();
+        fetchRoles();
+      } catch (error) {
+        console.error('Failed to add role:', error);
+      }
+    };
+
+    return (
+      <Dialog open={isModalOpen} onClose={handleModalClose} maxWidth="md" fullWidth>
+        <DialogTitle>Add New Role</DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  autoFocus
+                  margin="dense"
+                  label="Role Name"
+                  required
+                  fullWidth
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                />
+              )}
+            />
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  margin="dense"
+                  label="Description"
+                  fullWidth
+                  multiline
+                  rows={3}
+                  sx={{ mt: 2 }}
+                />
+              )}
+            />
+            <Box sx={{ mt: 2, maxHeight: 300, overflow: 'auto' }}>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox"></TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Path</TableCell>
+                      <TableCell>Method</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {permissions.map((permission) => (
+                      <TableRow key={permission.id}>
+                        <TableCell padding="checkbox">
+                          <Controller
+                            name="permissionIds"
+                            control={control}
+                            render={({ field }) => (
+                              <Checkbox
+                                checked={field.value.includes(permission.id)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    field.onChange([...field.value, permission.id]);
+                                  } else {
+                                    field.onChange(field.value.filter((id) => id !== permission.id));
+                                  }
+                                }}
+                              />
+                            )}
+                          />
+                        </TableCell>
+                        <TableCell>{permission.name}</TableCell>
+                        <TableCell>{permission.path}</TableCell>
+                        <TableCell>
+                          <MethodChip method={permission.method} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              
+            </Box>
+            {errors.permissionIds && (
+                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                  {errors.permissionIds.message}
+                </Typography>
+              )}
+            <DialogActions>
+              <Button onClick={handleModalClose}>Cancel</Button>
+              <Button type="submit" variant="contained">
+                Add Role
+              </Button>
+            </DialogActions>
+          </form>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
+  const EditRoleForm = () => {
+    const {
+      control,
+      handleSubmit,
+      reset,
+      formState: { errors },
+    } = useForm({
+      resolver: zodResolver(
+        roleControllerUpdateRoleBody.refine(
+          (data) => data.permissionIds.length > 0,
+          { message: 'At least one permission must be selected', path: ['permissionIds'] }
+        )
+      ),
+      defaultValues: {
+        id: selectedRole?.id || 0,
+        name: selectedRole?.name || '',
+        description: selectedRole?.description || '',
+        permissionIds: selectedRole?.permissions.map((p) => p.id) || [],
+      },
+    });
+
+    useEffect(() => {
+      if (selectedRole) {
+        reset({
+          id: selectedRole.id,
+          name: selectedRole.name,
+          description: selectedRole.description || '',
+          permissionIds: selectedRole.permissions.map((p) => p.id),
+        });
+      }
+    }, [selectedRole, reset]);
+
+    const onSubmit = async (data: any) => {
+      try {
+        await roleControllerUpdateRole(data);
+        handleEditModalClose();
+        fetchRoles();
+      } catch (error) {
+        console.error('Failed to update role:', error);
+      }
+    };
+
+    return (
+      <Dialog open={isEditModalOpen} onClose={handleEditModalClose} maxWidth="md" fullWidth>
+        <DialogTitle>Edit Role</DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  autoFocus
+                  margin="dense"
+                  label="Role Name"
+                  required
+                  fullWidth
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                />
+              )}
+            />
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  margin="dense"
+                  label="Description"
+                  fullWidth
+                  multiline
+                  rows={3}
+                  sx={{ mt: 2 }}
+                />
+              )}
+            />
+            <Box sx={{ mt: 2, maxHeight: 300, overflow: 'auto' }}>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox"></TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Path</TableCell>
+                      <TableCell>Method</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {permissions.map((permission) => (
+                      <TableRow key={permission.id}>
+                        <TableCell padding="checkbox">
+                          <Controller
+                            name="permissionIds"
+                            control={control}
+                            render={({ field }) => (
+                              <Checkbox
+                                checked={field.value.includes(permission.id)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    field.onChange([...field.value, permission.id]);
+                                  } else {
+                                    field.onChange(field.value.filter((id) => id !== permission.id));
+                                  }
+                                }}
+                              />
+                            )}
+                          />
+                        </TableCell>
+                        <TableCell>{permission.name}</TableCell>
+                        <TableCell>{permission.path}</TableCell>
+                        <TableCell>
+                          <MethodChip method={permission.method} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              
+            </Box>
+            {errors.permissionIds && (
+                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                  {errors.permissionIds.message}
+                </Typography>
+              )}
+            <DialogActions>
+              <Button onClick={handleEditModalClose}>Cancel</Button>
+              <Button type="submit" variant="contained">
+                Update Role
+              </Button>
+            </DialogActions>
+          </form>
+        </DialogContent>
+      </Dialog>
+    );
   };
 
   return (
@@ -219,13 +429,11 @@ export const ManageRole = () => {
               Role Management
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddRole}
-          >
-            Add New Role
-          </Button>
+          {isAcceptPermission(['add new role']) && (
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddRole}>
+              Add New Role
+            </Button>
+          )}
         </Box>
 
         <TableContainer>
@@ -243,12 +451,8 @@ export const ManageRole = () => {
                   <TableRow key={role.id}>
                     <TableCell>{role.name}</TableCell>
                     <TableCell>
-                      <Box
-                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-                      >
-                        <Typography>
-                          {role.permissions.length} permissions
-                        </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography>{role.permissions.length} permissions</Typography>
                         <IconButton
                           size="small"
                           onClick={() => handleViewPermissions(role)}
@@ -273,180 +477,11 @@ export const ManageRole = () => {
           </Table>
         </TableContainer>
 
-        <Dialog
-          open={isModalOpen}
-          onClose={handleModalClose}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle>Add New Role</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Role Name"
-              required
-              fullWidth
-              value={roleName}
-              onChange={(e) => setRoleName(e.target.value)}
-              error={!roleName}
-              helperText={!roleName ? 'Role name is required' : ''}
-            />
-            <TextField
-              margin="dense"
-              label="Description"
-              fullWidth
-              multiline
-              rows={3}
-              value={roleDescription}
-              onChange={(e) => setRoleDescription(e.target.value)}
-              sx={{ mt: 2 }}
-            />
-            <Box sx={{ mt: 2, maxHeight: 300, overflow: 'auto' }}>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell padding="checkbox"></TableCell>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Path</TableCell>
-                      <TableCell>Method</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {permissions.map((permission) => (
-                      <TableRow key={permission.id}>
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={selectedPermissions.includes(
-                              permission.id,
-                            )}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedPermissions([
-                                  ...selectedPermissions,
-                                  permission.id,
-                                ]);
-                              } else {
-                                setSelectedPermissions(
-                                  selectedPermissions.filter(
-                                    (id) => id !== permission.id,
-                                  ),
-                                );
-                              }
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>{permission.name}</TableCell>
-                        <TableCell>{permission.path}</TableCell>
-                        <TableCell>
-                          <MethodChip method={permission.method} />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleModalClose}>Cancel</Button>
-            <Button onClick={handleSubmit} variant="contained">
-              Add Role
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <AddRoleForm />
 
-        <Dialog
-          open={isEditModalOpen}
-          onClose={handleEditModalClose}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle>Edit Role</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Role Name"
-              required
-              fullWidth
-              value={roleName}
-              onChange={(e) => setRoleName(e.target.value)}
-              error={!roleName}
-              helperText={!roleName ? 'Role name is required' : ''}
-            />
+        <EditRoleForm />
 
-            <TextField
-              margin="dense"
-              label="Description"
-              fullWidth
-              multiline
-              rows={3}
-              value={roleDescription}
-              onChange={(e) => setRoleDescription(e.target.value)}
-              sx={{ mt: 2 }}
-            />
-            <Box sx={{ mt: 2, maxHeight: 300, overflow: 'auto' }}>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell padding="checkbox"></TableCell>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Path</TableCell>
-                      <TableCell>Method</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {permissions.map((permission) => (
-                      <TableRow key={permission.id}>
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={selectedPermissions.includes(
-                              permission.id,
-                            )}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedPermissions([
-                                  ...selectedPermissions,
-                                  permission.id,
-                                ]);
-                              } else {
-                                setSelectedPermissions(
-                                  selectedPermissions.filter(
-                                    (id) => id !== permission.id,
-                                  ),
-                                );
-                              }
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>{permission.name}</TableCell>
-                        <TableCell>{permission.path}</TableCell>
-                        <TableCell>
-                          <MethodChip method={permission.method} />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleEditModalClose}>Cancel</Button>
-            <Button onClick={handleEditSubmit} variant="contained">
-              Update Role
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Modal
-          open={isViewModalOpen}
-          onClose={handleCloseViewModal}
-          aria-labelledby="view-permissions-modal"
-        >
+        <Modal open={isViewModalOpen} onClose={handleCloseViewModal} aria-labelledby="view-permissions-modal">
           <Box
             sx={{
               position: 'absolute',

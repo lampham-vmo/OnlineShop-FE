@@ -14,6 +14,8 @@ const ProductDetails = () => {
   const [productData, setProductData] = useState<ProductResponse>();
   const [error, setError] = useState<boolean>(false);
 
+  const [previewImg, setPreviewImg] = useState(0);
+
   const fetchProduct = async () => {
     try {
       const data =
@@ -40,6 +42,8 @@ const ProductDetails = () => {
     );
   }
 
+  const listImage: string[] = JSON.parse(productData?.image || '[]');
+
   return (
     <div>
       <Breadcrumb title={'Product Details'} />
@@ -54,7 +58,7 @@ const ProductDetails = () => {
                   <div className="lg:min-h-[512px] rounded-lg shadow-1 bg-gray-2 p-4 sm:p-7.5 relative flex items-center justify-center">
                     <div>
                       <img
-                        src={productData?.image}
+                        src={listImage[previewImg]}
                         alt="products-details"
                         width={400}
                         height={400}
@@ -64,19 +68,20 @@ const ProductDetails = () => {
 
                   {/* ?  &apos;border-blue &apos; :  &apos;border-transparent&apos; */}
                   <div className="flex flex-wrap sm:flex-nowrap gap-4.5 mt-6">
-                    {Array.from({ length: 1 }).map((item, key) => (
+                    {listImage.map((imgage, key) => (
                       <button
-                        // onClick={() => setPreviewImg(key)}
+                        onClick={() => setPreviewImg(key)}
                         key={key}
-                        // className={`flex items-center justify-center w-15 sm:w-25 h-15 sm:h-25 overflow-hidden rounded-lg bg-gray-2 shadow-1 ease-out duration-200 border-2 hover:border-blue ${
-                        //   key === previewI0mg ? 'border-blue' : 'border-transparent'
-                        // }`}
-                        className={`flex items-center justify-center w-15 sm:w-25 h-15 sm:h-25 overflow-hidden rounded-lg bg-gray-2 shadow-1 ease-out duration-200 border-2 hover:border-blue border-blue`}
+                        className={`flex items-center justify-center w-15 sm:w-25 h-15 sm:h-25 overflow-hidden rounded-lg bg-gray-2 shadow-1 ease-out duration-200 border-2 hover:border-blue ${
+                          key === previewImg
+                            ? 'border-blue'
+                            : 'border-transparent'
+                        }`}
                       >
                         <img
                           width={50}
                           height={50}
-                          src={productData?.image}
+                          src={imgage}
                           alt="thumbnail"
                         />
                       </button>
