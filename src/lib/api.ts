@@ -56,12 +56,12 @@ axiosInstance.interceptors.response.use(
         throw new Error('Refresh token failed');
       } catch (refreshError) {
         useAuthStore.getState().clearTokens();
-        window.location.href = '/login';
+        window.location.href = '/signin';
         return Promise.reject(refreshError);
       }
     }
 
-    return Promise.reject(error);
+    return Promise.reject(error.response.data.error);
   },
 );
 

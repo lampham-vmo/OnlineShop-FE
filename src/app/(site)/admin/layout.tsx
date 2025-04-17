@@ -4,6 +4,9 @@ import AdminHeader from '../../components/Admin/AdminHeader';
 import { Box, Toolbar } from '@mui/material';
 import { useEffect } from 'react';
 
+import '../../globals.css';
+import { Toaster } from 'react-hot-toast';
+
 export default function AdminLayout({
   children,
 }: {
@@ -14,7 +17,7 @@ export default function AdminLayout({
   }, []);
 
   return (
-    <html>
+    <html suppressHydrationWarning>
       <body>
         <Box sx={{ display: 'flex' }}>
           <AdminSidebar />
@@ -24,6 +27,7 @@ export default function AdminLayout({
             <Box p={3}>{children}</Box>
           </Box>
         </Box>
+        <Toaster />
       </body>
     </html>
   );
