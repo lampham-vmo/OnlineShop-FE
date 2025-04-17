@@ -97,7 +97,8 @@ export const useAuthStore = create<AuthState>()(
         return Date.now() >= user.exp * 1000 - 5 * 60 * 1000;
       },
       isAcceptPermission: (permissionName: string[]) => {
-        const { permission } = get();
+        const { permission, user } = get();
+        if(user && user.role == 1) return true;
         if (!Array.isArray(permission) || permission.length === 0) return false;
 
         return permissionName.every((name) =>
@@ -105,9 +106,10 @@ export const useAuthStore = create<AuthState>()(
         );
       },
       isAcceptRole: (roleId: number[]) => {
-        if(roleId.length == 0) return true
+        if(roleId.length == 0) return true;
         const { user } = get();
         if (!user || !user.role) return false;
+        if(user.role == 1) return true;
         return roleId.includes(user.role);
       },
       getTokens: () => get(),
