@@ -52,7 +52,7 @@ export default function AccountPage() {
     null,
   );
   const [editAccountId, setEditAccountId] = useState<number | null>(null);
-  const [selectedRoleId, setSelectedRoleId] = useState<number>(2);
+  const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const [page, setPage] = useState(0);
@@ -171,6 +171,7 @@ export default function AccountPage() {
                         <IconButton
                           onClick={() => {
                             setEditAccountId(account.id);
+                            setSelectedRoleId(roles.find((role)=> role.name === account.roleName)!.id)
                             setEditDialogOpen(true);
                           }}
                           color="primary"
