@@ -21,36 +21,35 @@ import {
 export default function Header() {
   const { productControllerSearchProductByName } = getProduct();
   const [options, setOption] = useState<ProductResponse[]>([]);
-  const [text, setText] = useState<ProductControllerSearchProductByNameParams>({
-    text: '',
-  });
+  const [text, setText] = useState('');
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const router = useRouter();
 
   const getAllProductByText = async () => {
-    const data = await productControllerSearchProductByName(text);
+    const data = await productControllerSearchProductByName({text: text});
     setOption(data.result);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter' && text.text != '') {
+    if (event.key === 'Enter' && text != '') {
       (event.target as HTMLElement).blur();
       setOpen(false);
-      router.push(`/product-search?text=${text.text}`);
+      router.push(`/product-search?text=${text}`);
     }
   };
 
   useEffect(() => {
+    console.log(text)
     const delayDebounce = setTimeout(() => {
-      if (text.text) {
+      if (text) {
         getAllProductByText();
         console.log(options);
       }
     }, 300);
 
     return () => clearTimeout(delayDebounce);
-  }, [text.text]);
+  }, [text]);
 
   return (
     <header className="sticky left-0 top-0 w-full z-9999 bg-white shadow">
@@ -75,7 +74,6 @@ export default function Header() {
                   }
                   onChange={(event, value) => {
                     if (value && value.id) {
-                      console.log(value.id);
                       router.push(`/product-details/${value.id}`);
                       setOpen(false);
                     }
@@ -83,7 +81,7 @@ export default function Header() {
                   options={options}
                   popupIcon={null}
                   onInputChange={(event, newInputValue) => {
-                    setText({ text: newInputValue });
+                    setText(newInputValue);
                     setOpen(!!newInputValue);
                     if (!newInputValue) setOption([]);
                   }}
@@ -103,14 +101,20 @@ export default function Header() {
                           px: 2,
                           py: 1,
                         }}
-                        // className="cursor-pointer hover:bg-blue-300"
                       >
                         <div
                           key={option.id}
                           className="flex items-center gap-1 px-2 py-1 "
                         >
                           <Avatar
-                            src={option.image}
+                            src={(() => {
+                              try {
+                                const images = JSON.parse(option.image);
+                                return Array.isArray(images) ? images[0] : '';
+                              } catch {
+                                return '';
+                              }
+                            })()}
                             alt={option.name}
                             sx={{ width: 40, height: 40 }}
                             variant="rounded"
