@@ -81,7 +81,7 @@ export default function AdminSidebar() {
           </Box>
         ) : (
           <List>
-            {filteredMenuItems.map((item) => (
+            {menuItems.map((item) => (
               <ListItemButton
                 key={item.label}
                 selected={pathname === item.path}
