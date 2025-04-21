@@ -30,7 +30,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
 import { getUsers } from '@/generated/api/endpoints/users/users';
-import { GetUserAccountDTO, Role, RoleListResponseDto } from '@/generated/api/models';
+import {
+  GetUserAccountDTO,
+  Role,
+  RoleListResponseDto,
+} from '@/generated/api/models';
 import { getRole } from '@/generated/api/endpoints/role/role';
 
 const {
@@ -39,13 +43,11 @@ const {
   userControllerUpdateUserRole,
 } = getUsers();
 
-const {
-  roleControllerFindAll
-} = getRole()
+const { roleControllerFindAll } = getRole();
 
 export default function AccountPage() {
   const [accounts, setAccounts] = useState<GetUserAccountDTO[]>([]);
-  const [roles, setRoles] = useState<Role[]>([])
+  const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedAccountId, setSelectedAccountId] = useState<number | null>(
@@ -63,8 +65,8 @@ export default function AccountPage() {
       try {
         const res = await userControllerFindAll();
         setAccounts(res.data.accounts);
-        const res1 = await roleControllerFindAll()
-        setRoles(res1.data)
+        const res1 = await roleControllerFindAll();
+        setRoles(res1.data);
       } catch (err) {
         console.error('Failed to fetch accounts:', err);
       } finally {
@@ -171,7 +173,11 @@ export default function AccountPage() {
                         <IconButton
                           onClick={() => {
                             setEditAccountId(account.id);
-                            setSelectedRoleId(roles.find((role)=> role.name === account.roleName)!.id)
+                            setSelectedRoleId(
+                              roles.find(
+                                (role) => role.name === account.roleName,
+                              )!.id,
+                            );
                             setEditDialogOpen(true);
                           }}
                           color="primary"

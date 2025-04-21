@@ -34,8 +34,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const authApi = getAuth();
-  
-  const {user, setTokens, setPermission} = useAuthStore.getState()
+
+  const { user, setTokens, setPermission } = useAuthStore.getState();
   // Initialize react-hook-form with zod resolver
   // Check for authentication on component mount
 
@@ -71,14 +71,13 @@ export default function Login() {
       });
 
       // Redirect sau khi đăng nhập thành công
-      const payload: any = jwtDecode(result.accessToken)
-      if(payload.role == 1){
-        router.push('/admin')
-      }else{
-        router.push('/')
+      const payload: any = jwtDecode(result.accessToken);
+      if (payload.role == 1) {
+        router.push('/admin');
+      } else {
+        router.push('/');
       }
       // router.push('/')
-
     } catch (err: any) {
       setError(
         err.response?.data?.message || 'Login failed. Please try again.',

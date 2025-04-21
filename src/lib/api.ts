@@ -22,37 +22,38 @@ axiosInstance.interceptors.request.use(async (config) => {
   return config;
 });
 
-
-let refreshPromise : Promise<boolean> | null = null;
+let refreshPromise: Promise<boolean> | null = null;
 // Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
-    const isRefreshRequest =  originalRequest.url?.includes('/auth/refreshAT');
+    const isRefreshRequest = originalRequest.url?.includes('/auth/refreshAT');
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !isRefreshRequest 
+      !isRefreshRequest
     ) {
       originalRequest._retry = true;
-      //if refreshPromise is null =>  create 
-      if(!refreshPromise){
-        refreshPromise = useAuthStore.getState().refreshAccessToken()
-        .then(success => {
-          refreshPromise = null;
-          return success
-        })
-        .catch(err => {
-          refreshPromise = null;
-          return false
-        })
+      //if refreshPromise is null =>  create
+      if (!refreshPromise) {
+        refreshPromise = useAuthStore
+          .getState()
+          .refreshAccessToken()
+          .then((success) => {
+            refreshPromise = null;
+            return success;
+          })
+          .catch((err) => {
+            refreshPromise = null;
+            return false;
+          });
       }
       try {
         const success = await refreshPromise;
-        if(success){
-          const {accessToken} = useAuthStore.getState();
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;  
+        if (success) {
+          const { accessToken } = useAuthStore.getState();
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return axiosInstance(originalRequest);
         }
         //if refresh token fail

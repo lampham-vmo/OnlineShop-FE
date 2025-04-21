@@ -27,7 +27,7 @@ export default function Header() {
   const router = useRouter();
 
   const getAllProductByText = async () => {
-    const data = await productControllerSearchProductByName({text: text});
+    const data = await productControllerSearchProductByName({ text: text });
     setOption(data.result);
   };
 
@@ -40,7 +40,7 @@ export default function Header() {
   };
 
   useEffect(() => {
-    console.log(text)
+    console.log(text);
     const delayDebounce = setTimeout(() => {
       if (text) {
         getAllProductByText();

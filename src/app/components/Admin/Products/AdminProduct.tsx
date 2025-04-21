@@ -147,7 +147,6 @@ const rows = [
   createData('Gingerbread', 356, 16.0, 49, 3.9),
 ];
 
-
 export default function CustomizedTables() {
   const [params, setParams] =
     React.useState<ProductControllerGetAllProductParams>({
@@ -183,75 +182,86 @@ export default function CustomizedTables() {
   // Avoid a layout jump when reaching the last page with empty rows.
   return (
     <>
-    <div>
-      <TableContainer component={Paper} >
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>Id</StyledTableCell>
-              <StyledTableCell>Name</StyledTableCell>
-              <StyledTableCell>Image</StyledTableCell>
-              <StyledTableCell>Stock</StyledTableCell>
-              <StyledTableCell>Price</StyledTableCell>
-              <StyledTableCell>Discount</StyledTableCell>
-              <StyledTableCell>Rating</StyledTableCell>
-              <StyledTableCell>Category Name</StyledTableCell>
-              <StyledTableCell>Created At</StyledTableCell>
-              <StyledTableCell>Update/Delete</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {productList.map((row) => (
-              <StyledTableRow key={row.name}>
-                <StyledTableCell component="th" scope="row">
-                  {row.id}
-                </StyledTableCell>
-                <StyledTableCell>{row.name}</StyledTableCell>
-                <StyledTableCell>
-                  {(() => {
-                    try {
-                      const images = JSON.parse(row.image);
-                      return Array.isArray(images) ? (
-                        <img
-                          src={images[0]}
-                          alt="product"
-                          style={{ width: 50, height: 50, objectFit: 'cover' }}
-                        />
-                      ) : null;
-                    } catch {
-                      return null;
-                    }
-                  })()}
-                </StyledTableCell>
-                <StyledTableCell>{row.stock}</StyledTableCell>
-                <StyledTableCell>{row.price}$</StyledTableCell>
-                <StyledTableCell>{row.discount}%</StyledTableCell>
-                <StyledTableCell>{row.rating}</StyledTableCell>
-                <StyledTableCell>{row.categoryName}</StyledTableCell>
-                <StyledTableCell>{row.createdAt}</StyledTableCell>
-                <StyledTableCell>
-                  <div className="flex gap-x-2">
-                    <UpdateButton initialData={row} onSuccess={handleUpdateSuccess} />
-                    <DeleteProduct id={row.id} name={row.name} onSuccess={handleUpdateSuccess} />
-                  </div>
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <div className="flex justify-center mt-10">
-        <Stack spacing={2}>
-          <Pagination
-            count={totalPages}
-            page={params.page}
-            defaultPage={1}
-            onChange={handleChangePage}
-            color="primary"
-          />
-        </Stack>
+      <div>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Id</StyledTableCell>
+                <StyledTableCell>Name</StyledTableCell>
+                <StyledTableCell>Image</StyledTableCell>
+                <StyledTableCell>Stock</StyledTableCell>
+                <StyledTableCell>Price</StyledTableCell>
+                <StyledTableCell>Discount</StyledTableCell>
+                <StyledTableCell>Rating</StyledTableCell>
+                <StyledTableCell>Category Name</StyledTableCell>
+                <StyledTableCell>Created At</StyledTableCell>
+                <StyledTableCell>Update/Delete</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {productList.map((row) => (
+                <StyledTableRow key={row.name}>
+                  <StyledTableCell component="th" scope="row">
+                    {row.id}
+                  </StyledTableCell>
+                  <StyledTableCell>{row.name}</StyledTableCell>
+                  <StyledTableCell>
+                    {(() => {
+                      try {
+                        const images = JSON.parse(row.image);
+                        return Array.isArray(images) ? (
+                          <img
+                            src={images[0]}
+                            alt="product"
+                            style={{
+                              width: 50,
+                              height: 50,
+                              objectFit: 'cover',
+                            }}
+                          />
+                        ) : null;
+                      } catch {
+                        return null;
+                      }
+                    })()}
+                  </StyledTableCell>
+                  <StyledTableCell>{row.stock}</StyledTableCell>
+                  <StyledTableCell>{row.price}$</StyledTableCell>
+                  <StyledTableCell>{row.discount}%</StyledTableCell>
+                  <StyledTableCell>{row.rating}</StyledTableCell>
+                  <StyledTableCell>{row.categoryName}</StyledTableCell>
+                  <StyledTableCell>{row.createdAt}</StyledTableCell>
+                  <StyledTableCell>
+                    <div className="flex gap-x-2">
+                      <UpdateButton
+                        initialData={row}
+                        onSuccess={handleUpdateSuccess}
+                      />
+                      <DeleteProduct
+                        id={row.id}
+                        name={row.name}
+                        onSuccess={handleUpdateSuccess}
+                      />
+                    </div>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <div className="flex justify-center mt-10">
+          <Stack spacing={2}>
+            <Pagination
+              count={totalPages}
+              page={params.page}
+              defaultPage={1}
+              onChange={handleChangePage}
+              color="primary"
+            />
+          </Stack>
+        </div>
       </div>
-    </div>
     </>
   );
 }
