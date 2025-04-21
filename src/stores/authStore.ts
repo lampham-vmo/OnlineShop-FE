@@ -48,7 +48,12 @@ export const useAuthStore = create<AuthState>()(
         set({ accessToken, refreshToken, user });
       },
       clearTokens: () => {
-        set({ accessToken: null, refreshToken: null, user: null });
+        set({
+          accessToken: null,
+          refreshToken: null,
+          user: null,
+          permission: null,
+        });
       },
       initAuth: () => {
         // không cần thiết nữa nếu dùng persist
