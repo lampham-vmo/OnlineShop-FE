@@ -3,10 +3,6 @@ import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
 
-// Biến để theo dõi số lần retry
-let refreshRetryCount = 0;
-const MAX_REFRESH_RETRIES = 1;
-
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
 });
@@ -26,41 +22,50 @@ axiosInstance.interceptors.request.use(async (config) => {
   return config;
 });
 
+let refreshPromise: Promise<boolean> | null = null;
 // Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
-
-    // Kiểm tra nếu đây là request refresh token, không retry
-    const isRefreshRequest =
-      await originalRequest.url?.includes('/auth/refreshAT');
-
+    const isRefreshRequest = originalRequest.url?.includes('/auth/refreshAT');
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !isRefreshRequest &&
-      refreshRetryCount < MAX_REFRESH_RETRIES
+      !isRefreshRequest
     ) {
       originalRequest._retry = true;
-      refreshRetryCount++;
-
+      //if refreshPromise is null =>  create
+      if (!refreshPromise) {
+        refreshPromise = useAuthStore
+          .getState()
+          .refreshAccessToken()
+          .then((success) => {
+            refreshPromise = null;
+            return success;
+          })
+          .catch((err) => {
+            refreshPromise = null;
+            return false;
+          });
+      }
       try {
-        const success = await useAuthStore.getState().refreshAccessToken();
-        console.log('success? ', success);
+        const success = await refreshPromise;
         if (success) {
           const { accessToken } = useAuthStore.getState();
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return axiosInstance(originalRequest);
         }
-        throw new Error('Refresh token failed');
-      } catch (refreshError) {
+        //if refresh token fail
         useAuthStore.getState().clearTokens();
         window.location.href = '/signin';
-        return Promise.reject(refreshError);
+        return Promise.reject(error);
+      } catch (err) {
+        useAuthStore.getState().clearTokens();
+        window.location.href = '/signin';
+        return Promise.reject(err);
       }
     }
-
     return Promise.reject(error.response.data.error);
   },
 );

@@ -93,7 +93,13 @@ function SortableImage({
   };
 
   return (
-    <MuiBox ref={setNodeRef} style={style} {...attributes} {...listeners} className="relative">
+    <MuiBox
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="relative"
+    >
       <img
         src={url}
         alt={`img-${index}`}
@@ -117,7 +123,6 @@ function SortableImage({
     </MuiBox>
   );
 }
-
 
 export default function BasicModal() {
   const { productControllerCreateProduct } = getProduct();
@@ -196,7 +201,7 @@ export default function BasicModal() {
       event.target.type === 'checkbox'
         ? event.target.checked
         : event.target.value;
-      setFormErrors({});
+    setFormErrors({});
     if (['stock', 'price', 'discount', 'categoryId'].includes(field)) {
       value = Number(value);
     }
@@ -208,7 +213,7 @@ export default function BasicModal() {
 
   const handleSubmit = async () => {
     const errors: Record<string, string> = {};
-  
+
     // Check image
     if (imageLink.length === 0) {
       errors.image = 'Image must have at least 1';
@@ -216,15 +221,15 @@ export default function BasicModal() {
     if (formData.categoryId === -1) {
       errors.categoryId = 'You must select one';
     }
-  
+
     // Validate với Zod
     try {
-      console.log(formData)
-      if(formData.name.trim()==""){
-        errors.name = "Name should not be empty"
+      console.log(formData);
+      if (formData.name.trim() == '') {
+        errors.name = 'Name should not be empty';
       }
-      if(formData.description.trim() == ""){
-        errors.description = "Description should not be empty"
+      if (formData.description.trim() == '') {
+        errors.description = 'Description should not be empty';
       }
       productControllerCreateProductBody.parse(formData);
     } catch (error) {
@@ -236,14 +241,14 @@ export default function BasicModal() {
         });
       }
     }
-  
+
     if (Object.keys(errors).length > 0) {
-      console.log(errors)
+      console.log(errors);
       setFormErrors(errors);
       toast.error('Vui lòng kiểm tra lại thông tin!');
       return;
     }
-  
+
     // Gọi API tạo sản phẩm
     try {
       setFormErrors({});
@@ -251,7 +256,7 @@ export default function BasicModal() {
         loading: 'Đang tạo sản phẩm...',
         success: 'Tạo sản phẩm thành công!',
       });
-  
+
       // Reset form sau khi thành công
       setFormData({
         name: '',
@@ -270,7 +275,7 @@ export default function BasicModal() {
     } catch (error: any) {
       // ✅ Xử lý lỗi trả về từ API (message là array hoặc string)
       const message = error?.message;
-  
+
       if (Array.isArray(message)) {
         toast.error(message.join('\n'));
       } else if (typeof message === 'string') {
@@ -280,7 +285,6 @@ export default function BasicModal() {
       }
     }
   };
-  
 
   React.useEffect(() => {
     getAllCategory();
@@ -381,42 +385,46 @@ export default function BasicModal() {
             />
           </Button>
           <DndContext
-  sensors={useSensors(useSensor(PointerSensor))}
-  collisionDetection={closestCenter}
-  onDragEnd={({ active, over }) => {
-    if (active.id !== over?.id) {
-      const oldIndex = imageLink.findIndex((url) => url === active.id);
-      const newIndex = imageLink.findIndex((url) => url === over?.id);
-      const reordered = arrayMove(imageLink, oldIndex, newIndex);
-      setImageLink(reordered);
-      setFormData((prev) => ({
-        ...prev,
-        image: JSON.stringify(reordered),
-      }));
-    }
-  }}
->
-  <SortableContext items={imageLink} strategy={verticalListSortingStrategy}>
-    <MuiBox className="flex flex-wrap gap-2">
-      {imageLink.map((url, index) => (
-        <SortableImage
-          key={url}
-          url={url}
-          index={index}
-          onRemove={(i) => {
-            const updated = imageLink.filter((_, idx) => idx !== i);
-            setImageLink(updated);
-            setFormData((prev) => ({
-              ...prev,
-              image: JSON.stringify(updated),
-            }));
-          }}
-        />
-      ))}
-    </MuiBox>
-  </SortableContext>
-</DndContext>
-
+            sensors={useSensors(useSensor(PointerSensor))}
+            collisionDetection={closestCenter}
+            onDragEnd={({ active, over }) => {
+              if (active.id !== over?.id) {
+                const oldIndex = imageLink.findIndex(
+                  (url) => url === active.id,
+                );
+                const newIndex = imageLink.findIndex((url) => url === over?.id);
+                const reordered = arrayMove(imageLink, oldIndex, newIndex);
+                setImageLink(reordered);
+                setFormData((prev) => ({
+                  ...prev,
+                  image: JSON.stringify(reordered),
+                }));
+              }
+            }}
+          >
+            <SortableContext
+              items={imageLink}
+              strategy={verticalListSortingStrategy}
+            >
+              <MuiBox className="flex flex-wrap gap-2">
+                {imageLink.map((url, index) => (
+                  <SortableImage
+                    key={url}
+                    url={url}
+                    index={index}
+                    onRemove={(i) => {
+                      const updated = imageLink.filter((_, idx) => idx !== i);
+                      setImageLink(updated);
+                      setFormData((prev) => ({
+                        ...prev,
+                        image: JSON.stringify(updated),
+                      }));
+                    }}
+                  />
+                ))}
+              </MuiBox>
+            </SortableContext>
+          </DndContext>
 
           {formErrors.image && (
             <Typography variant="caption" color="error">
@@ -425,7 +433,9 @@ export default function BasicModal() {
           )}
 
           <FormControl fullWidth>
-            <InputLabel error={!!formErrors.categoryId} id="category-label">Category</InputLabel>
+            <InputLabel error={!!formErrors.categoryId} id="category-label">
+              Category
+            </InputLabel>
             <Select
               error={!!formErrors.categoryId}
               labelId="category-label"

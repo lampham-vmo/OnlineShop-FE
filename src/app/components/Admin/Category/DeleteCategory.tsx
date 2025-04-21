@@ -46,7 +46,9 @@ const DeleteCategory = ({ id, name, onSuccess }: IDeleteCategoryProps) => {
         handleClose();
       }
     } catch (error: any) {
-      toast.error(error.message || 'Delete failed!');
+      toast.error(
+        Array.isArray(error.message) ? error.message[0] : error.message,
+      );
     } finally {
       setLoading(false);
     }

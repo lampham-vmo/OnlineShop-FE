@@ -48,7 +48,12 @@ export const useAuthStore = create<AuthState>()(
         set({ accessToken, refreshToken, user });
       },
       clearTokens: () => {
-        set({ accessToken: null, refreshToken: null, user: null });
+        set({
+          accessToken: null,
+          refreshToken: null,
+          user: null,
+          permission: null,
+        });
       },
       initAuth: () => {
         // không cần thiết nữa nếu dùng persist
@@ -98,7 +103,7 @@ export const useAuthStore = create<AuthState>()(
       },
       isAcceptPermission: (permissionName: string[]) => {
         const { permission, user } = get();
-        if(user && user.role == 1) return true;
+        if (user && user.role == 1) return true;
         if (!Array.isArray(permission) || permission.length === 0) return false;
 
         return permissionName.every((name) =>
@@ -109,7 +114,7 @@ export const useAuthStore = create<AuthState>()(
         if (roleId.length == 0) return true;
         const { user } = get();
         if (!user || !user.role) return false;
-        if(user.role == 1) return true;
+        if (user.role == 1) return true;
         return roleId.includes(user.role);
       },
       getTokens: () => get(),

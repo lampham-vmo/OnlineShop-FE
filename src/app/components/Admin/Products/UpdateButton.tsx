@@ -1,37 +1,39 @@
 'use client';
 import * as React from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import CloseIcon from '@mui/icons-material/Close';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import {
-  Box,
-  Button,
-  Typography,
-  Modal,
-  TextField,
   FormControl,
+  FormHelperText,
   InputAdornment,
   InputLabel,
   MenuItem,
   OutlinedInput,
   Select,
-  FormHelperText,
-  IconButton,
   styled,
+  TextField,
+  Box as MuiBox,
+  IconButton,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useForm, Controller } from 'react-hook-form';
-import toast from 'react-hot-toast';
-import { zodResolver } from '@hookform/resolvers/zod';
-
 import { getProduct } from '@/generated/api/endpoints/product/product';
 import { getUpload } from '@/generated/api/endpoints/upload/upload';
-import { getCategory } from '@/generated/api/endpoints/category/category';
 import {
-  productControllerCreateProductBody
+  CategoryResponseDto,
+  ProductRequest,
+  ProductResponse,
+  UploadControllerUploadImageBody,
+} from '@/generated/api/models';
+import toast from 'react-hot-toast';
+import { getCategory } from '@/generated/api/endpoints/category/category';
+import { ZodError } from 'zod';
+import {
+  productControllerCreateProductBody,
+  productControllerUpdateProductDetailParams,
 } from '@/generated/api/schemas/product/product.zod';
-import { CategoryResponseDto, ProductRequest, ProductResponse } from '@/generated/api/models';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -66,319 +68,304 @@ interface UpdateProductModalProps {
   onSuccess?: () => void;
 }
 
-function SortableImage({
-  url,
-  index,
-  onRemove,
-}: {
-  url: string;
-  index: number;
-  onRemove: (index: number) => void;
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: url });
-  const style = { transform: CSS.Transform.toString(transform), transition };
-
-  return (
-    <Box ref={setNodeRef} style={style} {...attributes} {...listeners} className="relative">
-      <img src={url} alt={`img-${index}`} className="w-16 h-16 object-cover rounded cursor-move" />
-      <IconButton
-        size="small"
-        onClick={() => onRemove(index)}
-        sx={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          color: 'white',
-          '&:hover': { backgroundColor: 'rgba(0,0,0,0.8)' },
-          padding: '2px',
-        }}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </Box>
-  );
-}
-
-export default function UpdateProductModal({ initialData, onSuccess }: UpdateProductModalProps) {
+export default function UpdateProductModal({
+  initialData,
+  onSuccess,
+}: UpdateProductModalProps) {
   const { productControllerUpdateProductDetail } = getProduct();
   const { categoryControllerGetAll } = getCategory();
   const { uploadControllerUploadImage } = getUpload();
 
   const [open, setOpen] = React.useState(false);
-  const [categories, setCategories] = React.useState<CategoryResponseDto[]>([]);
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
+    {},
+  );
   const [imageLink, setImageLink] = React.useState<string[]>([]);
+  const [categories, setCategories] = React.useState<CategoryResponseDto[]>([]);
 
+  const [formData, setFormData] = React.useState<ProductRequest>({
+    name: initialData.name,
+    description: initialData.description,
+    stock: initialData.stock,
+    price: initialData.price,
+    discount: initialData.discount,
+    image: initialData.image,
+    categoryId: -1,
+  });
   const parsedImages: string[] = (() => {
     try {
-      const result = JSON.parse(initialData.image);
+      const result = JSON.parse(formData.image);
       return Array.isArray(result) ? result : [];
     } catch {
       return [];
     }
   })();
-
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    getValues,
-    formState: { errors },
-  } = useForm<ProductRequest>({
-    resolver: zodResolver(productControllerCreateProductBody),
-    defaultValues: {
-      name: initialData.name,
-      description: initialData.description,
-      stock: initialData.stock,
-      price: initialData.price,
-      discount: initialData.discount,
-      image: initialData.image,
-      categoryId: -1,
-    },
-  });
-
   React.useEffect(() => {
-    if (!open) return;
-
     categoryControllerGetAll().then((res) => {
       setCategories(res.data);
-      const found = res.data.find((c) => c.name === initialData.categoryName);
-      setValue('categoryId', found?.id ?? -1);
+      setFormData((prev) => ({
+        ...prev,
+        categoryId:
+          categories.find((c) => c.name === initialData.categoryName)?.id ?? -1,
+      }));
+      console.log(formData.categoryId);
     });
-
     setImageLink(parsedImages);
-    setValue('image', JSON.stringify(parsedImages));
   }, [open]);
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleChange = (field: string) => (e: any) => {
+    let value =
+      e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    if (['stock', 'price', 'discount', 'categoryId'].includes(field)) {
+      value = Number(value);
+      console.log(value);
+    }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const files = event.target.files;
     if (!files) return;
-
     const valid = Array.from(files).filter((f) => f.type.startsWith('image/'));
     if (valid.length !== files.length) {
       toast.error('Chỉ được upload file ảnh!');
       return;
     }
-
     for (const file of valid) {
       if (imageLink.length >= 3) {
         toast.error('Chỉ được upload tối đa 3 ảnh!');
         break;
       }
-
-      const res = await toast.promise(() => uploadControllerUploadImage({ file }), {
-        loading: 'Đang tải ảnh...',
-        success: 'Tải thành công',
-        error: 'Lỗi tải ảnh',
+      const res = await toast.promise(
+        () => uploadControllerUploadImage({ file }),
+        {
+          loading: 'Loading',
+          success: 'Upload Success',
+          error: 'Upload Failed',
+        },
+      );
+      setImageLink((prev) => {
+        const updated = [...prev, res.data];
+        setFormData((f) => ({ ...f, image: JSON.stringify(updated) }));
+        return updated;
       });
-
-      const updated = [...imageLink, res.data];
-      setImageLink(updated);
-      setValue('image', JSON.stringify(updated));
     }
   };
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const handleSubmit = async () => {
+    const errors: Record<string, string> = {};
 
-  const onSubmit = async (data: ProductRequest) => {
+    // Check image
     if (imageLink.length === 0) {
-      toast.error('Phải có ít nhất 1 ảnh!');
+      errors.image = 'Image must have at least 1';
+    }
+    if (formData.categoryId === -1) {
+      errors.categoryId = 'You must select one';
+    }
+
+    // Validate với Zod
+    try {
+      console.log(formData);
+      if (formData.name.trim() == '') {
+        errors.name = 'Name should not be empty';
+      }
+      if (formData.description.trim() == '') {
+        errors.description = 'Description should not be empty';
+      }
+      productControllerCreateProductBody.parse(formData);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        error.errors.forEach((err) => {
+          if (err.path && err.path.length > 0) {
+            errors[err.path[0] as string] = err.message;
+          }
+        });
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      console.log(errors);
+      setFormErrors(errors);
+      toast.error('Please check again');
       return;
     }
 
+    // Gọi API tạo sản phẩm
     try {
-      const updatedData: ProductRequest = {
-        ...data,
-        image: JSON.stringify(imageLink),
-      };
+      setFormErrors({});
+      await toast.promise(
+        productControllerUpdateProductDetail(initialData.id, formData),
+        {
+          loading: 'Updating....',
+          success: 'Update Successful',
+        },
+      );
 
-      await toast.promise(productControllerUpdateProductDetail(initialData.id, updatedData), {
-        loading: 'Đang cập nhật...',
-        success: 'Cập nhật thành công',
-        error: 'Lỗi cập nhật',
+      // Reset form sau khi thành công
+      setFormData({
+        name: '',
+        description: '',
+        stock: 0,
+        price: 0,
+        discount: 0,
+        image: '',
+        categoryId: -1,
       });
-
+      setImageLink([]);
+      setFormErrors({});
       onSuccess?.();
-      setOpen(false);
+      setTimeout(() => {
+        handleClose();
+      }, 600);
     } catch (error: any) {
-      toast.error(error?.message || 'Đã xảy ra lỗi khi cập nhật sản phẩm');
+      // ✅ Xử lý lỗi trả về từ API (message là array hoặc string)
+      const message = error?.message;
+
+      if (Array.isArray(message)) {
+        toast.error(message.join('\n'));
+      } else if (typeof message === 'string') {
+        toast.error(message);
+      } else {
+        toast.error('Đã xảy ra lỗi khi tạo sản phẩm.');
+      }
     }
   };
 
   return (
-    <>
-      <Button variant="outlined" onClick={() => setOpen(true)}>
+    <React.Fragment>
+      <Button variant="outlined" onClick={handleOpen}>
         Edit
       </Button>
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <Box component="form" sx={style} onSubmit={handleSubmit(onSubmit)}>
+      <Modal open={open} onClose={handleClose}>
+        <Box component="form" sx={style}>
           <Typography variant="h6">Update Product</Typography>
-
-          <Controller
-            name="name"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label="Product Name"
-                fullWidth
-                {...field}
-                error={!!errors.name}
-                helperText={errors.name?.message}
-              />
-            )}
+          <TextField
+            label="Product Name"
+            value={formData.name}
+            onChange={handleChange('name')}
+            error={!!formErrors.name}
+            helperText={formErrors.name}
+            fullWidth
           />
-
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label="Description"
-                multiline
-                rows={4}
-                fullWidth
-                {...field}
-                error={!!errors.description}
-                helperText={errors.description?.message}
-              />
-            )}
+          <TextField
+            label="Description"
+            value={formData.description}
+            multiline
+            rows={4}
+            onChange={handleChange('description')}
+            error={!!formErrors.description}
+            helperText={formErrors.description}
+            fullWidth
           />
-
-<Controller
-  name="stock"
-  control={control}
-  render={({ field }) => (
-    <TextField
-      label="Stock"
-      type="number"
-      fullWidth
-      {...field}
-      value={field.value ?? ''}
-      onChange={(e) => field.onChange(parseInt(e.target.value))}
-      error={!!errors.stock}
-      helperText={errors.stock?.message}
-    />
-  )}
-/>
-
-<Controller
-  name="price"
-  control={control}
-  render={({ field }) => {
-    const formatMoney = (value: string) =>
-      value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-    const parseMoney = (value: string) =>
-      Number(value.replace(/\./g, '') || 0);
-
-    const displayValue = field.value ? formatMoney(field.value.toString()) : '';
-
-    return (
-      <FormControl fullWidth error={!!errors.price}>
-        <InputLabel htmlFor="price">Price</InputLabel>
-        <OutlinedInput
-          id="price"
-          value={displayValue}
-          onChange={(e) => {
-            const raw = e.target.value;
-            const parsed = parseMoney(raw);
-            field.onChange(parsed);
-          }}
-          startAdornment={<InputAdornment position="start">$</InputAdornment>}
-          label="Price"
-        />
-        <FormHelperText>{errors.price?.message}</FormHelperText>
-      </FormControl>
-    );
-  }}
-/>
-
-
-
-<Controller
-  name="discount"
-  control={control}
-  render={({ field }) => (
-    <TextField
-      label="Discount (%)"
-      type="number"
-      fullWidth
-      {...field}
-      value={field.value ?? ''}
-      onChange={(e) => field.onChange(parseFloat(e.target.value))}
-      error={!!errors.discount}
-      helperText={errors.discount?.message}
-    />
-  )}
-/>
-
-
-          <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
-            Upload Images
-            <VisuallyHiddenInput accept="image/*" type="file" onChange={handleImageUpload} />
-          </Button>
-
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={({ active, over }) => {
-              if (active.id !== over?.id) {
-                const oldIndex = imageLink.findIndex((url) => url === active.id);
-                const newIndex = imageLink.findIndex((url) => url === over?.id);
-                const reordered = arrayMove(imageLink, oldIndex, newIndex);
-                setImageLink(reordered);
-                setValue('image', JSON.stringify(reordered));
+          <TextField
+            label="Stock"
+            type="number"
+            value={formData.stock === 0 ? '' : formData.stock}
+            onChange={handleChange('stock')}
+            error={!!formErrors.stock}
+            helperText={formErrors.stock}
+            fullWidth
+          />
+          <FormControl fullWidth error={!!formErrors.price}>
+            <InputLabel htmlFor="price">Price</InputLabel>
+            <OutlinedInput
+              id="price"
+              type="number"
+              startAdornment={
+                <InputAdornment position="start">$</InputAdornment>
               }
-            }}
+              value={formData.price === 0 ? '' : formData.price}
+              onChange={handleChange('price')}
+            />
+            <FormHelperText>{formErrors.price}</FormHelperText>
+          </FormControl>
+          <TextField
+            label="Discount (%)"
+            type="number"
+            value={formData.discount}
+            onChange={handleChange('discount')}
+            error={!!formErrors.discount}
+            helperText={formErrors.discount}
+            fullWidth
+          />
+          <Button
+            component="label"
+            variant="contained"
+            startIcon={<CloudUploadIcon />}
           >
-            <SortableContext items={imageLink} strategy={verticalListSortingStrategy}>
-              <Box className="flex flex-wrap gap-2">
-                {imageLink.map((url, index) => (
-                  <SortableImage
-                    key={url}
-                    url={url}
-                    index={index}
-                    onRemove={(i) => {
-                      const updated = imageLink.filter((_, idx) => idx !== i);
-                      setImageLink(updated);
-                      setValue('image', JSON.stringify(updated));
-                    }}
-                  />
-                ))}
-              </Box>
-            </SortableContext>
-          </DndContext>
-
-          {errors.image && (
+            Upload files
+            <VisuallyHiddenInput
+              accept="image/*"
+              type="file"
+              onChange={handleImageUpload}
+            />
+          </Button>
+          <MuiBox className="flex flex-wrap gap-2">
+            {imageLink.map((url, i) => (
+              <MuiBox key={i} className="relative">
+                <img
+                  src={url}
+                  alt={`img-${i}`}
+                  className="w-16 h-16 object-cover rounded"
+                />
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    const updated = imageLink.filter((_, index) => index !== i);
+                    setImageLink(updated);
+                    setFormData((prev) => ({
+                      ...prev,
+                      image: JSON.stringify(updated),
+                    }));
+                  }}
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    color: 'white',
+                    '&:hover': { backgroundColor: 'rgba(0,0,0,0.8)' },
+                    padding: '2px',
+                  }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </MuiBox>
+            ))}
+          </MuiBox>
+          {formErrors.image && (
             <Typography color="error" variant="caption">
-              {errors.image.message}
+              {formErrors.image}
             </Typography>
           )}
-
-          <Controller
-            name="categoryId"
-            control={control}
-            render={({ field }) => (
-              <FormControl fullWidth error={!!errors.categoryId}>
-                <InputLabel id="cat-label">Category</InputLabel>
-                <Select labelId="cat-label" {...field}>
-                  <MenuItem value={-1}>Select Category</MenuItem>
-                  {categories.map((c) => (
-                    <MenuItem key={c.id} value={c.id}>
-                      {c.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <FormHelperText>{errors.categoryId?.message}</FormHelperText>
-              </FormControl>
-            )}
-          />
-
-          <Button variant="contained" type="submit">
+          <FormControl fullWidth error={!!formErrors.categoryId}>
+            <InputLabel id="cat-label">Category</InputLabel>
+            <Select
+              labelId="cat-label"
+              value={formData.categoryId}
+              onChange={handleChange('categoryId')}
+            >
+              <MenuItem value={-1}>Select Category</MenuItem>
+              {categories.map((c) => (
+                <MenuItem key={c.id} value={c.id}>
+                  {c.name}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{formErrors.categoryId}</FormHelperText>
+          </FormControl>
+          <Button variant="contained" onClick={handleSubmit}>
             Submit
           </Button>
         </Box>
       </Modal>
-    </>
+    </React.Fragment>
   );
 }

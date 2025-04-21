@@ -8,6 +8,7 @@ import ScrollToTop from '../../components/Common/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
+import { useRouter } from 'next/navigation';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,6 +26,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [hasHydrated, setHasHydrated] = useState(false);
+  const router = useRouter();
+
+  const { user } = useAuthStore();
 
   useEffect(() => {
     if (useAuthStore.persist.hasHydrated()) {
@@ -38,12 +42,18 @@ export default function RootLayout({
     }
   }, []);
 
+  useEffect(() => {
+    if (hasHydrated && !user) {
+      router.push('/signin');
+    }
+  }, [hasHydrated]);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {hasHydrated ? (
+        {hasHydrated && user ? (
           <>
             <Header />
             {children}

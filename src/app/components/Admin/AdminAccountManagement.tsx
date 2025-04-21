@@ -30,7 +30,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
 import { getUsers } from '@/generated/api/endpoints/users/users';
-import { GetUserAccountDTO } from '@/generated/api/models';
+import {
+  GetUserAccountDTO,
+  Role,
+  RoleListResponseDto,
+} from '@/generated/api/models';
+import { getRole } from '@/generated/api/endpoints/role/role';
 
 const {
   userControllerFindAll,
@@ -38,15 +43,18 @@ const {
   userControllerUpdateUserRole,
 } = getUsers();
 
+const { roleControllerFindAll } = getRole();
+
 export default function AccountPage() {
   const [accounts, setAccounts] = useState<GetUserAccountDTO[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedAccountId, setSelectedAccountId] = useState<number | null>(
     null,
   );
   const [editAccountId, setEditAccountId] = useState<number | null>(null);
-  const [selectedRoleId, setSelectedRoleId] = useState<number>(2);
+  const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const [page, setPage] = useState(0);
@@ -57,6 +65,8 @@ export default function AccountPage() {
       try {
         const res = await userControllerFindAll();
         setAccounts(res.data.accounts);
+        const res1 = await roleControllerFindAll();
+        setRoles(res1.data);
       } catch (err) {
         console.error('Failed to fetch accounts:', err);
       } finally {
@@ -91,16 +101,8 @@ export default function AccountPage() {
       await userControllerUpdateUserRole(String(editAccountId), {
         role_id: selectedRoleId,
       });
-      setAccounts((prev) =>
-        prev.map((acc) =>
-          acc.id === editAccountId
-            ? {
-                ...acc,
-                roleName: selectedRoleId === 1 ? 'admin' : 'user',
-              }
-            : acc,
-        ),
-      );
+      const res = await userControllerFindAll();
+      setAccounts(res.data.accounts);
     } catch (err) {
       console.error('Failed to update role', err);
     } finally {
@@ -172,7 +174,9 @@ export default function AccountPage() {
                           onClick={() => {
                             setEditAccountId(account.id);
                             setSelectedRoleId(
-                              account.roleName === 'Admin' ? 1 : 2,
+                              roles.find(
+                                (role) => role.name === account.roleName,
+                              )!.id,
                             );
                             setEditDialogOpen(true);
                           }}
@@ -244,9 +248,13 @@ export default function AccountPage() {
                 labelId="role-select-label"
                 value={selectedRoleId}
                 onChange={(e) => setSelectedRoleId(Number(e.target.value))}
+                label="Role"
               >
-                <MenuItem value={1}>Admin</MenuItem>
-                <MenuItem value={2}>User</MenuItem>
+                {roles.map((role) => (
+                  <MenuItem key={role.id} value={role.id}>
+                    {role.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Box>

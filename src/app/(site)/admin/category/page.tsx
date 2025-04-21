@@ -1,4 +1,4 @@
-import ManageCategory from '@/app/components/Admin/Category';
+import DisplayCategory from '@/app/components/Admin/Category';
 
 import { Metadata } from 'next';
 
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const ManageCategoryPage = () => {
-  return <ManageCategory />;
+  return <DisplayCategory />;
 };
 
 export default ManageCategoryPage;
