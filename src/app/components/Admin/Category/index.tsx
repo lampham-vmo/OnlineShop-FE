@@ -31,6 +31,8 @@ import { getCategory } from '@/generated/api/endpoints/category/category';
 import CreateCategory from './CreateCategory';
 import UpdateCategory from './UpdateCategory';
 import DeleteCategory from './DeleteCategory';
+import { useAuthStore } from '@/stores/authStore';
+import { EPermissionCategory } from './category.validation';
 
 interface TablePaginationActionsProps {
   count: number;
@@ -135,6 +137,8 @@ const columns: ColumnData[] = [
 ];
 
 const ManageCategory = () => {
+  const { isAcceptPermission } = useAuthStore();
+
   const [dataCategories, setDataCategories] =
     useState<CategoryPaginationData>();
   const [loading, setLoading] = useState(true);
@@ -142,7 +146,7 @@ const ManageCategory = () => {
   const [params, setParams] = useState<CategoryControllerGetListParams>({
     page: 1,
     pageSize: 10,
-    order: 'ASC',
+    order: 'DESC',
   });
 
   const handleChangePage = (_: unknown, newPage: number) => {
@@ -188,7 +192,9 @@ const ManageCategory = () => {
       </Typography>
 
       {/* Block Create */}
-      <CreateCategory onSuccess={getListCategory} />
+      {isAcceptPermission([EPermissionCategory.CREATE_CATEGORY]) && (
+        <CreateCategory onSuccess={getListCategory} />
+      )}
 
       {loading ? (
         <Box display="flex" justifyContent="center" py={10}>
@@ -199,7 +205,7 @@ const ManageCategory = () => {
         !dataCategories.result ||
         dataCategories.result.length === 0 ? (
         <div className="text-center py-5 text-3xl text-dark">
-          Doesn't exist any catagory
+          There are no categories available
         </div>
       ) : (
         <TableContainer component={Paper}>
@@ -240,15 +246,23 @@ const ManageCategory = () => {
                       spacing={1}
                       justifyContent="flex-start"
                     >
-                      <UpdateCategory
-                        category={category}
-                        onSuccess={getListCategory}
-                      />
+                      {isAcceptPermission([
+                        EPermissionCategory.UPDATE_CATEGORY,
+                      ]) && (
+                        <UpdateCategory
+                          category={category}
+                          onSuccess={getListCategory}
+                        />
+                      )}
 
-                      <DeleteCategory
-                        {...category}
-                        onSuccess={getListCategory}
-                      />
+                      {isAcceptPermission([
+                        EPermissionCategory.DELETE_CATEGORY,
+                      ]) && (
+                        <DeleteCategory
+                          {...category}
+                          onSuccess={getListCategory}
+                        />
+                      )}
                     </Stack>
                   </TableCell>
                 </TableRow>
@@ -280,4 +294,19 @@ const ManageCategory = () => {
   );
 };
 
-export default ManageCategory;
+const DisplayCategory = () => {
+  const { isAcceptPermission } = useAuthStore();
+  if (
+    !isAcceptPermission([EPermissionCategory.GET_LIST_CATEGORY_WITH_PAGING])
+  ) {
+    return (
+      <div className="text-dark text-4xl text-center font-semibold">
+        403 Forbidden Resource
+      </div>
+    );
+  }
+
+  return <ManageCategory />;
+};
+
+export default DisplayCategory;

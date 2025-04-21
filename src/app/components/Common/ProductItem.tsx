@@ -2,6 +2,7 @@ import { ProductResponse } from '@/generated/api/models';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 interface IProductItemProps {
   item: ProductResponse;
@@ -14,6 +15,13 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
 
   const handleViewDetail = (id: number) => {
     router.push(`/product-details/${id}`);
+  };
+
+  const handleAddToCart = (item: ProductResponse) => {
+    // TODO: ADD TO CART
+    if (item.stock === 0) {
+      toast.error(`${item.name} out of stock`, { duration: 3000 });
+    }
   };
 
   return (
@@ -56,7 +64,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
           </button>
 
           <button
-            // onClick={() => handleAddToCart()}
+            onClick={() => handleAddToCart(item)}
             aria-label="button for add to cart"
             id="addCartOne"
             className="flex items-center justify-center w-18 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white hover:text-white hover:bg-blue"
@@ -108,10 +116,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
         {/* <p className="text-custom-sm">({item.stock})</p> */}
       </div>
 
-      <h3
-        className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5"
-        // onClick={() => handleProductDetails()}
-      >
+      <h3 className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5">
         <Link href={`/product-details/${item.id}`}> {item.name} </Link>
       </h3>
 

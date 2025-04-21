@@ -34,7 +34,10 @@ import { Role } from '@/generated/api/models/role';
 import { getRole } from '@/generated/api/endpoints/role/role';
 import { useAuthStore } from '@/stores/authStore';
 import { getPermission } from '@/generated/api/endpoints/permission/permission';
-import { roleControllerUpdateRoleBody, roleControllerAddRoleBody } from '@/generated/api/schemas/role/role.zod';
+import {
+  roleControllerUpdateRoleBody,
+  roleControllerAddRoleBody,
+} from '@/generated/api/schemas/role/role.zod';
 
 const MethodChip = ({ method }: { method: string }) => {
   const getMethodColor = (method: string) => {
@@ -157,8 +160,11 @@ export const ManageRole = () => {
       resolver: zodResolver(
         roleControllerAddRoleBody.refine(
           (data) => data.permissionIds.length > 0,
-          { message: 'At least one permission must be selected', path: ['permissionIds'] }
-        )
+          {
+            message: 'At least one permission must be selected',
+            path: ['permissionIds'],
+          },
+        ),
       ),
       defaultValues: {
         name: '',
@@ -178,7 +184,12 @@ export const ManageRole = () => {
     };
 
     return (
-      <Dialog open={isModalOpen} onClose={handleModalClose} maxWidth="md" fullWidth>
+      <Dialog
+        open={isModalOpen}
+        onClose={handleModalClose}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Add New Role</DialogTitle>
         <DialogContent>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -236,9 +247,16 @@ export const ManageRole = () => {
                                 checked={field.value.includes(permission.id)}
                                 onChange={(e) => {
                                   if (e.target.checked) {
-                                    field.onChange([...field.value, permission.id]);
+                                    field.onChange([
+                                      ...field.value,
+                                      permission.id,
+                                    ]);
                                   } else {
-                                    field.onChange(field.value.filter((id) => id !== permission.id));
+                                    field.onChange(
+                                      field.value.filter(
+                                        (id) => id !== permission.id,
+                                      ),
+                                    );
                                   }
                                 }}
                               />
@@ -255,13 +273,12 @@ export const ManageRole = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
-              
             </Box>
             {errors.permissionIds && (
-                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                  {errors.permissionIds.message}
-                </Typography>
-              )}
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {errors.permissionIds.message}
+              </Typography>
+            )}
             <DialogActions>
               <Button onClick={handleModalClose}>Cancel</Button>
               <Button type="submit" variant="contained">
@@ -284,8 +301,11 @@ export const ManageRole = () => {
       resolver: zodResolver(
         roleControllerUpdateRoleBody.refine(
           (data) => data.permissionIds.length > 0,
-          { message: 'At least one permission must be selected', path: ['permissionIds'] }
-        )
+          {
+            message: 'At least one permission must be selected',
+            path: ['permissionIds'],
+          },
+        ),
       ),
       defaultValues: {
         id: selectedRole?.id || 0,
@@ -317,7 +337,12 @@ export const ManageRole = () => {
     };
 
     return (
-      <Dialog open={isEditModalOpen} onClose={handleEditModalClose} maxWidth="md" fullWidth>
+      <Dialog
+        open={isEditModalOpen}
+        onClose={handleEditModalClose}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Edit Role</DialogTitle>
         <DialogContent>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -375,9 +400,16 @@ export const ManageRole = () => {
                                 checked={field.value.includes(permission.id)}
                                 onChange={(e) => {
                                   if (e.target.checked) {
-                                    field.onChange([...field.value, permission.id]);
+                                    field.onChange([
+                                      ...field.value,
+                                      permission.id,
+                                    ]);
                                   } else {
-                                    field.onChange(field.value.filter((id) => id !== permission.id));
+                                    field.onChange(
+                                      field.value.filter(
+                                        (id) => id !== permission.id,
+                                      ),
+                                    );
                                   }
                                 }}
                               />
@@ -394,13 +426,12 @@ export const ManageRole = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
-              
             </Box>
             {errors.permissionIds && (
-                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                  {errors.permissionIds.message}
-                </Typography>
-              )}
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {errors.permissionIds.message}
+              </Typography>
+            )}
             <DialogActions>
               <Button onClick={handleEditModalClose}>Cancel</Button>
               <Button type="submit" variant="contained">
@@ -430,7 +461,11 @@ export const ManageRole = () => {
             </Typography>
           </Box>
           {isAcceptPermission(['add new role']) && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddRole}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddRole}
+            >
               Add New Role
             </Button>
           )}
@@ -451,8 +486,12 @@ export const ManageRole = () => {
                   <TableRow key={role.id}>
                     <TableCell>{role.name}</TableCell>
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography>{role.permissions.length} permissions</Typography>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
+                        <Typography>
+                          {role.permissions.length} permissions
+                        </Typography>
                         <IconButton
                           size="small"
                           onClick={() => handleViewPermissions(role)}
@@ -481,7 +520,11 @@ export const ManageRole = () => {
 
         <EditRoleForm />
 
-        <Modal open={isViewModalOpen} onClose={handleCloseViewModal} aria-labelledby="view-permissions-modal">
+        <Modal
+          open={isViewModalOpen}
+          onClose={handleCloseViewModal}
+          aria-labelledby="view-permissions-modal"
+        >
           <Box
             sx={{
               position: 'absolute',

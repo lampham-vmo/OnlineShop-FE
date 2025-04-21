@@ -40,16 +40,13 @@ const DeleteProduct = ({ id, name, onSuccess }: IDeleteCategoryProps) => {
   const handleConfirmDelete = async () => {
     setLoading(true);
     try {
-        await toast.promise(
-            getProduct().productControllerRemoveProduct(id),
-                {
-                  loading: 'Deleting....',
-                  success: 'Deleted success',
-                  error: 'Delete Fail',
-                },
-              );
-              onSuccess?.();
-              setTimeout(handleClose, 300);
+      await toast.promise(getProduct().productControllerRemoveProduct(id), {
+        loading: 'Deleting....',
+        success: 'Deleted success',
+        error: 'Delete Fail',
+      });
+      onSuccess?.();
+      setTimeout(handleClose, 300);
     } catch (error: any) {
       toast.error(error.message || 'Delete failed!');
     } finally {

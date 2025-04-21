@@ -134,31 +134,37 @@ const ProductDetails = () => {
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <g clipPath="url(#clip0_375_9221)">
-                          <path
-                            d="M10 0.5625C4.78125 0.5625 0.5625 4.78125 0.5625 10C0.5625 15.2188 4.78125 19.4688 10 19.4688C15.2188 19.4688 19.4688 15.2188 19.4688 10C19.4688 4.78125 15.2188 0.5625 10 0.5625ZM10 18.0625C5.5625 18.0625 1.96875 14.4375 1.96875 10C1.96875 5.5625 5.5625 1.96875 10 1.96875C14.4375 1.96875 18.0625 5.59375 18.0625 10.0312C18.0625 14.4375 14.4375 18.0625 10 18.0625Z"
-                            fill="#22AD5C"
-                          />
-                          <path
-                            d="M12.6875 7.09374L8.9688 10.7187L7.2813 9.06249C7.00005 8.78124 6.56255 8.81249 6.2813 9.06249C6.00005 9.34374 6.0313 9.78124 6.2813 10.0625L8.2813 12C8.4688 12.1875 8.7188 12.2812 8.9688 12.2812C9.2188 12.2812 9.4688 12.1875 9.6563 12L13.6875 8.12499C13.9688 7.84374 13.9688 7.40624 13.6875 7.12499C13.4063 6.84374 12.9688 6.84374 12.6875 7.09374Z"
-                            fill="#22AD5C"
-                          />
-                        </g>
-                        <defs>
-                          <clipPath id="clip0_375_9221">
-                            <rect width="20" height="20" fill="white" />
-                          </clipPath>
-                        </defs>
-                      </svg>
+                      {productData.stock > 0 ? (
+                        <>
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g clipPath="url(#clip0_375_9221)">
+                              <path
+                                d="M10 0.5625C4.78125 0.5625 0.5625 4.78125 0.5625 10C0.5625 15.2188 4.78125 19.4688 10 19.4688C15.2188 19.4688 19.4688 15.2188 19.4688 10C19.4688 4.78125 15.2188 0.5625 10 0.5625ZM10 18.0625C5.5625 18.0625 1.96875 14.4375 1.96875 10C1.96875 5.5625 5.5625 1.96875 10 1.96875C14.4375 1.96875 18.0625 5.59375 18.0625 10.0312C18.0625 14.4375 14.4375 18.0625 10 18.0625Z"
+                                fill="#22AD5C"
+                              />
+                              <path
+                                d="M12.6875 7.09374L8.9688 10.7187L7.2813 9.06249C7.00005 8.78124 6.56255 8.81249 6.2813 9.06249C6.00005 9.34374 6.0313 9.78124 6.2813 10.0625L8.2813 12C8.4688 12.1875 8.7188 12.2812 8.9688 12.2812C9.2188 12.2812 9.4688 12.1875 9.6563 12L13.6875 8.12499C13.9688 7.84374 13.9688 7.40624 13.6875 7.12499C13.4063 6.84374 12.9688 6.84374 12.6875 7.09374Z"
+                                fill="#22AD5C"
+                              />
+                            </g>
+                            <defs>
+                              <clipPath id="clip0_375_9221">
+                                <rect width="20" height="20" fill="white" />
+                              </clipPath>
+                            </defs>
+                          </svg>
 
-                      <span className="text-green"> In Stock </span>
+                          <span className="text-green"> In Stock </span>
+                        </>
+                      ) : (
+                        <span className="text-red">Out of Stock</span>
+                      )}
                     </div>
                   </div>
 
@@ -172,70 +178,72 @@ const ProductDetails = () => {
                     </span>
                   </h3>
 
-                  <form onSubmit={(e) => e.preventDefault()}>
-                    <div className="flex flex-wrap items-center gap-4.5 border-t border-gray-3 mt-7.5 mb-9 py-9">
-                      <div className="flex items-center rounded-md border border-gray-3">
-                        <button
-                          aria-label="button for remove product"
-                          className="flex items-center justify-center w-12 h-12 ease-out duration-200 hover:text-blue"
-                          // onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-                        >
-                          <svg
-                            className="fill-current"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                  {productData.stock > 0 && (
+                    <form onSubmit={(e) => e.preventDefault()}>
+                      <div className="flex flex-wrap items-center gap-4.5 border-t border-gray-3 mt-7.5 mb-9 py-9">
+                        <div className="flex items-center rounded-md border border-gray-3">
+                          <button
+                            aria-label="button for remove product"
+                            className="flex items-center justify-center w-12 h-12 ease-out duration-200 hover:text-blue"
+                            // onClick={() => quantity > 1 && setQuantity(quantity - 1)}
                           >
-                            <path
-                              d="M3.33301 10.0001C3.33301 9.53984 3.7061 9.16675 4.16634 9.16675H15.833C16.2932 9.16675 16.6663 9.53984 16.6663 10.0001C16.6663 10.4603 16.2932 10.8334 15.833 10.8334H4.16634C3.7061 10.8334 3.33301 10.4603 3.33301 10.0001Z"
-                              fill=""
-                            />
-                          </svg>
-                        </button>
+                            <svg
+                              className="fill-current"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M3.33301 10.0001C3.33301 9.53984 3.7061 9.16675 4.16634 9.16675H15.833C16.2932 9.16675 16.6663 9.53984 16.6663 10.0001C16.6663 10.4603 16.2932 10.8334 15.833 10.8334H4.16634C3.7061 10.8334 3.33301 10.4603 3.33301 10.0001Z"
+                                fill=""
+                              />
+                            </svg>
+                          </button>
 
-                        <span className="flex items-center justify-center w-16 h-12 border-x border-gray-4">
-                          {1}
-                        </span>
+                          <span className="flex items-center justify-center w-16 h-12 border-x border-gray-4">
+                            {1}
+                          </span>
 
-                        <button
-                          // onClick={() => setQuantity(quantity + 1)}
-                          aria-label="button for add product"
-                          className="flex items-center justify-center w-12 h-12 ease-out duration-200 hover:text-blue"
-                        >
-                          <svg
-                            className="fill-current"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                          <button
+                            // onClick={() => setQuantity(quantity + 1)}
+                            aria-label="button for add product"
+                            className="flex items-center justify-center w-12 h-12 ease-out duration-200 hover:text-blue"
                           >
-                            <path
-                              d="M3.33301 10C3.33301 9.5398 3.7061 9.16671 4.16634 9.16671H15.833C16.2932 9.16671 16.6663 9.5398 16.6663 10C16.6663 10.4603 16.2932 10.8334 15.833 10.8334H4.16634C3.7061 10.8334 3.33301 10.4603 3.33301 10Z"
-                              fill=""
-                            />
-                            <path
-                              d="M9.99967 16.6667C9.53944 16.6667 9.16634 16.2936 9.16634 15.8334L9.16634 4.16671C9.16634 3.70647 9.53944 3.33337 9.99967 3.33337C10.4599 3.33337 10.833 3.70647 10.833 4.16671L10.833 15.8334C10.833 16.2936 10.4599 16.6667 9.99967 16.6667Z"
-                              fill=""
-                            />
-                          </svg>
+                            <svg
+                              className="fill-current"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M3.33301 10C3.33301 9.5398 3.7061 9.16671 4.16634 9.16671H15.833C16.2932 9.16671 16.6663 9.5398 16.6663 10C16.6663 10.4603 16.2932 10.8334 15.833 10.8334H4.16634C3.7061 10.8334 3.33301 10.4603 3.33301 10Z"
+                                fill=""
+                              />
+                              <path
+                                d="M9.99967 16.6667C9.53944 16.6667 9.16634 16.2936 9.16634 15.8334L9.16634 4.16671C9.16634 3.70647 9.53944 3.33337 9.99967 3.33337C10.4599 3.33337 10.833 3.70647 10.833 4.16671L10.833 15.8334C10.833 16.2936 10.4599 16.6667 9.99967 16.6667Z"
+                                fill=""
+                              />
+                            </svg>
+                          </button>
+                        </div>
+
+                        <a
+                          href="#"
+                          className="inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark"
+                        >
+                          Purchase Now
+                        </a>
+
+                        <button className="inline-flex font-medium text-white bg-dark py-3 px-7 rounded-md ease-out duration-200 hover:bg-dark-2 false">
+                          Add to Cart
                         </button>
                       </div>
-
-                      <a
-                        href="#"
-                        className="inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark"
-                      >
-                        Purchase Now
-                      </a>
-
-                      <button className="inline-flex font-medium text-white bg-dark py-3 px-7 rounded-md ease-out duration-200 hover:bg-dark-2 false">
-                        Add to Cart
-                      </button>
-                    </div>
-                  </form>
+                    </form>
+                  )}
                 </div>
               </div>
             </div>
