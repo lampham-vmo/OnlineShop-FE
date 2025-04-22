@@ -1,18 +1,21 @@
 'use client';
 
+import { useAuthStore } from '@/stores/authStore';
 import {
   AppBar,
   Toolbar,
   Typography,
-  Avatar,
-  IconButton,
   Menu,
   MenuItem,
   Box,
 } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function AdminHeader() {
+  const { user, clearTokens } = useAuthStore();
+  const router = useRouter();
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -25,7 +28,9 @@ export default function AdminHeader() {
 
   const handleLogout = () => {
     // TODO: logout logic
-    handleMenuClose();
+    // await authControllerLogout();
+    clearTokens();
+    router.push('/signin');
   };
 
   return (
@@ -39,14 +44,17 @@ export default function AdminHeader() {
         </Typography>
 
         <Box>
-          <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
-            <Avatar alt="Admin" src="/images/admin-avatar.png" />
-          </IconButton>
+          <div
+            className="w-10 h-10 rounded-full text-white transition-all duration-300 bg-gray-5 hover:bg-white hover:text-dark flex items-center justify-center cursor-pointer"
+            onClick={handleMenuOpen}
+          >
+            {user?.email[0].toUpperCase()}
+          </div>
 
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
+            onClose={() => setAnchorEl(null)}
             anchorOrigin={{
               vertical: 'bottom',
               horizontal: 'right',
@@ -56,8 +64,22 @@ export default function AdminHeader() {
               horizontal: 'right',
             }}
           >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                router.push('/profile');
+              }}
+            >
+              Profile
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                handleLogout();
+              }}
+            >
+              Logout
+            </MenuItem>
           </Menu>
         </Box>
       </Toolbar>

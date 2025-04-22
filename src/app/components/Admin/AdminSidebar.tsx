@@ -15,6 +15,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import GroupIcon from '@mui/icons-material/Group';
 import CategoryIcon from '@mui/icons-material/Category';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import { useRouter, usePathname } from 'next/navigation';
 import { Permission } from '@/generated/api/models';
 import { useAuthStore } from '@/stores/authStore';
@@ -57,6 +58,12 @@ const menuItems = [
     icon: <AdminPanelSettingsIcon />,
     path: '/admin/role',
     apiPath: '/api/v1/role',
+  },
+  {
+    label: 'Payment Methods',
+    icon: <PaymentsIcon />,
+    path: '/admin/payment-method',
+    apiPath: '/api/v1/payment-method',
   },
 ];
 
