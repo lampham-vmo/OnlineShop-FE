@@ -74,6 +74,7 @@ export default function ProfileComponent() {
             if (response.success) {
                 setProfile(updatedProfile);
                 window.alert("Profile updated successfully!");
+                setErrorMessage('');  
                 console.log("Updated Profile:", updatedProfile);
                 setOpenModal(false); 
             } else {
