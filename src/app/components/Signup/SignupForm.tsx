@@ -18,7 +18,17 @@ import { useUserStore } from '@/stores/useUserStore';
 import { authControllerCreateBody } from '@/generated/api/schemas/auth/auth.zod';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 
-type FormData = z.infer<typeof authControllerCreateBody>;
+// Update the Zod schema to validate Gmail addresses
+const gmailValidationSchema = authControllerCreateBody.extend({
+  email: z
+    .string()
+    .email('Invalid email address')
+    .refine((email) => email.endsWith('@gmail.com'), {
+      message: 'Only Gmail addresses are allowed',
+    }),
+});
+
+type FormData = z.infer<typeof gmailValidationSchema>;
 
 export default function SignUpForm() {
   const {
@@ -26,7 +36,7 @@ export default function SignUpForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(authControllerCreateBody),
+    resolver: zodResolver(gmailValidationSchema), // Use the updated schema
   });
 
   const [error, setError] = useState('');
@@ -37,10 +47,10 @@ export default function SignUpForm() {
     try {
       const res = await getAuth().authControllerCreate(data);
       setUser(res.data);
-      setSuccess('Account created successfully!');
+      setSuccess('Account created successfully, please check your email to activate the account!');
       setError('');
     } catch (err: any) {
-      const message = err.response?.data?.message || 'Signup failed';
+      const message = err.message || 'Signup failed';
       setError(message);
       setSuccess('');
     }

@@ -14,8 +14,9 @@ import {
   InputAdornment,
   IconButton,
   Alert,
+  CircularProgress,
 } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff, CheckCircle, Replay } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { authControllerLoginBody } from '@/generated/api/schemas/auth/auth.zod';
@@ -33,6 +34,9 @@ export default function Login() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailNotVerified, setEmailNotVerified] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  const [resendStatus, setResendStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   const authApi = getAuth();
 
   const { user, setTokens, setPermission } = useAuthStore.getState();
@@ -60,6 +64,7 @@ export default function Login() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setError(null);
+      setEmailNotVerified(false);
       const response = await authApi.authControllerLogin(data);
       const result = response.data;
 
@@ -79,9 +84,26 @@ export default function Login() {
       }
       // router.push('/')
     } catch (err: any) {
+      console.log(err);
       setError(
-        err.response?.data?.message || 'Login failed. Please try again.',
+        err.message || 'Login failed. Please try again.',
       );
+      if (err.message === 'email not verified!') {
+        setEmailNotVerified(true);
+        setEmail(data.email); // Save the email for resending confirmation
+      }
+    }
+  };
+
+  const handleResendConfirmationEmail = async () => {
+    if (!email) return;
+    setResendStatus('loading');
+    try {
+      await authApi.authControllerReSendConfirmationEmail(email);
+      setResendStatus('success');
+    } catch (err: any) {
+      alert('Failed to resend confirmation email: ' + err.message);
+      setResendStatus('idle');
     }
   };
 
@@ -113,6 +135,44 @@ export default function Login() {
             <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
               {error}
             </Alert>
+          )}
+
+          {emailNotVerified && (
+            <Box
+              sx={{
+                marginTop: 2,
+                padding: 2,
+                border: '1px solid black',
+                borderRadius: 2,
+                textAlign: 'center',
+              }}
+            >
+              {resendStatus === 'success' ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CheckCircle color="success" />
+                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    Confirmation email resent successfully!
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={handleResendConfirmationEmail}
+                    >
+                      <Replay fontSize="small" />
+                    </IconButton>
+                  </Typography>
+                </Box>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleResendConfirmationEmail}
+                  disabled={resendStatus === 'loading'}
+                  startIcon={resendStatus === 'loading' ? <CircularProgress size={20} /> : null}
+                >
+                  {resendStatus === 'loading' ? 'Resending...' : 'Click here to resend confirmation email'}
+                </Button>
+              )}
+            </Box>
           )}
 
           <Box
