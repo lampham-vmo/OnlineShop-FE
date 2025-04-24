@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import useCartStore from "@/stores/useCartStore";
 import { ProductResponse } from "@/generated/api/models";
 import { getProduct } from "@/generated/api/endpoints/product/product";
@@ -10,6 +9,8 @@ interface IProductItemProps {
 }
 
 const SingleItem = ({ item, removeItemFromCart }: IProductItemProps) => {
+  const {cartItems} = useCartStore();
+  // item = itemList.
   // const [cartData, setCartData] = useState<ProductResponse>();
   // const [error, setError] = useState<boolean>(false);
   
@@ -27,6 +28,8 @@ const SingleItem = ({ item, removeItemFromCart }: IProductItemProps) => {
   //   useEffect(() => {
   //     fetchProduct()
   //   }, [])
+
+  console.log("Cart Items from zustand store:", cartItems);
   
   const handleRemoveFromCart = () => {
     console.log(`Removing: ${item.id}`)
@@ -36,14 +39,14 @@ const SingleItem = ({ item, removeItemFromCart }: IProductItemProps) => {
     <div className="flex items-center justify-between gap-5">
       <div className="w-full flex items-center gap-6">
         <div className="flex items-center justify-center rounded-[10px] bg-gray-3 max-w-[90px] w-full h-22.5">
-          <Image src={item.imgs?.thumbnails[0]} alt="product" width={100} height={100} />
+          <img src={JSON.parse(item.image)[0]} alt="product" width={100} height={100} />
         </div>
 
         <div>
           <h3 className="font-medium text-dark mb-1 ease-out duration-200 hover:text-blue">
             <a href="#"> {item.name} </a>
           </h3>
-          <p className="text-custom-sm">Price: ${item.discount}</p>
+          <p className="text-custom-sm">Price: ${item.priceAfterDis.toFixed(2)}</p>
         </div>
       </div>
 
