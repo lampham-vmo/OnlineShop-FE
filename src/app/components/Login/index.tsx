@@ -15,6 +15,7 @@ import {
   IconButton,
   Alert,
   CircularProgress,
+  Modal,
 } from '@mui/material';
 import { Visibility, VisibilityOff, CheckCircle, Replay } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
@@ -23,6 +24,7 @@ import { authControllerLoginBody } from '@/generated/api/schemas/auth/auth.zod';
 import type { LoginUserDTO } from '@/generated/api/models';
 import { useAuthStore, type AuthState } from '@/stores/authStore';
 import { jwtDecode } from 'jwt-decode';
+import ResetPasswordForm from "../VerifyResetToken";
 
 // Use the Orval-generated zod schema
 const loginSchema = authControllerLoginBody;
@@ -37,6 +39,7 @@ export default function Login() {
   const [emailNotVerified, setEmailNotVerified] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
   const [resendStatus, setResendStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [openResetPasswordModal, setOpenResetPasswordModal] = useState(false);
   const authApi = getAuth();
 
   const { user, setTokens, setPermission } = useAuthStore.getState();
@@ -250,9 +253,41 @@ export default function Login() {
                 Sign up
               </a>
             </Typography>
+            <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+            Forget password? <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpenResetPasswordModal(true);
+                }}
+                style={{ textDecoration: "none", color: "#1976d2" }}
+              >
+                Click here
+              </a>
+            </Typography>
           </Box>
         </Paper>
       </Box>
+      <Modal
+        open={openResetPasswordModal}
+        onClose={() => setOpenResetPasswordModal(false)}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}
+        >
+          <ResetPasswordForm />
+        </Box>
+      </Modal>
     </Container>
   );
 }
