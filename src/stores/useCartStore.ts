@@ -30,7 +30,7 @@ interface CartStore {
     increase: () => void,
     decrease: () => void,
 
-    calculateSubtotal: () => void,
+    calculateSubtotal: () => number,
 
     openCart: () => void,
     closeCart: () => void,
@@ -57,8 +57,11 @@ const useCartStore = create<CartStore>()(
                 set((state) => ({ CartAmountCount: state.CartAmountCount - 1})),
         
             // TODO: calculate price
-            calculateSubtotal: () => 
-                set((state)=> ({CartSubtotal: state.cartItems.reduce((total, item) => total + item.priceAfterDis, 0)})),
+            calculateSubtotal: () => {
+                const items = get().cartItems;
+                const result =items.reduce((total, item) => total + item.priceAfterDis,0);
+                return result;
+            },   
         
             // TODO: cart open/close
             openCart: () => set({isCartOpen: true}),

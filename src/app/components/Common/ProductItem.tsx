@@ -20,15 +20,17 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
     router.push(`/product-details/${id}`);
   };
 
-  const isAdded = cartItems.some(cartItem => cartItem.id = item.id)
+  const isAdded = cartItems.some(cartItem => cartItem.id === item.id)
   const handleAddToCart = (item: ProductResponse) => {
     // TODO: prevent adding after product is already added
     if (isAdded) {
       toast.error(`${item.name} is already added`, {duration: 3000});
+      return
     }
 
     if (item.stock === 0) {
       toast.error(`${item.name} out of stock`, { duration: 3000 });
+      return
     }
     isAdded ? console.log("Item already added") : addItemToCart(item)
   };

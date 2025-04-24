@@ -3,13 +3,35 @@ import { useAuthStore } from '@/stores/authStore';
 import { Menu, MenuItem, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
 
 
 const HeaderTopRight = () => {
-  const {CartAmountCount, toggleCart, isCartOpen, cartItems } = useCartStore();
+  const { toggleCart, isCartOpen, cartItems, calculateSubtotal } = useCartStore();
+
+  const setCartItem = useCartStore((state) => state.setCartItem);
+
+  useEffect(() => {
+    setCartItem(
+      Array.from({ length: 120 }).map((_, i) => ({
+        id: i,
+        name: `Product ${i}`,
+        description: "Mock product",
+        stock: 5,
+        price: 10,
+        discount: 0,
+        rating: null,
+        image: JSON.stringify("['https://picsum.photos/200', 'https://picsum.photos/199']"),
+        createdAt: new Date().toISOString(),
+        priceAfterDis: 10,
+        categoryName: "Mock" as any,
+      }))
+    );
+  }, [setCartItem]);
+
+  const subtotal = calculateSubtotal();
 
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
@@ -86,13 +108,13 @@ const HeaderTopRight = () => {
           </svg>
 
           <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
-            {cartItems.length}
+            {cartItems.length <= 100 ? cartItems.length : <span>99+</span>}
           </span>
         </span>
 
         <div>
           <span className="block text-2xs text-dark-4 uppercase">cart</span>
-          <p className="font-medium text-custom-sm text-dark">${100}</p>
+          <p className="font-medium text-custom-sm text-dark">${subtotal.toFixed(2)}</p>
         </div>
       </button>
 
