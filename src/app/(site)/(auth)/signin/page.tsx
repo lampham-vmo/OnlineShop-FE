@@ -1,3 +1,4 @@
+"use client"
 import Login from '@/app/components/Login';
 import { useAuthStore } from '@/stores/authStore';
 import React from 'react';
