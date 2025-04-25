@@ -73,6 +73,7 @@ export default function Login() {
 
       // Sử dụng authStore để lưu tokens
       setPermission(result.permission);
+      console.log(result)
       setTokens({
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
@@ -85,7 +86,7 @@ export default function Login() {
       } else {
         router.push('/');
       }
-      // router.push('/')
+
     } catch (err: any) {
       console.log(err);
       setError(

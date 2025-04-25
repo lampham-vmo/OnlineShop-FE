@@ -1,4 +1,5 @@
 import { ProductResponse } from '@/generated/api/models';
+import useCartStore from '@/stores/useCartStore';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,6 +11,8 @@ interface IProductItemProps {
 }
 
 const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
+  const {addItemToCart, cartItems} = useCartStore()
+
   const router = useRouter();
   const listImage: string[] = JSON.parse(item.image);
 
@@ -17,11 +20,17 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
     router.push(`/product-details/${id}`);
   };
 
+  const isAdded = cartItems.some(cartItem => cartItem.id = item.id)
   const handleAddToCart = (item: ProductResponse) => {
-    // TODO: ADD TO CART
+    // TODO: prevent adding after product is already added
+    if (isAdded) {
+      toast.error(`${item.name} is already added`, {duration: 3000});
+    }
+
     if (item.stock === 0) {
       toast.error(`${item.name} out of stock`, { duration: 3000 });
     }
+    isAdded ? console.log("Item already added") : addItemToCart(item)
   };
 
   return (
@@ -40,7 +49,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
             aria-label="button for quick view"
             className="flex items-center justify-center w-18 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white hover:text-white hover:bg-blue"
           >
-            <svg
+             <svg
               className="fill-current"
               width="16"
               height="16"
@@ -65,11 +74,12 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
 
           <button
             onClick={() => handleAddToCart(item)}
+            disabled={isAdded || item.stock === 0}
             aria-label="button for add to cart"
             id="addCartOne"
-            className="flex items-center justify-center w-18 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white hover:text-white hover:bg-blue"
+            className={isAdded ? "flex items-center justify-center w-18 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white" : "flex items-center justify-center w-18 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white hover:text-white hover:bg-blue"}
           >
-            <svg
+            {isAdded ? <div> Added </div> : <svg
               className="fill-current"
               width="16"
               height="16"
@@ -95,7 +105,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
                 d="M11.0001 14.5001C10.1716 14.5001 9.50005 13.8285 9.50005 13.0001C9.50005 12.1716 10.1716 11.5001 11.0001 11.5001C11.8285 11.5001 12.5001 12.1716 12.5001 13.0001C12.5001 13.8285 11.8285 14.5001 11.0001 14.5001ZM10.5001 13.0001C10.5001 13.2762 10.7239 13.5001 11.0001 13.5001C11.2762 13.5001 11.5001 13.2762 11.5001 13.0001C11.5001 12.7239 11.2762 12.5001 11.0001 12.5001C10.7239 12.5001 10.5001 12.7239 10.5001 13.0001Z"
                 fill=""
               />
-            </svg>
+            </svg>}
           </button>
         </div>
       </div>
