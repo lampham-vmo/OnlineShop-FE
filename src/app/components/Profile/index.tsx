@@ -1,7 +1,7 @@
 "use client";
 import { getUsers } from "@/generated/api/endpoints/users/users";
 import { Profile } from "@/generated/api/models";
-import { userControllerUpdateProfileBody } from "@/generated/api/schemas/users/users.zod";
+import { userControllerUpdateProfileBody, userControllerUpdatePasswordBody } from "@/generated/api/schemas/users/users.zod";
 import { useAuthStore } from "@/stores/authStore";
 import { useEffect, useState } from "react";
 import {
@@ -22,7 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function ProfileComponent() {
     const [profile, setProfile] = useState<Profile | undefined>(undefined);
-    const { userControllerGetProfileById, userControllerUpdateProfile } = getUsers();
+    const { userControllerGetProfileById, userControllerUpdateProfile, userControllerUpdatePassword } = getUsers();
     const user = useAuthStore((state) => state.user);
 
     const [openModal, setOpenModal] = useState(false);
@@ -98,6 +98,53 @@ export default function ProfileComponent() {
         fetchProfile();
     }, [user]);
 
+    const [openPasswordModal, setOpenPasswordModal] = useState(false);
+
+    const {
+        control: passwordControl,
+        handleSubmit: handlePasswordSubmit,
+        reset: resetPasswordForm,
+        formState: { errors: passwordErrors },
+    } = useForm({
+        resolver: zodResolver(userControllerUpdatePasswordBody),
+        defaultValues: {
+            oldPassword: "",
+            password: "",
+            confirmPassword: "",
+        },
+    });
+
+    const handleOpenPasswordModal = () => {
+        setOpenPasswordModal(true);
+    };
+
+    const handleClosePasswordModal = () => {
+        setOpenPasswordModal(false);
+        resetPasswordForm();
+    };
+
+    const onChangePassword = async (data: any) => {
+        if (!user) return;
+
+        try {
+            const response = await userControllerUpdatePassword(user.id, {
+                oldPassword: data.oldPassword,
+                password: data.password,
+                confirmPassword: data.confirmPassword,
+            });
+            if (response.success) {
+                window.alert("Password updated successfully!");
+                handleClosePasswordModal();
+            } else {
+                console.error("Failed to update password:", response);
+                window.alert("Failed to update password.");
+            }
+        } catch (error: any) {
+      
+            window.alert(error.message || "An error occurred.");
+        }
+    };
+
     return (
         <Box sx={{ padding: 4, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
             <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", textAlign: "center" }}>
@@ -147,10 +194,95 @@ export default function ProfileComponent() {
                             )}
                         </Box>
                     ))}
+                      <Button
+                variant="contained"
+                color="primary"
+                onClick={handleOpenPasswordModal}
+                sx={{ mt: 2 }}
+            >
+                Change Password
+            </Button>
                 </Paper>
             ) : (
                 <Typography sx={{ textAlign: "center", marginTop: 4 }}>Loading profile...</Typography>
             )}
+
+          
+
+            <Modal open={openPasswordModal} onClose={handleClosePasswordModal}>
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: 400,
+                        bgcolor: "background.paper",
+                        boxShadow: 24,
+                        p: 4,
+                        borderRadius: 2,
+                    }}
+                >
+                    <Typography variant="h6" sx={{ marginBottom: 2 }}>
+                        Change Password
+                    </Typography>
+                    <form onSubmit={handlePasswordSubmit(onChangePassword)}>
+                        <Controller
+                            name="oldPassword"
+                            control={passwordControl}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    fullWidth
+                                    label="Old Password"
+                                    type="password"
+                                    error={!!passwordErrors.oldPassword}
+                                    helperText={passwordErrors.oldPassword?.message}
+                                    sx={{ marginBottom: 2 }}
+                                />
+                            )}
+                        />
+                        <Controller
+                            name="password"
+                            control={passwordControl}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    fullWidth
+                                    label="New Password"
+                                    type="password"
+                                    error={!!passwordErrors.password}
+                                    helperText={passwordErrors.password?.message}
+                                    sx={{ marginBottom: 2 }}
+                                />
+                            )}
+                        />
+                        <Controller
+                            name="confirmPassword"
+                            control={passwordControl}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    fullWidth
+                                    label="Confirm Password"
+                                    type="password"
+                                    error={!!passwordErrors.confirmPassword}
+                                    helperText={passwordErrors.confirmPassword?.message}
+                                    sx={{ marginBottom: 2 }}
+                                />
+                            )}
+                        />
+                        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+                            <Button variant="outlined" onClick={handleClosePasswordModal}>
+                                Cancel
+                            </Button>
+                            <Button variant="contained" type="submit">
+                                Save
+                            </Button>
+                        </Box>
+                    </form>
+                </Box>
+            </Modal>
 
             <Modal open={openModal} onClose={handleCloseModal}>
                 <Box
@@ -195,17 +327,7 @@ export default function ProfileComponent() {
                     </form>
                 </Box>
             </Modal>
-            {/* <Snackbar
-                open={!!successMessage}
-                autoHideDuration={3000}
-                onClose={handleCloseSnackbar}
-                sx={{ zIndex: 1500 }} // 👈 Thêm dòng này
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            >
-                <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: "100%" }}>
-                    {successMessage}
-                </Alert>
-            </Snackbar> */}
+        
         </Box>
     );
 }

@@ -1,4 +1,4 @@
-`use client`;
+"use client";
 import VerifyEmail from '@/app/components/Verify';
 import React from 'react';
 
