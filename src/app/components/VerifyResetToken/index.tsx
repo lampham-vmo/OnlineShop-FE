@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -13,16 +13,13 @@ import {
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { useAuthStore } from '@/stores/authStore';
 import { authControllerResetPasswordBody } from '@/generated/api/schemas/auth/auth.zod';
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { TextField, Snackbar } from "@mui/material";
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { TextField, Snackbar } from '@mui/material';
 
-const { authControllerResetPassword  } = getAuth();
+const { authControllerResetPassword } = getAuth();
 
-const VerifyResetToken = () => {
-  
-  
-};
+const VerifyResetToken = () => {};
 
 const ResetPasswordForm = () => {
   const {
@@ -32,13 +29,13 @@ const ResetPasswordForm = () => {
   } = useForm({
     resolver: zodResolver(authControllerResetPasswordBody),
     defaultValues: {
-      email: "",
+      email: '',
     },
   });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [severity, setSeverity] = useState<"success" | "error">("success");
+  const [severity, setSeverity] = useState<'success' | 'error'>('success');
 
   const onSubmit = async (data: { email: string }) => {
     setLoading(true);
@@ -46,15 +43,15 @@ const ResetPasswordForm = () => {
     try {
       const response = await authControllerResetPassword(data);
       if (response.success) {
-        setSeverity("success");
-        setMessage("Reset password link sent successfully!");
+        setSeverity('success');
+        setMessage('Reset password link sent successfully!');
       } else {
-        setSeverity("error");
-        setMessage("Failed to send reset password link.");
+        setSeverity('error');
+        setMessage('Failed to send reset password link.');
       }
     } catch (error: any) {
-      setSeverity("error");
-      setMessage(error.message || "An error occurred.");
+      setSeverity('error');
+      setMessage(error.message || 'An error occurred.');
     } finally {
       setLoading(false);
     }
@@ -84,7 +81,11 @@ const ResetPasswordForm = () => {
           fullWidth
           disabled={loading}
         >
-          {loading ? <CircularProgress size={24} color="inherit" /> : "Send Reset Password Link"}
+          {loading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            'Send Reset Password Link'
+          )}
         </Button>
       </form>
       {message && (
@@ -96,7 +97,7 @@ const ResetPasswordForm = () => {
           <Alert
             onClose={() => setMessage(null)}
             severity={severity}
-            sx={{ width: "100%" }}
+            sx={{ width: '100%' }}
           >
             {message}
           </Alert>

@@ -23,13 +23,11 @@ export default function RootLayout({
 }>) {
   const user = useAuthStore((state) => state.user);
 
+  if (user) {
+    window.location.href = '/';
+    return null;
+  }
 
-    if (user){
-      window.location.href="/"
-      return null
-    }
-   
-  
   return (
     <html lang="en" suppressHydrationWarning>
       <body

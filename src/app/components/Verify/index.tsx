@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -13,7 +13,8 @@ import {
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { useAuthStore } from '@/stores/authStore';
 
-const { authControllerConfirmEmail,  authControllerConfirmResetPasswordToken} = getAuth();
+const { authControllerConfirmEmail, authControllerConfirmResetPasswordToken } =
+  getAuth();
 
 const VerifyEmail = () => {
   const searchParams = useSearchParams();
@@ -29,7 +30,9 @@ const VerifyEmail = () => {
     return null;
   }
 
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
 
   useEffect(() => {
     if (!token || typeof token !== 'string') return;
@@ -48,7 +51,10 @@ const VerifyEmail = () => {
   }, [token]);
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8, display: 'flex', justifyContent: 'center' }}>
+    <Container
+      maxWidth="sm"
+      sx={{ mt: 8, display: 'flex', justifyContent: 'center' }}
+    >
       <Paper
         elevation={3}
         sx={{
@@ -59,7 +65,11 @@ const VerifyEmail = () => {
           backgroundColor: '#f9f9f9',
         }}
       >
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ fontWeight: 'bold', color: '#1976d2' }}
+        >
           Account Verification
         </Typography>
 
@@ -73,12 +83,26 @@ const VerifyEmail = () => {
         )}
 
         {status === 'success' && (
-          <Alert severity="success" sx={{ mt: 4, fontSize: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Alert
+            severity="success"
+            sx={{
+              mt: 4,
+              fontSize: '1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
             <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 2 }}>
               Your account has been successfully verified.
             </Typography>
             <Box mt={3}>
-              <Button variant="contained" color="primary" href="/signin" sx={{ fontWeight: 'bold' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                href="/signin"
+                sx={{ fontWeight: 'bold' }}
+              >
                 Sign in now
               </Button>
             </Box>
@@ -109,7 +133,9 @@ export const VerifyConfirmResetPassword = () => {
     return null;
   }
 
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
 
   useEffect(() => {
     if (!token || typeof token !== 'string') return;
@@ -128,7 +154,10 @@ export const VerifyConfirmResetPassword = () => {
   }, [token]);
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8, display: 'flex', justifyContent: 'center' }}>
+    <Container
+      maxWidth="sm"
+      sx={{ mt: 8, display: 'flex', justifyContent: 'center' }}
+    >
       <Paper
         elevation={3}
         sx={{
@@ -139,7 +168,11 @@ export const VerifyConfirmResetPassword = () => {
           backgroundColor: '#f9f9f9',
         }}
       >
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ fontWeight: 'bold', color: '#1976d2' }}
+        >
           Reset Password
         </Typography>
 
@@ -153,12 +186,26 @@ export const VerifyConfirmResetPassword = () => {
         )}
 
         {status === 'success' && (
-          <Alert severity="success" sx={{ mt: 4, fontSize: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Alert
+            severity="success"
+            sx={{
+              mt: 4,
+              fontSize: '1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
             <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 2 }}>
               Your account's password has been successfully resetted.
             </Typography>
             <Box mt={3}>
-              <Button variant="contained" color="primary" href="/signin" sx={{ fontWeight: 'bold' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                href="/signin"
+                sx={{ fontWeight: 'bold' }}
+              >
                 Sign in now
               </Button>
             </Box>
@@ -173,6 +220,6 @@ export const VerifyConfirmResetPassword = () => {
       </Paper>
     </Container>
   );
-}
+};
 
 export default VerifyEmail;

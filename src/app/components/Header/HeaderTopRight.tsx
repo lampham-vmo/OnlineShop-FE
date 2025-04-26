@@ -7,9 +7,8 @@ import { useState } from 'react';
 import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
 
-
 const HeaderTopRight = () => {
-  const {CartAmountCount, toggleCart, isCartOpen, cartItems } = useCartStore();
+  const { CartAmountCount, toggleCart, isCartOpen, cartItems } = useCartStore();
 
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
@@ -49,10 +48,7 @@ const HeaderTopRight = () => {
   return (
     <div className="flex justify-between items-center gap-5">
       {/* Cart Button */}
-      <button
-        onClick={toggleCart}
-        className="flex items-center gap-2.5"
-      >
+      <button onClick={toggleCart} className="flex items-center gap-2.5">
         <span className="inline-block relative">
           <svg
             width="24"

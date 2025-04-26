@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from "react";
-import useCartStore from "@/stores/useCartStore";
-import { ProductResponse } from "@/generated/api/models";
-import { getProduct } from "@/generated/api/endpoints/product/product";
+import React, { useEffect, useState } from 'react';
+import useCartStore from '@/stores/useCartStore';
+import { ProductResponse } from '@/generated/api/models';
+import { getProduct } from '@/generated/api/endpoints/product/product';
 
 interface IProductItemProps {
   item: ProductResponse;
-  removeItemFromCart: (id: number) => void
+  removeItemFromCart: (id: number) => void;
 }
 
 const SingleItem = ({ item, removeItemFromCart }: IProductItemProps) => {
-  const {cartItems} = useCartStore();
+  const { cartItems } = useCartStore();
   // item = itemList.
   // const [cartData, setCartData] = useState<ProductResponse>();
   // const [error, setError] = useState<boolean>(false);
-  
-  
+
   //   const fetchProduct = async () => {
   //     try {
   //       const data =
@@ -29,24 +28,31 @@ const SingleItem = ({ item, removeItemFromCart }: IProductItemProps) => {
   //     fetchProduct()
   //   }, [])
 
-  console.log("Cart Items from zustand store:", cartItems);
-  
+  console.log('Cart Items from zustand store:', cartItems);
+
   const handleRemoveFromCart = () => {
-    console.log(`Removing: ${item.id}`)
+    console.log(`Removing: ${item.id}`);
     removeItemFromCart(item.id);
   };
   return (
     <div className="flex items-center justify-between gap-5">
       <div className="w-full flex items-center gap-6">
         <div className="flex items-center justify-center rounded-[10px] bg-gray-3 max-w-[90px] w-full h-22.5">
-          <img src={JSON.parse(item.image)[0]} alt="product" width={100} height={100} />
+          <img
+            src={JSON.parse(item.image)[0]}
+            alt="product"
+            width={100}
+            height={100}
+          />
         </div>
 
         <div>
           <h3 className="font-medium text-dark mb-1 ease-out duration-200 hover:text-blue">
             <a href="#"> {item.name} </a>
           </h3>
-          <p className="text-custom-sm">Price: ${item.priceAfterDis.toFixed(2)}</p>
+          <p className="text-custom-sm">
+            Price: ${item.priceAfterDis.toFixed(2)}
+          </p>
         </div>
       </div>
 

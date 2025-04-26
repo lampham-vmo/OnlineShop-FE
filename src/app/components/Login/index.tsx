@@ -17,14 +17,19 @@ import {
   CircularProgress,
   Modal,
 } from '@mui/material';
-import { Visibility, VisibilityOff, CheckCircle, Replay } from '@mui/icons-material';
+import {
+  Visibility,
+  VisibilityOff,
+  CheckCircle,
+  Replay,
+} from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { authControllerLoginBody } from '@/generated/api/schemas/auth/auth.zod';
 import type { LoginUserDTO } from '@/generated/api/models';
 import { useAuthStore, type AuthState } from '@/stores/authStore';
 import { jwtDecode } from 'jwt-decode';
-import ResetPasswordForm from "../VerifyResetToken";
+import ResetPasswordForm from '../VerifyResetToken';
 
 // Use the Orval-generated zod schema
 const loginSchema = authControllerLoginBody;
@@ -38,7 +43,9 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [emailNotVerified, setEmailNotVerified] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
-  const [resendStatus, setResendStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [resendStatus, setResendStatus] = useState<
+    'idle' | 'loading' | 'success'
+  >('idle');
   const [openResetPasswordModal, setOpenResetPasswordModal] = useState(false);
   const authApi = getAuth();
 
@@ -73,7 +80,7 @@ export default function Login() {
 
       // Sử dụng authStore để lưu tokens
       setPermission(result.permission);
-      console.log(result)
+      console.log(result);
       setTokens({
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
@@ -86,12 +93,9 @@ export default function Login() {
       } else {
         router.push('/');
       }
-
     } catch (err: any) {
       console.log(err);
-      setError(
-        err.message || 'Login failed. Please try again.',
-      );
+      setError(err.message || 'Login failed. Please try again.');
       if (err.message === 'email not verified!') {
         setEmailNotVerified(true);
         setEmail(data.email); // Save the email for resending confirmation
@@ -154,7 +158,10 @@ export default function Login() {
               {resendStatus === 'success' ? (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <CheckCircle color="success" />
-                  <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                  >
                     Confirmation email resent successfully!
                     <IconButton
                       size="small"
@@ -171,9 +178,15 @@ export default function Login() {
                   color="primary"
                   onClick={handleResendConfirmationEmail}
                   disabled={resendStatus === 'loading'}
-                  startIcon={resendStatus === 'loading' ? <CircularProgress size={20} /> : null}
+                  startIcon={
+                    resendStatus === 'loading' ? (
+                      <CircularProgress size={20} />
+                    ) : null
+                  }
                 >
-                  {resendStatus === 'loading' ? 'Resending...' : 'Click here to resend confirmation email'}
+                  {resendStatus === 'loading'
+                    ? 'Resending...'
+                    : 'Click here to resend confirmation email'}
                 </Button>
               )}
             </Box>
@@ -255,13 +268,14 @@ export default function Login() {
               </a>
             </Typography>
             <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-            Forget password? <a
+              Forget password?{' '}
+              <a
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
                   setOpenResetPasswordModal(true);
                 }}
-                style={{ textDecoration: "none", color: "#1976d2" }}
+                style={{ textDecoration: 'none', color: '#1976d2' }}
               >
                 Click here
               </a>
@@ -275,12 +289,12 @@ export default function Login() {
       >
         <Box
           sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
             width: 400,
-            bgcolor: "background.paper",
+            bgcolor: 'background.paper',
             boxShadow: 24,
             p: 4,
             borderRadius: 2,
