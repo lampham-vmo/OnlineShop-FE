@@ -1,31 +1,18 @@
-import { ProductResponseCategoryName } from "@/generated/api/models";
+import { CartProduct} from "@/generated/api/models";
 import {create} from "zustand"
 import { persist } from "zustand/middleware"
 
 // TODO: define interface for CartItem
-interface CartItem {
-    id: number;
-    name: string;
-    description: string;
-    stock: number;
-    price: number;
-    discount: number;
-    rating: number | null;
-    image: string;
-    createdAt: string;
-    priceAfterDis: number;
-    categoryName: ProductResponseCategoryName;
 
-}
 
 // TODO: define interface for CartStore
 interface CartStore {
-    CartAmountCount: number,
+    CartItemCount: number,
 
     CartSubtotal: number,
     
     isCartOpen: boolean,
-    cartItems: CartItem[],
+    cartItems: CartProduct[],
 
     increase: () => void,
     decrease: () => void,
@@ -35,8 +22,8 @@ interface CartStore {
     openCart: () => void,
     closeCart: () => void,
     toggleCart: () => void,
-    setCartItem: (item: CartItem[]) => void, 
-    addItemToCart: (item: CartItem) => void,
+    setCartItems: (item: CartProduct[]) => void, 
+    addItemToCart: (item: CartProduct) => void,
     removeItemFromCart: (id: number) => void,
 
 }
@@ -44,17 +31,17 @@ interface CartStore {
 const useCartStore = create<CartStore>()(
     persist(
         (set, get) => ({
-            CartAmountCount: 0,
+            CartItemCount: 0,
             CartSubtotal: 0,
             isCartOpen: false,
             cartItems: [],
         
             // TODO: increase count (this is not really useful since we already had addItemToCart() )
             increase: () => 
-                set((state) => ({ CartAmountCount: state.CartAmountCount + 1 })),
+                set((state) => ({ CartItemCount: state.CartItemCount + 1 })),
         
             decrease: () =>
-                set((state) => ({ CartAmountCount: state.CartAmountCount - 1})),
+                set((state) => ({ CartItemCount: state.CartItemCount - 1})),
         
             // TODO: calculate price
             calculateSubtotal: () => {
@@ -69,15 +56,18 @@ const useCartStore = create<CartStore>()(
             toggleCart: () => set((state) => ({ isCartOpen: !state.isCartOpen})),
         
             // TODO: Add all items to cart
-            setCartItem: (item) => 
+            setCartItems: (item) => 
                 set(() => ({
                     cartItems: item
                 })),
             // TODO: Add 1 item to cart
-            addItemToCart: (item) => 
+            addItemToCart: (item:CartProduct) => 
+               {
+                console.log("Item added", item) 
                 set((state) => ({
                 cartItems: [...state.cartItems, item],
-                })),
+                }))
+            },
             
             removeItemFromCart: (id) => 
                 set((state) => ({

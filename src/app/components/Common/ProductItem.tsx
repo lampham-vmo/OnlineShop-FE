@@ -1,3 +1,4 @@
+import { getCart } from '@/generated/api/endpoints/cart/cart';
 import { ProductResponse } from '@/generated/api/models';
 import useCartStore from '@/stores/useCartStore';
 import Image from 'next/image';
@@ -12,6 +13,7 @@ interface IProductItemProps {
 
 const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
   const {addItemToCart, cartItems} = useCartStore()
+  const {cartControllerAddToCart} = getCart()
 
   const router = useRouter();
   const listImage: string[] = JSON.parse(item.image);
@@ -32,6 +34,9 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
       toast.error(`${item.name} out of stock`, { duration: 3000 });
       return
     }
+    cartControllerAddToCart({quantity: 1, productId: item.id})
+
+    // Note: Add Item dang bi bug type, de la type any thi oke
     isAdded ? console.log("Item already added") : addItemToCart(item)
   };
 

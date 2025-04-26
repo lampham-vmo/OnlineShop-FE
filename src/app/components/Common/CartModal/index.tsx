@@ -1,33 +1,38 @@
+// TODO: if user not logged in, prevent add to cart
 "use client";
 import React, { useEffect, useState } from "react";
 import SingleItem from "./SingleItem";
 import Link from "next/link";
 import EmptyCart from "./EmptyCart";
 import useCartStore from "@/stores/useCartStore";
+import { getCart } from "@/generated/api/endpoints/cart/cart";
+import { ChangeCartProductDTO, GetCartFinalResponseDTO } from "@/generated/api/models";
 
 const CartSidebarModal = () => {
-  const { calculateSubtotal, closeCart, isCartOpen, cartItems, removeItemFromCart } = useCartStore();
+  const { calculateSubtotal, closeCart, isCartOpen, cartItems, removeItemFromCart, setCartItems } = useCartStore();
   const subTotal = calculateSubtotal()
   
-    // const [cartData, setCartData] = useState<ProductResponse>();
-    //   const [error, setError] = useState<boolean>(false);
-    // const fetchProduct = async () => {
-    //   try {
-    //     const data =
-    //       await getProduct().productControllerGetAllProduct();
-    //     setCartData(data);
-    //   } catch (error) {
-    //     setError(true);
-    //   }
-    // };
+    const [cartData, setCartData] = useState<GetCartFinalResponseDTO>();
+    const [error, setError] = useState<boolean>(false);
+    const {cartControllerAddToCart, cartControllerGetCart, cartControllerDecreaseQuantity, cartControllerDeleteCart, cartControllerIncreaseQuantity} = getCart();
 
-    // useEffect(() => {
-    //   fetchProduct()
-    // }, [])
+    const fetchCart = async () => {
+      try {
+        const { data } = await cartControllerGetCart()
+        setCartItems(data.items)   
+        console.log("Cart items: ",cartItems)     
+      } catch (error) {
+        setError(true);
+      }
+    };
+
+    useEffect(() => {
+        fetchCart()
+    }, [])
 
   useEffect(() => {
     // closing modal while clicking outside
-    function handleClickOutside(event) {
+    function handleClickOutside(event: any) {
       if (!event.target.closest(".modal-content")) {
         closeCart();
       }
@@ -42,7 +47,9 @@ const CartSidebarModal = () => {
     };
   }, [isCartOpen, closeCart]);
 
-  return (
+  console.log(cartItems)
+
+  return cartItems.length === 0 ? <div>Loading</div> : (
     <div
       className={`fixed top-0 left-0 z-99999 overflow-y-auto no-scrollbar w-full h-screen bg-dark/70 ease-linear duration-500 ${
         isCartOpen ? "translate-x-0" : "translate-x-full"
@@ -89,7 +96,9 @@ const CartSidebarModal = () => {
                   <SingleItem
                     key={key}
                     item={item}
-                    removeItemFromCart={() => removeItemFromCart(item.id)}
+                    removeItemFromCart={() => {
+                      cartControllerDeleteCart({id: item.id})
+                    }}
                   />
                 ))
               ) 
