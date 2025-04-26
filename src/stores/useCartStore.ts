@@ -1,4 +1,4 @@
-import { CartProduct} from "@/generated/api/models";
+import { CartProduct, Product} from "@/generated/api/models";
 import {create} from "zustand"
 import { persist } from "zustand/middleware"
 
@@ -8,9 +8,7 @@ import { persist } from "zustand/middleware"
 // TODO: define interface for CartStore
 interface CartStore {
     CartItemCount: number,
-
     CartSubtotal: number,
-    
     isCartOpen: boolean,
     cartItems: CartProduct[],
 
@@ -23,7 +21,7 @@ interface CartStore {
     closeCart: () => void,
     toggleCart: () => void,
     setCartItems: (item: CartProduct[]) => void, 
-    addItemToCart: (item: CartProduct) => void,
+    addItemToCart: (item: Product) => void,
     removeItemFromCart: (id: number) => void,
 
 }
@@ -45,8 +43,12 @@ const useCartStore = create<CartStore>()(
         
             // TODO: calculate price
             calculateSubtotal: () => {
-                const items = get().cartItems;
-                const result =items.reduce((total, item) => total + item.priceAfterDis,0);
+                const itemsInCart = get().cartItems;
+                // console.log("Item in cart:",itemsInCart)
+                // items trong cart vẫn có priceAfterDis
+                const result =itemsInCart.reduce((total, item) => { 
+                    console.log("Item.product.price: ", item.product)
+                    return total + (item.product.price - (item.product.price * item.product.discount/100))},0);
                 return result;
             },   
         
@@ -61,17 +63,23 @@ const useCartStore = create<CartStore>()(
                     cartItems: item
                 })),
             // TODO: Add 1 item to cart
-            addItemToCart: (item:CartProduct) => 
+            addItemToCart: (product: Product) => 
                {
-                console.log("Item added", item) 
-                set((state) => ({
-                cartItems: [...state.cartItems, item],
-                }))
+                set((state) => {
+                    const newCartItem: CartProduct = {
+                        id: Date.now(), // se duoc set sau
+                        product: product,
+                        cart: {} as any,
+                        quantity: 1,
+                      };
+                
+                      return { cartItems: [...state.cartItems, newCartItem] };
+                  })
             },
             
-            removeItemFromCart: (id) => 
+            removeItemFromCart: (productId: number) => 
                 set((state) => ({
-                cartItems:state.cartItems.filter((item) => item.id !== id),
+                cartItems:state.cartItems.filter((item) => item.id !== productId),
                 })),
         }),
         {

@@ -18,8 +18,8 @@ const CartSidebarModal = () => {
 
     const fetchCart = async () => {
       try {
-        const { data } = await cartControllerGetCart()
-        setCartItems(data.items)   
+        const data = (await cartControllerGetCart()).data
+        setCartItems(data.items)
         console.log("Cart items: ",cartItems)     
       } catch (error) {
         setError(true);

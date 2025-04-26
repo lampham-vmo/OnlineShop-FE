@@ -1,5 +1,5 @@
 import { getCart } from '@/generated/api/endpoints/cart/cart';
-import { ProductResponse } from '@/generated/api/models';
+import { CartProduct, Product, ProductResponse } from '@/generated/api/models';
 import useCartStore from '@/stores/useCartStore';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 interface IProductItemProps {
-  item: ProductResponse;
+  item: Product;
   bgWhite: boolean;
 }
 
@@ -23,7 +23,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
   };
 
   const isAdded = cartItems.some(cartItem => cartItem.id === item.id)
-  const handleAddToCart = (item: ProductResponse) => {
+  const handleAddToCart = (item: Product) => {
     // TODO: prevent adding after product is already added
     if (isAdded) {
       toast.error(`${item.name} is already added`, {duration: 3000});
@@ -39,6 +39,8 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
     // Note: Add Item dang bi bug type, de la type any thi oke
     isAdded ? console.log("Item already added") : addItemToCart(item)
   };
+
+  const itemDiscountedPrice = item.price - item.price*item.discount/100
 
   return (
     <div className="group">
@@ -139,7 +141,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
 
       <span className="flex items-center gap-2 font-medium text-lg">
         <span className="text-dark">
-          ${item.priceAfterDis.toLocaleString()}
+          ${itemDiscountedPrice.toLocaleString()}
         </span>
         <span className="text-dark-4 line-through">
           ${item.price.toLocaleString()}

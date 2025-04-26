@@ -1,17 +1,16 @@
 import React from "react";
-import { CartProduct } from "@/generated/api/models";
+import { CartProduct, Product } from "@/generated/api/models";
+import useCartStore from "@/stores/useCartStore";
 
-interface IProductItemProps {
+interface SingleItemProps {
   // de any thi chay duoc nhung se return ra id va quantity
-  item: any;
+  item: Product;
   removeItemFromCart: (id: number) => void
 }
 
-const SingleItem = ({ item, removeItemFromCart }: IProductItemProps) => {
-  // const {cartItems} = useCartStore();
+const SingleItem = ({ item, removeItemFromCart }: SingleItemProps) => {
+  console.log("Item image:", item.image)
 
-  // console.log("Cart Items from zustand store:", cartItems);
-  
   const handleRemoveFromCart = () => {
     console.log(`Removing: ${item.id}`)
     removeItemFromCart(item.id);
@@ -20,16 +19,16 @@ const SingleItem = ({ item, removeItemFromCart }: IProductItemProps) => {
     <div className="flex items-center justify-between gap-5">
       <div className="w-full flex items-center gap-6">
         <div className="flex items-center justify-center rounded-[10px] bg-gray-3 max-w-[90px] w-full h-22.5">
-          <p>{item.product.name}</p>
-          {/* <img src={JSON.parse(item.product.image)[0]} alt="product" width={100} height={100} /> */}
+          {/* <p>{itemInCart.name}</p> */}
+          <img src={item.image} alt="product" width={100} height={100} />
           {/* Why is it like this */}
         </div>
 
         <div>
           <h3 className="font-medium text-dark mb-1 ease-out duration-200 hover:text-blue">
-            <a href="#"> {item.quantity} </a>
+            <a href="#"> {item.name} </a>
           </h3>
-          {/* <p className="text-custom-sm">Price: ${item.price.toFixed(2)}</p> */}
+          <p className="text-custom-sm">Price: ${item.price}</p>
         </div>
       </div>
 

@@ -115,7 +115,7 @@ const HeaderTopRight = () => {
 
         <div>
           <span className="block text-2xs text-dark-4 uppercase">cart</span>
-          <p className="font-medium text-custom-sm text-dark">${subtotal.toFixed(2)}</p>
+          <p className="font-medium text-custom-sm text-dark">${subtotal.toLocaleString()}</p>
         </div>
       </button>
 
