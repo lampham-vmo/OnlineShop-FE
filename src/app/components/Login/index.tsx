@@ -29,7 +29,7 @@ import { authControllerLoginBody } from '@/generated/api/schemas/auth/auth.zod';
 import type { LoginUserDTO } from '@/generated/api/models';
 import { useAuthStore, type AuthState } from '@/stores/authStore';
 import { jwtDecode } from 'jwt-decode';
-import ResetPasswordForm from '../VerifyResetToken';
+import SendResetPasswordForm from '../VerifyResetToken';
 
 // Use the Orval-generated zod schema
 const loginSchema = authControllerLoginBody;
@@ -300,7 +300,7 @@ export default function Login() {
             borderRadius: 2,
           }}
         >
-          <ResetPasswordForm />
+          <SendResetPasswordForm />
         </Box>
       </Modal>
     </Container>

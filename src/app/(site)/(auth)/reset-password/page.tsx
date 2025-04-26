@@ -1,5 +1,5 @@
 'use client';
-import { VerifyConfirmResetPassword } from '@/app/components/Verify';
+import ResetPasswordForm from '@/app/components/Verify';
 import { useAuthStore } from '@/stores/authStore';
 import React from 'react';
 
@@ -12,7 +12,7 @@ export default function VerifyPage() {
   }
   return (
     <div>
-      <VerifyConfirmResetPassword />
+      <ResetPasswordForm />
     </div>
   );
 }

@@ -9,7 +9,12 @@ import {
   Box,
   Button,
   Paper,
+  TextField,
 } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { authControllerConfirmResetPasswordTokenBody } from '@/generated/api/schemas/auth/auth.zod';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -119,7 +124,7 @@ const VerifyEmail = () => {
   );
 };
 
-export const VerifyConfirmResetPassword = () => {
+const ResetPasswordForm = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const user = useAuthStore((state) => state.user);
@@ -133,25 +138,29 @@ export const VerifyConfirmResetPassword = () => {
     return null;
   }
 
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading',
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
+    'idle',
   );
 
-  useEffect(() => {
-    if (!token || typeof token !== 'string') return;
+  const schema = authControllerConfirmResetPasswordTokenBody;
 
-    const verify = async () => {
-      try {
-        const res = await authControllerConfirmResetPasswordToken(token);
-        setStatus('success');
-      } catch (err) {
-        console.log(err);
-        setStatus('error');
-      }
-    };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
 
-    verify();
-  }, [token]);
+  const onSubmit = async (data: z.infer<typeof schema>) => {
+    setStatus('loading');
+    try {
+      await authControllerConfirmResetPasswordToken(token, data);
+      setStatus('success');
+    } catch (err) {
+      setStatus('error');
+    }
+  };
 
   return (
     <Container
@@ -180,7 +189,7 @@ export const VerifyConfirmResetPassword = () => {
           <Box sx={{ mt: 4 }}>
             <CircularProgress />
             <Typography variant="body1" sx={{ mt: 2, color: '#555' }}>
-              resetting your password...
+              Resetting your password...
             </Typography>
           </Box>
         )}
@@ -197,7 +206,7 @@ export const VerifyConfirmResetPassword = () => {
             }}
           >
             <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 2 }}>
-              Your account's password has been successfully resetted.
+              Your password has been successfully reset.
             </Typography>
             <Box mt={3}>
               <Button
@@ -217,9 +226,41 @@ export const VerifyConfirmResetPassword = () => {
             Reset failed. The link may have expired or is invalid.
           </Alert>
         )}
+
+        {status === 'idle' && (
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <TextField
+              label="Password"
+              type="password"
+              fullWidth
+              margin="normal"
+              {...register('password')}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+            />
+            <TextField
+              label="Confirm Password"
+              type="password"
+              fullWidth
+              margin="normal"
+              {...register('confirmPassword')}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword?.message}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 2, fontWeight: 'bold' }}
+            >
+              Reset Password
+            </Button>
+          </form>
+        )}
       </Paper>
     </Container>
   );
 };
 
-export default VerifyEmail;
+export default ResetPasswordForm;

@@ -21,7 +21,7 @@ const { authControllerResetPassword } = getAuth();
 
 const VerifyResetToken = () => {};
 
-const ResetPasswordForm = () => {
+const SendResetPasswordForm = () => {
   const {
     control,
     handleSubmit,
@@ -107,4 +107,4 @@ const ResetPasswordForm = () => {
   );
 };
 
-export default ResetPasswordForm;
+export default SendResetPasswordForm;
