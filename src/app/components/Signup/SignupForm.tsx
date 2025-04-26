@@ -47,7 +47,9 @@ export default function SignUpForm() {
     try {
       const res = await getAuth().authControllerCreate(data);
       setUser(res.data);
-      setSuccess('Account created successfully, please check your email to activate the account!');
+      setSuccess(
+        'Account created successfully, please check your email to activate the account!',
+      );
       setError('');
     } catch (err: any) {
       const message = err.message || 'Signup failed';

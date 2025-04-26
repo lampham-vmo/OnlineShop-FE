@@ -1,50 +1,56 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import SingleItem from "./SingleItem";
-import Link from "next/link";
-import EmptyCart from "./EmptyCart";
-import useCartStore from "@/stores/useCartStore";
+'use client';
+import React, { useEffect, useState } from 'react';
+import SingleItem from './SingleItem';
+import Link from 'next/link';
+import EmptyCart from './EmptyCart';
+import useCartStore from '@/stores/useCartStore';
 
 const CartSidebarModal = () => {
-  const { calculateSubtotal, closeCart, isCartOpen, cartItems, removeItemFromCart } = useCartStore();
-  
-    // const [cartData, setCartData] = useState<ProductResponse>();
-    //   const [error, setError] = useState<boolean>(false);
-    // const fetchProduct = async () => {
-    //   try {
-    //     const data =
-    //       await getProduct().productControllerGetAllProduct();
-    //     setCartData(data);
-    //   } catch (error) {
-    //     setError(true);
-    //   }
-    // };
+  const {
+    calculateSubtotal,
+    closeCart,
+    isCartOpen,
+    cartItems,
+    removeItemFromCart,
+  } = useCartStore();
 
-    // useEffect(() => {
-    //   fetchProduct()
-    // }, [])
+  // const [cartData, setCartData] = useState<ProductResponse>();
+  //   const [error, setError] = useState<boolean>(false);
+  // const fetchProduct = async () => {
+  //   try {
+  //     const data =
+  //       await getProduct().productControllerGetAllProduct();
+  //     setCartData(data);
+  //   } catch (error) {
+  //     setError(true);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchProduct()
+  // }, [])
 
   useEffect(() => {
     // closing modal while clicking outside
     function handleClickOutside(event) {
-      if (!event.target.closest(".modal-content")) {
+      if (!event.target.closest('.modal-content')) {
         closeCart();
       }
     }
 
     if (isCartOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isCartOpen, closeCart]);
 
   return (
     <div
       className={`fixed top-0 left-0 z-99999 overflow-y-auto no-scrollbar w-full h-screen bg-dark/70 ease-linear duration-500 ${
-        isCartOpen ? "translate-x-0" : "translate-x-full"
+        isCartOpen ? 'translate-x-0' : 'translate-x-full'
       }`}
     >
       <div className="flex items-center justify-end">
@@ -82,7 +88,6 @@ const CartSidebarModal = () => {
 
           <div className="h-[66vh] overflow-y-auto no-scrollbar">
             <div className="flex flex-col gap-6">
-
               {cartItems.length > 0 ? (
                 cartItems.map((item, key) => (
                   <SingleItem
@@ -91,8 +96,7 @@ const CartSidebarModal = () => {
                     removeItemFromCart={() => removeItemFromCart(item.id)}
                   />
                 ))
-              ) 
-              : (
+              ) : (
                 <EmptyCart />
               )}
             </div>
@@ -101,7 +105,7 @@ const CartSidebarModal = () => {
           <div className="border-t border-gray-3 bg-white pt-5 pb-4 sm:pb-7.5 lg:pb-11 mt-7.5 sticky bottom-0">
             <div className="flex items-center justify-between gap-5 mb-6">
               <p className="font-medium text-xl text-dark">Subtotal:</p>
-            {/* TODO: Total price */}
+              {/* TODO: Total price */}
               <p className="font-medium text-xl text-dark">${}</p>
             </div>
 

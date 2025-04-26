@@ -1,7 +1,6 @@
-import React from "react";
-import Link from "next/link";
-import useCartStore from "@/stores/useCartStore";
-
+import React from 'react';
+import Link from 'next/link';
+import useCartStore from '@/stores/useCartStore';
 
 const EmptyCart = () => {
   const { closeCart } = useCartStore();
