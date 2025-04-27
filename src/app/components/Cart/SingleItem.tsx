@@ -37,7 +37,7 @@ function SingleItem({ item}:SingleItemProps) {
     cartControllerIncreaseQuantity({ id: item.id });
     increaseCartItemQuantity(item.id);
   };
-  
+  // doesn't work, might be BE
   const handleDecreaseQuantity = () => {
     if (item.quantity <= 1) {
       toast.error(`Item ${item.product.name} cannot go below 1!`);
