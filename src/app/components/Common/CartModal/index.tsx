@@ -8,10 +8,9 @@ import useCartStore from "@/stores/useCartStore";
 import { getCart } from "@/generated/api/endpoints/cart/cart";
 
 const CartSidebarModal = () => {
-  const { calculateSubtotal, closeCart, isCartOpen, cartItems, removeItemFromCart, setCartItems } = useCartStore();
+  const { calculateSubtotal, closeCart, isCartOpen, cartItems, removeItemFromCart} = useCartStore();
   const subTotal = calculateSubtotal()
   
-    const [error, setError] = useState<boolean>(false);
     const { cartControllerDeleteCart, } = getCart();
 
   useEffect(() => {

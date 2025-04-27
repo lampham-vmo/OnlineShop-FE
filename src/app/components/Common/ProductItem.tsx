@@ -28,17 +28,17 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
     // TODO: prevent adding after product is already added
     if (isAdded) {
       toast.error(`${item.name} is already added`, {duration: 3000});
+      console.log("Item already added")
       return
+    } else {
+      cartControllerAddToCart({quantity: 1, productId: item.id})
+      addItemToCart(item)
     }
 
     if (item.stock === 0) {
       toast.error(`${item.name} out of stock`, { duration: 3000 });
       return
     }
-    cartControllerAddToCart({quantity: 1, productId: item.id})
-
-
-    isAdded ? console.log("Item already added") : addItemToCart(item)
   };
 
   const itemDiscountedPrice = item.price - item.price*item.discount/100

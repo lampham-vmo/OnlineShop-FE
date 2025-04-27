@@ -3,17 +3,19 @@ import {create} from "zustand"
 import { persist } from "zustand/middleware"
 
 // TODO: define interface for CartItem
-
+interface CartItem {
+    id: number,
+    product: Product,
+    quantity: number
+}
 
 // TODO: define interface for CartStore
 interface CartStore {
-    CartItemCount: number,
-    CartSubtotal: number,
     isCartOpen: boolean,
-    cartItems: CartProduct[],
+    cartItems: CartItem[],
 
-    increase: () => void,
-    decrease: () => void,
+    increaseCartItemQuantity: (id: number) => void,
+    decreaseCartItemQuantity: (id: number) => void,
 
     calculateSubtotal: () => number,
     calculateTotal: () => number,
@@ -21,7 +23,7 @@ interface CartStore {
     openCart: () => void,
     closeCart: () => void,
     toggleCart: () => void,
-    setCartItems: (item: CartProduct[]) => void, 
+    setCartItems: (item: CartItem[]) => void, 
     clearCartItems: () => void,
     addItemToCart: (item: Product) => void,
     removeItemFromCart: (id: number) => void,
@@ -31,22 +33,23 @@ interface CartStore {
 const useCartStore = create<CartStore>()(
     persist(
         (set, get) => ({
-            CartItemCount: 0,
-            CartSubtotal: 0,
             isCartOpen: false,
             cartItems: [],
         
             // TODO: increase count (this is not really useful since we already had addItemToCart() )
-            increase: () => 
-                set((state) => ({ CartItemCount: state.CartItemCount + 1 })),
+            increaseCartItemQuantity: (id: number) => 
+                set((state) => ({
+                    cartItems: state.cartItems.map((item) => item.id === id ? {...item, quantity: item.quantity+1} : item),
+                })),
         
-            decrease: () =>
-                set((state) => ({ CartItemCount: state.CartItemCount - 1})),
+            decreaseCartItemQuantity: (id: number) =>
+                set((state) => ({
+                    cartItems: state.cartItems.map((item) => item.id === id ? {...item, quantity: item.quantity-1} : item),
+                })),
         
             // TODO: calculate price
             calculateSubtotal: () => {
                 const itemsInCart = get().cartItems;
-                // items trong cart vẫn có priceAfterDis
                 const result =itemsInCart.reduce((total, item) => { 
                     return total + (item.product.price - (item.product.price * item.product.discount/100))},0);
                 return result;
@@ -54,11 +57,8 @@ const useCartStore = create<CartStore>()(
 
             calculateTotal: () => {
                 const itemsInCart = get().cartItems;
-                console.log("Item in cart:",itemsInCart)
-                // items trong cart vẫn có priceAfterDis
                 const result =itemsInCart.reduce((total, item) => { 
-                    console.log("Item.product.price: ", item.product)
-                    return total + (item.product.price - (item.product.price * item.product.discount/100))},0);
+                    return total + (item.quantity * (item.product.price - (item.product.price * item.product.discount/100)))},0);
                 return result;
             },
         
@@ -85,7 +85,7 @@ const useCartStore = create<CartStore>()(
                     console.log("existingItem: ",existingItem)
                     if(existingItem){return state}
 
-                    const newCartItem: CartProduct = {
+                    const newCartItem: CartItem = {
                         id: Date.now(), // se duoc set sau
                         product: product,
                         quantity: 1,

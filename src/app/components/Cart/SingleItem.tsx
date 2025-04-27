@@ -1,33 +1,50 @@
+import { getCart } from '@/generated/api/endpoints/cart/cart';
 import { CartProduct } from '@/generated/api/models';
-import React, { memo } from 'react'
+import useCartStore from '@/stores/useCartStore';
+import React, { memo, useState } from 'react'
+import toast from 'react-hot-toast';
 
 interface SingleItemProps {
   // de any thi chay duoc nhung se return ra id va quantity
   item: CartProduct;
-  removeItemFromCart: (id: number) => void
 }
 
-function SingleItem({ item, removeItemFromCart }:SingleItemProps) {
-  // TODO: Image, Price, Quantity, Delete Button
+function SingleItem({ item}:SingleItemProps) {
+  const {increaseCartItemQuantity, decreaseCartItemQuantity, removeItemFromCart} = useCartStore()
+
+  const {cartControllerIncreaseQuantity, cartControllerDecreaseQuantity, cartControllerDeleteCart} = getCart()
+
   const itemInCart = item.product
-
   const itemFirstImage = JSON.parse(itemInCart.image)[0];
-
+  
+  // TODO: handle remove
   const handleRemoveFromCart = () => {
     console.log(`Removing: ${item.id}`)
-    removeItemFromCart(item.id);
+    removeItemFromCart(item.id)
+    cartControllerDeleteCart({id: item.id})
   };
 
   const priceAfterDiscount = () => {
     const result = itemInCart.price - (itemInCart.price * itemInCart.discount/100)
     return result
   }
-
+  // TODO: increase decrease quantity
   const handleIncreaseQuantity = () => {
-    return 0
-  }
+    if (item.quantity >= item.product.stock) {
+      toast.error(`Item ${item.product.name} has reached maximum amount of stock!`, { duration: 3000 });
+      return;
+    }
+    cartControllerIncreaseQuantity({ id: item.id });
+    increaseCartItemQuantity(item.id);
+  };
+  
   const handleDecreaseQuantity = () => {
-    return 0
+    if (item.quantity <= 1) {
+      toast.error(`Item ${item.product.name} cannot go below 1!`);
+      return;
+    }
+    cartControllerDecreaseQuantity({ id: item.id });
+    decreaseCartItemQuantity(item.id);
   }
 
   return (
@@ -55,6 +72,7 @@ function SingleItem({ item, removeItemFromCart }:SingleItemProps) {
       <div className="min-w-[275px]">
         <div className="w-max flex items-center rounded-md border border-gray-3">
           <button
+            disabled={item.quantity <= 1}
             onClick={() => handleDecreaseQuantity()}
             aria-label="button for remove product"
             className="flex items-center justify-center w-11.5 h-11.5 ease-out duration-200 hover:text-blue"
@@ -75,10 +93,11 @@ function SingleItem({ item, removeItemFromCart }:SingleItemProps) {
           </button>
 
           <span className="flex items-center justify-center w-16 h-11.5 border-x border-gray-4">
-            {1}
+            {item.quantity}
           </span>
 
           <button
+            disabled={item.quantity === item.product.stock}
             onClick={() => handleIncreaseQuantity()}
             aria-label="button for add product"
             className="flex items-center justify-center w-11.5 h-11.5 ease-out duration-200 hover:text-blue"
@@ -105,7 +124,7 @@ function SingleItem({ item, removeItemFromCart }:SingleItemProps) {
       </div>
 
       <div className="min-w-[200px]">
-        <p className="text-dark">${(priceAfterDiscount() * 1).toLocaleString()}</p>
+        <p className="text-dark">${(priceAfterDiscount() * item.quantity).toLocaleString()}</p>
       </div>
 
       <div className="min-w-[50px] flex justify-end">
@@ -146,4 +165,4 @@ function SingleItem({ item, removeItemFromCart }:SingleItemProps) {
     </div>
   )
 }
-export default memo(SingleItem)
+export default SingleItem

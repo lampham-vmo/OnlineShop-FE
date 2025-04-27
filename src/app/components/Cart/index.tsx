@@ -1,27 +1,14 @@
 'use client'
-
 import React from 'react'
 import useCartStore from '@/stores/useCartStore';
-import { getCart } from '@/generated/api/endpoints/cart/cart';
 import Link from 'next/link';
 import SingleItem from './SingleItem';
-import Breadcrumb from '../Common/Breadcrumb';
 
 export default function Cart() {
   // sử dụng localstorage để lưu mảng sản phẩm và query liên tục mỗi lần bấm tăng sản phẩm
-  const { calculateSubtotal, closeCart, isCartOpen, cartItems, removeItemFromCart, setCartItems } = useCartStore();
+  const { cartItems, calculateTotal } = useCartStore();
   // Sử dụng các attribute trong mảng để tính toán giá total bằng method calculatePrice trong zustand store
-  const { cartControllerDeleteCart, } = getCart();
-
-  console.log("Cart Page cartItems:",cartItems)
-  // TODO: increase decrease quantity
-  // TODO: recalculate total dynamically
-  // TODO: handle remove
-  // TODO: set quantity
-  // TODO: handle deletion
-
-
-
+  
   return (
     <>
       {cartItems.length > 0 ? (
@@ -29,6 +16,7 @@ export default function Cart() {
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
             <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
               <h2 className="font-medium text-dark text-2xl">Your Cart</h2>
+              <div className='font-medium text-lg text-dark'>Total: ${calculateTotal().toLocaleString()}</div>
               <button className="text-blue">Clear Shopping Cart</button>
             </div>
 
@@ -64,10 +52,7 @@ export default function Cart() {
                       <SingleItem 
                       item={item} 
                       key={key} 
-                      removeItemFromCart={() => {
-                        removeItemFromCart(item.id)
-                        cartControllerDeleteCart({id: item.id})
-                      }} />
+                      />
                     ))}
                 </div>
               </div>
