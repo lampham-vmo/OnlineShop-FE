@@ -16,11 +16,13 @@ interface CartStore {
     decrease: () => void,
 
     calculateSubtotal: () => number,
+    calculateTotal: () => number,
 
     openCart: () => void,
     closeCart: () => void,
     toggleCart: () => void,
     setCartItems: (item: CartProduct[]) => void, 
+    clearCartItems: () => void,
     addItemToCart: (item: Product) => void,
     removeItemFromCart: (id: number) => void,
 
@@ -44,13 +46,21 @@ const useCartStore = create<CartStore>()(
             // TODO: calculate price
             calculateSubtotal: () => {
                 const itemsInCart = get().cartItems;
-                // console.log("Item in cart:",itemsInCart)
+                // items trong cart vẫn có priceAfterDis
+                const result =itemsInCart.reduce((total, item) => { 
+                    return total + (item.product.price - (item.product.price * item.product.discount/100))},0);
+                return result;
+            },   
+
+            calculateTotal: () => {
+                const itemsInCart = get().cartItems;
+                console.log("Item in cart:",itemsInCart)
                 // items trong cart vẫn có priceAfterDis
                 const result =itemsInCart.reduce((total, item) => { 
                     console.log("Item.product.price: ", item.product)
                     return total + (item.product.price - (item.product.price * item.product.discount/100))},0);
                 return result;
-            },   
+            },
         
             // TODO: cart open/close
             openCart: () => set({isCartOpen: true}),
@@ -62,14 +72,22 @@ const useCartStore = create<CartStore>()(
                 set(() => ({
                     cartItems: item
                 })),
+
+            clearCartItems: () => 
+                set(()=> ({
+                    cartItems: []
+                })),
             // TODO: Add 1 item to cart
             addItemToCart: (product: Product) => 
                {
                 set((state) => {
+                    const existingItem = state.cartItems.some(item => item.product.id === product.id);
+                    console.log("existingItem: ",existingItem)
+                    if(existingItem){return state}
+
                     const newCartItem: CartProduct = {
                         id: Date.now(), // se duoc set sau
                         product: product,
-                        cart: {} as any,
                         quantity: 1,
                       };
                 

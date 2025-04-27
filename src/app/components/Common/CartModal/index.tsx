@@ -6,29 +6,13 @@ import Link from "next/link";
 import EmptyCart from "./EmptyCart";
 import useCartStore from "@/stores/useCartStore";
 import { getCart } from "@/generated/api/endpoints/cart/cart";
-import { ChangeCartProductDTO, GetCartFinalResponseDTO } from "@/generated/api/models";
 
 const CartSidebarModal = () => {
   const { calculateSubtotal, closeCart, isCartOpen, cartItems, removeItemFromCart, setCartItems } = useCartStore();
   const subTotal = calculateSubtotal()
   
-    const [cartData, setCartData] = useState<GetCartFinalResponseDTO>();
     const [error, setError] = useState<boolean>(false);
-    const {cartControllerAddToCart, cartControllerGetCart, cartControllerDecreaseQuantity, cartControllerDeleteCart, cartControllerIncreaseQuantity} = getCart();
-
-    const fetchCart = async () => {
-      try {
-        const data = (await cartControllerGetCart()).data
-        setCartItems(data.items)
-        console.log("Cart items: ",cartItems)     
-      } catch (error) {
-        setError(true);
-      }
-    };
-
-    useEffect(() => {
-        fetchCart()
-    }, [])
+    const { cartControllerDeleteCart, } = getCart();
 
   useEffect(() => {
     // closing modal while clicking outside
@@ -47,9 +31,8 @@ const CartSidebarModal = () => {
     };
   }, [isCartOpen, closeCart]);
 
-  console.log(cartItems)
 
-  return cartItems.length === 0 ? <div>Loading</div> : (
+  return (
     <div
       className={`fixed top-0 left-0 z-99999 overflow-y-auto no-scrollbar w-full h-screen bg-dark/70 ease-linear duration-500 ${
         isCartOpen ? "translate-x-0" : "translate-x-full"
@@ -90,13 +73,13 @@ const CartSidebarModal = () => {
 
           <div className="h-[66vh] overflow-y-auto no-scrollbar">
             <div className="flex flex-col gap-6">
-
               {cartItems.length > 0 ? (
                 cartItems.map((item, key) => (
                   <SingleItem
                     key={key}
                     item={item}
                     removeItemFromCart={() => {
+                      removeItemFromCart(item.id)
                       cartControllerDeleteCart({id: item.id})
                     }}
                   />
@@ -112,7 +95,7 @@ const CartSidebarModal = () => {
             <div className="flex items-center justify-between gap-5 mb-6">
               <p className="font-medium text-xl text-dark">Subtotal:</p>
             {/* TODO: Total price */}
-              <p className="font-medium text-xl text-dark">${subTotal.toFixed(2)}</p>
+              <p className="font-medium text-xl text-dark">${subTotal.toLocaleString()}</p>
             </div>
 
             <div className="flex items-center gap-4">

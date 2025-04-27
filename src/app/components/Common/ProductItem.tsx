@@ -22,7 +22,8 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
     router.push(`/product-details/${id}`);
   };
 
-  const isAdded = cartItems.some(cartItem => cartItem.id === item.id)
+  const isAdded = cartItems.some(cartItem => cartItem.product.id === item.id)
+  console.log("isAdded: ",isAdded)
   const handleAddToCart = (item: Product) => {
     // TODO: prevent adding after product is already added
     if (isAdded) {
@@ -36,7 +37,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
     }
     cartControllerAddToCart({quantity: 1, productId: item.id})
 
-    // Note: Add Item dang bi bug type, de la type any thi oke
+
     isAdded ? console.log("Item already added") : addItemToCart(item)
   };
 

@@ -1,34 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import { CartProduct, Product } from "@/generated/api/models";
 import useCartStore from "@/stores/useCartStore";
 
 interface SingleItemProps {
   // de any thi chay duoc nhung se return ra id va quantity
-  item: Product;
+  item: CartProduct;
   removeItemFromCart: (id: number) => void
 }
 
 const SingleItem = ({ item, removeItemFromCart }: SingleItemProps) => {
-  console.log("Item image:", item.image)
+  const itemInCart = item.product
+
+  const itemFirstImage = JSON.parse(itemInCart.image)[0];
 
   const handleRemoveFromCart = () => {
     console.log(`Removing: ${item.id}`)
     removeItemFromCart(item.id);
   };
+
+  const priceAfterDiscount = () => {
+    const result = itemInCart.price - (itemInCart.price * itemInCart.discount/100)
+    return result.toLocaleString()
+  }
+
   return !item ? (<div>Single Item error</div>) : (
     <div className="flex items-center justify-between gap-5">
       <div className="w-full flex items-center gap-6">
         <div className="flex items-center justify-center rounded-[10px] bg-gray-3 max-w-[90px] w-full h-22.5">
-          {/* <p>{itemInCart.name}</p> */}
-          <img src={item.image} alt="product" width={100} height={100} />
+          <img src={itemFirstImage} alt="product" width={100} height={100} />
           {/* Why is it like this */}
         </div>
 
         <div>
           <h3 className="font-medium text-dark mb-1 ease-out duration-200 hover:text-blue">
-            <a href="#"> {item.name} </a>
+            <a href="#"> {itemInCart.name} </a>
           </h3>
-          <p className="text-custom-sm">Price: ${item.price}</p>
+          <p className="text-custom-sm">Price: ${priceAfterDiscount().toLocaleString()}</p>
         </div>
       </div>
 

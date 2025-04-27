@@ -6,31 +6,27 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
+import { getCart } from '@/generated/api/endpoints/cart/cart';
 
 
 const HeaderTopRight = () => {
-  const { toggleCart, isCartOpen, cartItems, calculateSubtotal } = useCartStore();
-
-  // mock data for cart
-  // const setCartItem = useCartStore((state) => state.setCartItem);
-
-  // useEffect(() => {
-  //   setCartItem(
-  //     Array.from({ length: 120 }).map((_, i) => ({
-  //       id: i,
-  //       name: `Product ${i}`,
-  //       description: "Mock product",
-  //       stock: 5,
-  //       price: 10,
-  //       discount: 0,
-  //       rating: null,
-  //       image: JSON.stringify("['https://picsum.photos/200', 'https://picsum.photos/199']"),
-  //       createdAt: new Date().toISOString(),
-  //       priceAfterDis: 10,
-  //       categoryName: "Mock" as any,
-  //     }))
-  //   );
-  // }, [setCartItem]);
+  const { toggleCart, isCartOpen, cartItems, calculateSubtotal, setCartItems } = useCartStore();
+  
+  const [error, setError] = useState<boolean>(false);
+  const { cartControllerGetCart } = getCart();
+  const fetchCart = async () => {
+        try {
+          const data = (await cartControllerGetCart()).data
+          setCartItems(data.items)
+          console.log("Logging cartItems: ",cartItems)     
+        } catch (error) {
+          setError(true);
+        }
+      };
+  
+      useEffect(() => {
+          fetchCart()
+      }, [])
 
   const subtotal = calculateSubtotal();
 
