@@ -1,11 +1,10 @@
 // hoc/withRoleGuard.tsx
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
-import { RoleId } from '@/constant/roles';
+import { Roles } from '@/constant/roles';
+
 type RoleGuardProps = {
   children: React.ReactNode;
-  allowedRoles: RoleId[];
+  allowedRoles: Roles[];
 };
 const RoleGuard = ({ children, allowedRoles }: RoleGuardProps) => {
   const { isAcceptRole } = useAuthStore();

@@ -1,9 +1,9 @@
 'use client';
-import Login from '@/app/components/Login';
+import ResetPasswordForm from '@/app/components/Verify';
 import { useAuthStore } from '@/stores/authStore';
 import React from 'react';
 
-export default function LoginPage() {
+export default function VerifyPage() {
   const user = useAuthStore((state) => state.user);
 
   if (user) {
@@ -12,7 +12,7 @@ export default function LoginPage() {
   }
   return (
     <div>
-      <Login />
+      <ResetPasswordForm />
     </div>
   );
 }

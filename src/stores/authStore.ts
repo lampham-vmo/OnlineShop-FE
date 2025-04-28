@@ -8,7 +8,9 @@ interface JwtPayload {
   sub: string;
   exp: number;
   iat: number;
-  [key: string]: any;
+  role: number;
+  id: string;
+  email: string;
 }
 
 export interface AuthState {

@@ -4,8 +4,12 @@ import { Menu, MenuItem, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import CartSidebarModal from '../Common/CartModal';
+import useCartStore from '@/stores/useCartStore';
 
 const HeaderTopRight = () => {
+  const { CartAmountCount, toggleCart, isCartOpen, cartItems } = useCartStore();
+
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
 
@@ -25,7 +29,7 @@ const HeaderTopRight = () => {
     { label: 'Logout', path: '/logout' },
   ];
 
-  if (AllowedRoleForAdminLayout.includes(user?.role)) {
+  if (AllowedRoleForAdminLayout.includes(user?.role!)) {
     settings.unshift({ label: 'Admin Dashboard', path: '/admin' });
   }
 
@@ -43,10 +47,8 @@ const HeaderTopRight = () => {
 
   return (
     <div className="flex justify-between items-center gap-5">
-      <button
-        // onClick={handleOpenCartModal}
-        className="flex items-center gap-2.5"
-      >
+      {/* Cart Button */}
+      <button onClick={toggleCart} className="flex items-center gap-2.5">
         <span className="inline-block relative">
           <svg
             width="24"
@@ -80,7 +82,7 @@ const HeaderTopRight = () => {
           </svg>
 
           <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
-            {100}
+            {cartItems.length}
           </span>
         </span>
 
@@ -90,6 +92,9 @@ const HeaderTopRight = () => {
         </div>
       </button>
 
+      {/* Toggle Cart Modal */}
+      {isCartOpen && <CartSidebarModal />}
+      {/* /Toggle Cart Modal */}
       {user ? (
         <>
           <div
