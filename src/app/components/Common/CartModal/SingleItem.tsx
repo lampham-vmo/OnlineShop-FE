@@ -1,58 +1,41 @@
-import React, { useEffect, useState } from 'react';
-import useCartStore from '@/stores/useCartStore';
-import { ProductResponse } from '@/generated/api/models';
-import { getProduct } from '@/generated/api/endpoints/product/product';
+import React, { useState } from "react";
+import { CartProduct, Product } from "@/generated/api/models";
+import useCartStore from "@/stores/useCartStore";
 
-interface IProductItemProps {
-  item: ProductResponse;
-  removeItemFromCart: (id: number) => void;
+interface SingleItemProps {
+  // de any thi chay duoc nhung se return ra id va quantity
+  item: CartProduct;
+  removeItemFromCart: (id: number) => void
 }
 
-const SingleItem = ({ item, removeItemFromCart }: IProductItemProps) => {
-  const { cartItems } = useCartStore();
-  // item = itemList.
-  // const [cartData, setCartData] = useState<ProductResponse>();
-  // const [error, setError] = useState<boolean>(false);
+const SingleItem = ({ item, removeItemFromCart }: SingleItemProps) => {
+  const itemInCart = item.product
 
-  //   const fetchProduct = async () => {
-  //     try {
-  //       const data =
-  //         await getProduct().productControllerGetAllProduct();
-  //       setCartData(data);
-  //     } catch (error) {
-  //       setError(true);
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     fetchProduct()
-  //   }, [])
-
-  console.log('Cart Items from zustand store:', cartItems);
+  const itemFirstImage = JSON.parse(itemInCart.image)[0];
 
   const handleRemoveFromCart = () => {
     console.log(`Removing: ${item.id}`);
     removeItemFromCart(item.id);
   };
-  return (
+
+  const priceAfterDiscount = () => {
+    const result = itemInCart.price - (itemInCart.price * itemInCart.discount/100)
+    return result.toLocaleString()
+  }
+
+  return !item ? (<div>Single Item error</div>) : (
     <div className="flex items-center justify-between gap-5">
       <div className="w-full flex items-center gap-6">
         <div className="flex items-center justify-center rounded-[10px] bg-gray-3 max-w-[90px] w-full h-22.5">
-          <img
-            src={JSON.parse(item.image)[0]}
-            alt="product"
-            width={100}
-            height={100}
-          />
+          <img src={itemFirstImage} alt="product" width={100} height={100} />
+          {/* Why is it like this */}
         </div>
 
         <div>
           <h3 className="font-medium text-dark mb-1 ease-out duration-200 hover:text-blue">
-            <a href="#"> {item.name} </a>
+            <a href="#"> {itemInCart.name} </a>
           </h3>
-          <p className="text-custom-sm">
-            Price: ${item.priceAfterDis.toFixed(2)}
-          </p>
+          <p className="text-custom-sm">Price: ${priceAfterDiscount().toLocaleString()}</p>
         </div>
       </div>
 
