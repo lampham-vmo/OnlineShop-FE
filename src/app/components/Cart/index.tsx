@@ -6,7 +6,7 @@ import SingleItem from './SingleItem';
 import { getCart } from '@/generated/api/endpoints/cart/cart';
 
 export default function Cart() {
-  const { cartItems, calculateTotal, clearCartItems } = useCartStore();
+  const { cartItems, calculateTotalPrice, clearCartItems } = useCartStore();
   const { cartControllerClearCart } = getCart()
   // Sử dụng các attribute trong mảng để tính toán giá total bằng method calculatePrice trong zustand store
   const handleClearCart = () => {
@@ -21,7 +21,7 @@ export default function Cart() {
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
             <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
               <h2 className="font-medium text-dark text-2xl">Your Cart</h2>
-              <div className='font-medium text-lg text-dark'>Total: ${calculateTotal().toLocaleString()}</div>
+              <div className='font-medium text-lg text-dark'>Total: ${calculateTotalPrice().toLocaleString()}</div>
               <button onClick={() => handleClearCart()} className="text-blue">Clear Shopping Cart</button>
             </div>
 
