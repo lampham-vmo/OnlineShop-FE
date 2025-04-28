@@ -8,12 +8,8 @@ import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
 
 const HeaderTopRight = () => {
-  const { toggleCart, isCartOpen, cartItems, calculateSubtotalPrice} = useCartStore();
+  const { toggleCart, isCartOpen, cartItems, totalPrice, getCartFromServer} = useCartStore();
   
-  const [error, setError] = useState<boolean>(false);
-  
-  const subtotal = calculateSubtotalPrice();
-
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
 
@@ -49,6 +45,9 @@ const HeaderTopRight = () => {
     }
   };
 
+  useEffect(() => {
+      getCartFromServer()
+  }, [])
   return (
     <div className="flex justify-between items-center gap-5">
       {/* Cart Button */}
@@ -95,7 +94,7 @@ const HeaderTopRight = () => {
 
         <div>
           <span className="block text-2xs text-dark-4 uppercase">cart</span>
-          <p className="font-medium text-custom-sm text-dark">${subtotal.toLocaleString()}</p>
+          <p className="font-medium text-custom-sm text-dark">${totalPrice.toLocaleString()}</p>
         </div>
       </button>
 

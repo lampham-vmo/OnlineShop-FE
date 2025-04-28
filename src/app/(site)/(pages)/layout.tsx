@@ -41,9 +41,6 @@ export default function RootLayout({
     }
   }, []);
 
-  useEffect(() => {
-    getCartFromServer()
-}, [cartItems])
 
   return (
     <html lang="en" suppressHydrationWarning>
