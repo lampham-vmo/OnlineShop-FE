@@ -138,9 +138,9 @@ const ResetPasswordForm = () => {
     return null;
   }
 
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
-    'idle',
-  );
+  const [status, setStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
 
   const schema = authControllerConfirmResetPasswordTokenBody;
 

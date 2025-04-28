@@ -8,6 +8,10 @@ import RequiredLabel from '../Common/RequiredLabel';
 import { OnApproveActions } from '@paypal/paypal-js';
 import { getOrders } from '@/generated/api/endpoints/orders/orders';
 import { useRouter } from 'next/navigation';
+import { getPaymentMethod } from '@/generated/api/endpoints/payment-method/payment-method';
+import { PaymentMethodResponseDto } from '@/generated/api/models';
+import toast from 'react-hot-toast';
+import { getCart } from '@/generated/api/endpoints/cart/cart';
 
 const orderSchema = z.object({
   fullName: z.string().min(1, 'Recipient name is required'),
@@ -15,6 +19,7 @@ const orderSchema = z.object({
   phoneNumber: z
     .string()
     .min(10, 'Phone number must be at least 10 digits')
+    .max(11, 'Phone number must not exceed 11 digits')
     .regex(/^[0-9]+$/, 'Phone number must contain only numbers'),
 });
 
@@ -71,6 +76,17 @@ const ButtonCheckout = () => {
     getValues,
   } = useFormContext<OrderFormData>();
   const [paypalEnabled, setPaypalEnabled] = useState(false);
+  const [disablePlaceOrder, setDisablePlaceOrder] = useState(false);
+
+  const [retryOrderId, setRetryOrderId] = useState<string | null>(null);
+  const [retryPaypalId, setRetryPaypalId] = useState<string | null>(null);
+
+  const [listPaymentMethod, setListPaymentMethod] = useState<
+    PaymentMethodResponseDto[]
+  >([]);
+
+  const { paymentMethodControllerFindAll } = getPaymentMethod();
+  const { cartControllerClearCart } = getCart();
 
   const initialOptions = {
     clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || '',
@@ -88,7 +104,6 @@ const ButtonCheckout = () => {
   const onSubmit = async (data: OrderFormData) => {
     try {
       const response = await ordersControllerCreate({
-        cartId: 1,
         paymentId: 1,
         receiver: data.fullName,
         receiver_phone: data.phoneNumber,
@@ -97,8 +112,9 @@ const ButtonCheckout = () => {
       if (response.success) {
         router.push('/success');
       }
-    } catch (error) {
-      router.push('/failed');
+    } catch (error: any) {
+      await cartControllerClearCart();
+      router.push(`/failed?message=${encodeURIComponent(error.message)}`);
     }
   };
 
@@ -107,32 +123,32 @@ const ButtonCheckout = () => {
     setPaypalEnabled(isValid);
   };
 
-  const listMethod = [
-    { id: 1, name: 'Cash on delivery', status: 'active' },
-    { id: 2, name: 'Paypal', status: 'active' },
-  ];
-
-  const paypalAvailable = listMethod.some(
+  const paypalAvailable = listPaymentMethod.some(
     (method) => method.id === 2 && method.status === 'active',
   );
-  let myOrderId = '';
 
   const handleCrearePaypalOrder = async () => {
     try {
+      if (retryPaypalId) {
+        return retryPaypalId;
+      }
+
       const formData = getValues();
 
       const response = await ordersControllerCreate({
-        cartId: 1,
         paymentId: 2,
         receiver: formData.fullName,
         receiver_phone: formData.phoneNumber,
         delivery_address: formData.address,
       });
       const [orderPaypalId, orderId] = response.data.id.split('-');
-      myOrderId = orderId;
+      setRetryPaypalId(orderPaypalId);
+      setRetryOrderId(orderId);
+
       return orderPaypalId;
     } catch (error: any) {
-      router.push('/failed');
+      await cartControllerClearCart();
+      router.push(`/failed?message=${encodeURIComponent(error.message)}`);
       return '';
     }
   };
@@ -144,16 +160,26 @@ const ButtonCheckout = () => {
     try {
       const response = await ordersControllerCaptureOrder(
         orderPaypalId,
-        myOrderId,
+        retryOrderId as string,
       );
 
       if (response.success) {
         router.push('/success');
       }
     } catch (error: any) {
-      router.push('/failed');
+      toast.error('Failed to complete your order, please try again!');
+      setDisablePlaceOrder(true);
     }
   };
+
+  const getListPaymentMethod = async () => {
+    const response = await paymentMethodControllerFindAll();
+    setListPaymentMethod(response.data);
+  };
+
+  useEffect(() => {
+    getListPaymentMethod();
+  }, []);
 
   useEffect(() => {
     setPaypalEnabled(isValid);
@@ -166,6 +192,7 @@ const ButtonCheckout = () => {
           variant="contained"
           color="primary"
           onClick={handleSubmit(onSubmit)}
+          disabled={disablePlaceOrder}
         >
           Place Order
         </Button>
