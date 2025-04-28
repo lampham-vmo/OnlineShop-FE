@@ -5,10 +5,9 @@ import { getCart } from "@/generated/api/endpoints/cart/cart";
 
 const { cartControllerGetCart, cartControllerAddToCart, cartControllerDeleteCart, cartControllerClearCart, cartControllerIncreaseQuantity, cartControllerDecreaseQuantity } = getCart();
 
-// TODO: define interface for CartItem
 // TODO: define interface for CartStore
 interface CartStore {
-    itemCount: number,
+    totalItemCount: number,
     isCartOpen: boolean,
     cartItems: CartProduct[],
     subtotalPrice: number,
@@ -18,7 +17,7 @@ interface CartStore {
     increaseCartItemQuantity: (id: number) => Promise<void>,
     decreaseCartItemQuantity: (id: number) => Promise<void>,
 
-    calculatePrices: () => void
+    updateCartState: () => void
 
     openCart: () => void,
     closeCart: () => void,
@@ -32,12 +31,13 @@ interface CartStore {
 const useCartStore = create<CartStore>()(
     persist(
         (set, get) => ({
-            itemCount: 0,
+            totalItemCount: 0,
             isCartOpen: false,
             cartItems: [],
             subtotalPrice: 0,
             totalPrice: 0,
 
+            // TODO: Add all items to cart
             getCartFromServer: async () => {
                 const response = await cartControllerGetCart();
                 const cartItems = response.data.items; // Adjust according to your API response shape
@@ -45,8 +45,7 @@ const useCartStore = create<CartStore>()(
                 console.log('cartItems: ', cartItems)
             },
 
-                        // TODO: calculate price
-            calculatePrices: () => {
+            updateCartState: () => {
                 const itemsInCart = get().cartItems;
 
                 const subtotalPrice = itemsInCart.reduce((total, item) => {
@@ -59,17 +58,17 @@ const useCartStore = create<CartStore>()(
                     return total + (item.quantity * discountedPrice);
                 }, 0);
 
-                set({ subtotalPrice, totalPrice });
-
+                const totalItemCount = itemsInCart.reduce((total,item) => total + item.quantity, 0)
+                set({ subtotalPrice, totalPrice, totalItemCount });
             },
         
-            // TODO: increase count (this is not really useful since we already had addItemToCart() )
+            // TODO: increase count
             increaseCartItemQuantity: async(id: number) => {
                 await cartControllerIncreaseQuantity({id: id});
                 set((state) => ({
                     cartItems: state.cartItems.map((item) => item.id === id ? {...item, quantity: item.quantity+1} : item),
                 }))
-                get().calculatePrices()},
+                get().updateCartState()},
          
         
             decreaseCartItemQuantity: async(id: number) =>{
@@ -77,16 +76,14 @@ const useCartStore = create<CartStore>()(
                 set((state) => ({
                     cartItems: state.cartItems.map((item) => item.id === id ? {...item, quantity: item.quantity-1} : item),
                 }))
-                get().calculatePrices()},
-        
-
+                get().updateCartState()},
         
             // TODO: cart open/close
             openCart: () => set({isCartOpen: true}),
             closeCart: () => set({isCartOpen: false}),
             toggleCart: () => set((state) => ({ isCartOpen: !state.isCartOpen})),
         
-            // TODO: Add all items to cart
+            
             clearCartItems: async() => {
                 await cartControllerClearCart(),
                 set({cartItems: []})
@@ -110,15 +107,17 @@ const useCartStore = create<CartStore>()(
                 }
 
                 set({cartItems: [...cartItems, newCartItem]});
-                get().calculatePrices()
+                get().updateCartState()
             },
-            
+
+
+            // TODO: Remove an item from the cart  
             removeItemFromCart: async(productId: number ) =>
             {
                 const itemsInCart = get().cartItems;
                 await cartControllerDeleteCart({id: productId})
                 set({cartItems: itemsInCart.filter(item => item.id !== productId )});
-                get().calculatePrices();
+                get().updateCartState();
             }
         }),
         {
