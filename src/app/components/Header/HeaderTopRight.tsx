@@ -6,28 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
-import { getCart } from '@/generated/api/endpoints/cart/cart';
 
 const HeaderTopRight = () => {
-  const { toggleCart, isCartOpen, cartItems, calculateSubtotal, setCartItems } = useCartStore();
+  const { toggleCart, isCartOpen, cartItems, calculateSubtotalPrice} = useCartStore();
   
   const [error, setError] = useState<boolean>(false);
-  const { cartControllerGetCart } = getCart();
-  const fetchCart = async () => {
-        try {
-          const data = (await cartControllerGetCart()).data
-          setCartItems(data.items)
-          console.log("Logging cartItems: ",cartItems)     
-        } catch (error) {
-          setError(true);
-        }
-      };
   
-      useEffect(() => {
-          fetchCart()
-      }, [])
-
-  const subtotal = calculateSubtotal();
+  const subtotal = calculateSubtotalPrice();
 
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
@@ -48,7 +33,7 @@ const HeaderTopRight = () => {
     { label: 'Logout', path: '/logout' },
   ];
 
-  if (AllowedRoleForAdminLayout.includes(user?.role!)) {
+  if (AllowedRoleForAdminLayout.includes(user?.role)) {
     settings.unshift({ label: 'Admin Dashboard', path: '/admin' });
   }
 
@@ -67,7 +52,10 @@ const HeaderTopRight = () => {
   return (
     <div className="flex justify-between items-center gap-5">
       {/* Cart Button */}
-      <button onClick={toggleCart} className="flex items-center gap-2.5">
+      <button
+        onClick={toggleCart}
+        className="flex items-center gap-2.5"
+      >
         <span className="inline-block relative">
           <svg
             width="24"
@@ -111,11 +99,12 @@ const HeaderTopRight = () => {
         </div>
       </button>
 
+
+      {user ? (
+        <>
       {/* Toggle Cart Modal */}
       {isCartOpen && <CartSidebarModal />}
       {/* /Toggle Cart Modal */}
-      {user ? (
-        <>
           <div
             className="w-10 h-10 rounded-full text-white transition-all duration-300 bg-blue-600 hover:bg-blue flex items-center justify-center cursor-pointer"
             onClick={handleOpenUserMenu}

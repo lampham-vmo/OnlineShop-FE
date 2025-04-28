@@ -8,10 +8,8 @@ import useCartStore from "@/stores/useCartStore";
 import { getCart } from "@/generated/api/endpoints/cart/cart";
 
 const CartSidebarModal = () => {
-  const { calculateSubtotal, closeCart, isCartOpen, cartItems, removeItemFromCart} = useCartStore();
-  const subTotal = calculateSubtotal()
-  
-    const { cartControllerDeleteCart, } = getCart();
+  const { calculateSubtotalPrice, closeCart, isCartOpen, cartItems, removeItemFromCart} = useCartStore();
+  const subTotal = calculateSubtotalPrice()
 
   useEffect(() => {
     // closing modal while clicking outside
@@ -29,7 +27,6 @@ const CartSidebarModal = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isCartOpen, closeCart]);
-
 
   return (
     <div
@@ -79,7 +76,6 @@ const CartSidebarModal = () => {
                     item={item}
                     removeItemFromCart={() => {
                       removeItemFromCart(item.id)
-                      cartControllerDeleteCart({id: item.id})
                     }}
                   />
                 ))

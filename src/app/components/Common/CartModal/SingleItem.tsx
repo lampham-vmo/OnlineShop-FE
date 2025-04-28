@@ -8,14 +8,14 @@ interface SingleItemProps {
   removeItemFromCart: (id: number) => void
 }
 
-const SingleItem = ({ item, removeItemFromCart }: SingleItemProps) => {
+const SingleItem = ({ item, removeItemFromCart}: SingleItemProps) => {
   const itemInCart = item.product
 
   const itemFirstImage = JSON.parse(itemInCart.image)[0];
 
   const handleRemoveFromCart = () => {
-    console.log(`Removing: ${item.id}`);
-    removeItemFromCart(item.id);
+    // console.log(`Removing: ${item.id}`);
+      removeItemFromCart(item.id);
   };
 
   const priceAfterDiscount = () => {

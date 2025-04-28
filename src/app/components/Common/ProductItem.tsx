@@ -29,7 +29,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
       toast.error(`${item.name} is already added`, {duration: 3000});
       return
     } else {
-      cartControllerAddToCart({quantity: 1, productId: item.id})
+      // cartControllerAddToCart({quantity: 1, productId: item.id})
       addItemToCart(item)
     }
 
