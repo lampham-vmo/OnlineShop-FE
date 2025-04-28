@@ -234,13 +234,13 @@ export default function Login() {
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton
+                        {/* <IconButton
                           aria-label="toggle password visibility"
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
                         >
                           {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
+                        </IconButton> */}
                       </InputAdornment>
                     ),
                   }}
