@@ -3,7 +3,6 @@ import React from 'react'
 import useCartStore from '@/stores/useCartStore';
 import Link from 'next/link';
 import SingleItem from './SingleItem';
-import { getCart } from '@/generated/api/endpoints/cart/cart';
 
 export default function Cart() {
   const { cartItems, totalPrice, clearCartItems } = useCartStore();
@@ -15,6 +14,12 @@ export default function Cart() {
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
             <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
               <h2 className="font-medium text-dark text-2xl">Your Cart</h2>
+              <Link
+                href="/checkout"
+                className="w-50 flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
+              >
+                Checkout
+              </Link>
               <div className='font-medium text-lg text-dark'>Total: ${totalPrice.toLocaleString()}</div>
               <button onClick={clearCartItems} className="text-blue">Clear Shopping Cart</button>
             </div>
@@ -56,10 +61,8 @@ export default function Cart() {
                 </div>
               </div>
             </div>
-
-            <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-11 mt-9">
-            </div>
           </div>
+          
         </section>
       ) : (
         <>
