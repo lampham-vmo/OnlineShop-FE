@@ -11,7 +11,6 @@ interface SingleItemProps {
 function SingleItem({ item}:SingleItemProps) {
   const {increaseCartItemQuantity, decreaseCartItemQuantity, removeItemFromCart} = useCartStore()
 
-  const {cartControllerIncreaseQuantity, cartControllerDecreaseQuantity, cartControllerDeleteCart} = getCart()
 
   const itemInCart = item.product
   const itemFirstImage = JSON.parse(itemInCart.image)[0];
@@ -19,7 +18,6 @@ function SingleItem({ item}:SingleItemProps) {
   // TODO: handle remove
   const handleRemoveFromCart = () => {
     removeItemFromCart(item.id)
-    cartControllerDeleteCart({id: item.id})
   };
 
   const priceAfterDiscount = () => {
@@ -32,8 +30,7 @@ function SingleItem({ item}:SingleItemProps) {
       toast.error(`Item ${item.product.name} has reached maximum amount of stock!`, { duration: 3000 });
       return;
     }
-    cartControllerIncreaseQuantity({ id: item.id });
-    increaseCartItemQuantity(item.id);
+    increaseCartItemQuantity(item.id)
   };
   // doesn't work, might be BE
   const handleDecreaseQuantity = () => {
@@ -41,7 +38,6 @@ function SingleItem({ item}:SingleItemProps) {
       toast.error(`Item ${item.product.name} cannot go below 1!`);
       return;
     }
-    cartControllerDecreaseQuantity({ id: item.id });
     decreaseCartItemQuantity(item.id);
   }
 

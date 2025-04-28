@@ -5,11 +5,13 @@ import SingleItem from "./SingleItem";
 import Link from "next/link";
 import EmptyCart from "./EmptyCart";
 import useCartStore from "@/stores/useCartStore";
-import { getCart } from "@/generated/api/endpoints/cart/cart";
 
 const CartSidebarModal = () => {
-  const { calculateSubtotalPrice, closeCart, isCartOpen, cartItems, removeItemFromCart} = useCartStore();
-  const subTotal = calculateSubtotalPrice()
+  const { subtotalPrice, closeCart, isCartOpen, cartItems, removeItemFromCart, getCartFromServer} = useCartStore();
+
+  useEffect(() => {
+    getCartFromServer()
+}, [])
 
   useEffect(() => {
     // closing modal while clicking outside
@@ -89,7 +91,7 @@ const CartSidebarModal = () => {
             <div className="flex items-center justify-between gap-5 mb-6">
               <p className="font-medium text-xl text-dark">Subtotal:</p>
             {/* TODO: Total price */}
-              <p className="font-medium text-xl text-dark">${subTotal.toLocaleString()}</p>
+              <p className="font-medium text-xl text-dark">${subtotalPrice}</p>
             </div>
 
             <div className="flex items-center gap-4">
