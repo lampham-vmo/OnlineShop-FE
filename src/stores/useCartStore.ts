@@ -40,7 +40,7 @@ const useCartStore = create<CartStore>()(
             // TODO: Add all items to cart
             getCartFromServer: async () => {
                 const response = await cartControllerGetCart();
-                const cartItems = response.data.items; // Adjust according to your API response shape
+                const cartItems = response.data.items;
                 set({ cartItems });
                 console.log('cartItems: ', cartItems)
             },
