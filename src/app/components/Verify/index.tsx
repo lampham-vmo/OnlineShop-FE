@@ -21,7 +21,7 @@ import { useAuthStore } from '@/stores/authStore';
 const { authControllerConfirmEmail, authControllerConfirmResetPasswordToken } =
   getAuth();
 
-const VerifyEmail = () => {
+export const VerifyEmail = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const user = useAuthStore((state) => state.user);
