@@ -44,6 +44,7 @@ const useCartStore = create<CartStore>()(
             // TODO: calculate price
             calculateSubtotal: () => {
                 const itemsInCart = get().cartItems;
+                console.log('cartItems in storage', itemsInCart)
                 const result =itemsInCart.reduce((total, item) => { 
                     console.log('item in cart: ', item)
                     return total + (item.product.price - (item.product.price * item.product.discount/100))},0);
