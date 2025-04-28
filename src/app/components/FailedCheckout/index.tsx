@@ -1,6 +1,26 @@
+'use client';
+
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const FailedCheckout = () => {
+  const searchParams = useSearchParams();
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const msg = searchParams.get('message');
+    if (msg) {
+      setMessage(msg);
+    } else {
+      setMessage('An unexpected error occurred.');
+    }
+  }, [searchParams]);
+
+  if (!message) {
+    return null;
+  }
+
   return (
     <section className="overflow-hidden py-20 bg-gray-2">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
@@ -10,7 +30,7 @@ const FailedCheckout = () => {
               Payment Failed!
             </h2>
             <h3 className="font-medium text-dark text-xl sm:text-2xl mb-3">
-              Your Order Could Not Be Completed
+              {message}
             </h3>
             <p className="max-w-[700px] w-full mx-auto mb-7.5">
               We apologize, but your payment was not successful. Please try
@@ -22,7 +42,7 @@ const FailedCheckout = () => {
               className="inline-flex items-center gap-2 font-medium text-white bg-red-500 py-3 px-6 rounded-md ease-out duration-200 hover:bg-red-600"
               href="/product-list"
             >
-              Try Again
+              Continue Shopping
               <svg
                 width="20"
                 height="20"

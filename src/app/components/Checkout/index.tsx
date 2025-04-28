@@ -1,36 +1,68 @@
 'use client';
 
 import Link from 'next/link';
-import SingleItem, { CartItem } from './SingleItem';
+import SingleItem from './SingleItem';
 import OrderForm from './OrderForm';
+import { useEffect, useState } from 'react';
+import { getCart } from '@/generated/api/endpoints/cart/cart';
+import { Box, CircularProgress } from '@mui/material';
+import { ICartProductItem } from '@/types/inteface';
 
 const Checkout = () => {
-  const cartItems: Array<CartItem> = [
-    {
-      id: 1,
-      title: 'Tenda Nova MW6 Mesh WiFi System',
-      price: 2990000,
-      discountedPrice: 2631200,
-      quantity: 2,
-      img: 'https://res.cloudinary.com/dukodbzjo/image/upload/v1744880596/xtogp80rguijrj7vwoar.webp',
-    },
-    {
-      id: 2,
-      title: 'ASUS RT-AX88U WiFi 6 Router',
-      price: 6590000,
-      discountedPrice: 6128700,
-      quantity: 3,
-      img: 'https://res.cloudinary.com/dukodbzjo/image/upload/v1744880566/hbc6fgjhltiprmn6pd3r.webp',
-    },
-  ];
+  const [items, setItems] = useState<ICartProductItem[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const { cartControllerGetCart } = getCart();
 
-  const total = cartItems.reduce((sum, item) => {
-    return sum + item.discountedPrice * item.quantity;
-  }, 0);
+  const getListItemsInCart = async () => {
+    try {
+      const response = await cartControllerGetCart();
+      let totalPrice = 0;
+      const newItems = response.data.items.map((item) => {
+        const product = item.product;
+        const priceDiscount =
+          product.price - (product.price * product.discount) / 100;
+
+        totalPrice += priceDiscount * item.quantity;
+        return {
+          ...item.product,
+          priceDiscount: priceDiscount,
+          quantityInCart: item.quantity,
+        };
+      });
+      setTotal(totalPrice);
+      setItems(newItems);
+    } catch (error) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getListItemsInCart();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" py={10}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-5 text-3xl text-dark font-semibold">
+        Internal Server Error
+      </div>
+    );
+  }
 
   return (
     <>
-      {cartItems.length > 0 ? (
+      {items.length > 0 ? (
         <section className="overflow-hidden py-20 bg-gray-2">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
             <h2 className="font-medium text-dark text-2xl mb-7.5">Products</h2>
@@ -59,10 +91,9 @@ const Checkout = () => {
                   </div>
 
                   {/* <!-- cart item --> */}
-                  {cartItems.length > 0 &&
-                    cartItems.map((item, key) => (
-                      <SingleItem item={item} key={key} />
-                    ))}
+                  {items.map((item, key) => (
+                    <SingleItem item={item} key={key} />
+                  ))}
                 </div>
               </div>
             </div>
