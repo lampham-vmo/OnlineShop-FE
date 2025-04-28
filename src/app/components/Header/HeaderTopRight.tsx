@@ -3,12 +3,31 @@ import { useAuthStore } from '@/stores/authStore';
 import { Menu, MenuItem, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
+import { getCart } from '@/generated/api/endpoints/cart/cart';
 
 const HeaderTopRight = () => {
-  const { CartAmountCount, toggleCart, isCartOpen, cartItems } = useCartStore();
+  const { toggleCart, isCartOpen, cartItems, calculateSubtotal, setCartItems } = useCartStore();
+  
+  const [error, setError] = useState<boolean>(false);
+  const { cartControllerGetCart } = getCart();
+  const fetchCart = async () => {
+        try {
+          const data = (await cartControllerGetCart()).data
+          setCartItems(data.items)
+          console.log("Logging cartItems: ",cartItems)     
+        } catch (error) {
+          setError(true);
+        }
+      };
+  
+      useEffect(() => {
+          fetchCart()
+      }, [])
+
+  const subtotal = calculateSubtotal();
 
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
@@ -82,13 +101,13 @@ const HeaderTopRight = () => {
           </svg>
 
           <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
-            {cartItems.length}
+            {cartItems.length <= 100 ? cartItems.length : <span>99+</span>}
           </span>
         </span>
 
         <div>
           <span className="block text-2xs text-dark-4 uppercase">cart</span>
-          <p className="font-medium text-custom-sm text-dark">${100}</p>
+          <p className="font-medium text-custom-sm text-dark">${subtotal.toLocaleString()}</p>
         </div>
       </button>
 
