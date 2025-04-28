@@ -1,14 +1,7 @@
-export interface CartItem {
-  id: number;
-  title: string;
-  price: number;
-  discountedPrice: number;
-  quantity: number;
-  img: string;
-}
+import { ICartProductItem } from '@/types/inteface';
 
 interface ISingleItemProps {
-  item: CartItem;
+  item: ICartProductItem;
 }
 
 const SingleItem = ({ item }: ISingleItemProps) => {
@@ -19,29 +12,34 @@ const SingleItem = ({ item }: ISingleItemProps) => {
           <div className="flex items-center justify-between gap-5">
             <div className="w-full flex items-center gap-5.5">
               <div className="flex items-center justify-center rounded-[5px] bg-gray-2 max-w-[80px] w-full h-17.5">
-                <img width={200} height={200} src={item.img} alt="product" />
+                <img
+                  width={200}
+                  height={200}
+                  src={JSON.parse(item.image)[0]}
+                  alt="product"
+                />
               </div>
 
               <div>
-                <h3 className="text-dark">{item.title}</h3>
+                <h3 className="text-dark">{item.name}</h3>
               </div>
             </div>
           </div>
         </div>
 
         <div className="min-w-[180px]">
-          <p className="text-dark">${item.discountedPrice.toLocaleString()}</p>
+          <p className="text-dark">${item.priceDiscount.toLocaleString()}</p>
         </div>
 
         <div className="min-w-[275px]">
           <span className="flex items-center justify-center w-16 h-11.5">
-            {item.quantity}
+            {item.quantityInCart}
           </span>
         </div>
 
         <div className="min-w-[200px]">
           <p className="text-dark">
-            ${(item.discountedPrice * item.quantity).toLocaleString()}
+            ${(item.priceDiscount * item.quantityInCart).toLocaleString()}
           </p>
         </div>
       </div>
