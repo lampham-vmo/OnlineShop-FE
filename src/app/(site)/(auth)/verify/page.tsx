@@ -1,5 +1,5 @@
 'use client';
-import VerifyEmail from '@/app/components/Verify';
+import {VerifyEmail} from '@/app/components/Verify';
 import React from 'react';
 
 export default function VerifyPage() {
