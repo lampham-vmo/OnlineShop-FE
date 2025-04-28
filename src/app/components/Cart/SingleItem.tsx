@@ -5,7 +5,6 @@ import React, { memo, useState } from 'react'
 import toast from 'react-hot-toast';
 
 interface SingleItemProps {
-  // de any thi chay duoc nhung se return ra id va quantity
   item: CartProduct;
 }
 
@@ -19,7 +18,6 @@ function SingleItem({ item}:SingleItemProps) {
   
   // TODO: handle remove
   const handleRemoveFromCart = () => {
-    console.log(`Removing: ${item.id}`)
     removeItemFromCart(item.id)
     cartControllerDeleteCart({id: item.id})
   };

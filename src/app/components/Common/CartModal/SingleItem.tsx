@@ -14,7 +14,6 @@ const SingleItem = ({ item, removeItemFromCart }: SingleItemProps) => {
   const itemFirstImage = JSON.parse(itemInCart.image)[0];
 
   const handleRemoveFromCart = () => {
-    console.log(`Removing: ${item.id}`)
     removeItemFromCart(item.id);
   };
 

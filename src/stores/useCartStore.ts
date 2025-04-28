@@ -3,16 +3,10 @@ import {create} from "zustand"
 import { persist } from "zustand/middleware"
 
 // TODO: define interface for CartItem
-interface CartItem {
-    id: number,
-    product: Product,
-    quantity: number
-}
-
 // TODO: define interface for CartStore
 interface CartStore {
     isCartOpen: boolean,
-    cartItems: CartItem[],
+    cartItems: CartProduct[],
 
     increaseCartItemQuantity: (id: number) => void,
     decreaseCartItemQuantity: (id: number) => void,
@@ -23,7 +17,7 @@ interface CartStore {
     openCart: () => void,
     closeCart: () => void,
     toggleCart: () => void,
-    setCartItems: (item: CartItem[]) => void, 
+    setCartItems: (item: CartProduct[]) => void, 
     clearCartItems: () => void,
     addItemToCart: (item: Product) => void,
     removeItemFromCart: (id: number) => void,
@@ -51,6 +45,7 @@ const useCartStore = create<CartStore>()(
             calculateSubtotal: () => {
                 const itemsInCart = get().cartItems;
                 const result =itemsInCart.reduce((total, item) => { 
+                    console.log('item in cart: ', item)
                     return total + (item.product.price - (item.product.price * item.product.discount/100))},0);
                 return result;
             },   
@@ -82,15 +77,13 @@ const useCartStore = create<CartStore>()(
                {
                 set((state) => {
                     const existingItem = state.cartItems.some(item => item.product.id === product.id);
-                    console.log("existingItem: ",existingItem)
                     if(existingItem){return state}
 
-                    const newCartItem: CartItem = {
-                        id: Date.now(), // se duoc set sau
+                    const newCartItem: CartProduct = {
+                        id: product.id, // se duoc set sau
                         product: product,
                         quantity: 1,
                       };
-                
                       return { cartItems: [...state.cartItems, newCartItem] };
                   })
             },

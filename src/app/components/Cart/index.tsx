@@ -3,11 +3,16 @@ import React from 'react'
 import useCartStore from '@/stores/useCartStore';
 import Link from 'next/link';
 import SingleItem from './SingleItem';
+import { getCart } from '@/generated/api/endpoints/cart/cart';
 
 export default function Cart() {
-  // sử dụng localstorage để lưu mảng sản phẩm và query liên tục mỗi lần bấm tăng sản phẩm
-  const { cartItems, calculateTotal } = useCartStore();
+  const { cartItems, calculateTotal, clearCartItems } = useCartStore();
+  const { cartControllerClearCart } = getCart()
   // Sử dụng các attribute trong mảng để tính toán giá total bằng method calculatePrice trong zustand store
+  const handleClearCart = () => {
+    cartControllerClearCart()
+    clearCartItems()
+  }
   
   return (
     <>
@@ -17,7 +22,7 @@ export default function Cart() {
             <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
               <h2 className="font-medium text-dark text-2xl">Your Cart</h2>
               <div className='font-medium text-lg text-dark'>Total: ${calculateTotal().toLocaleString()}</div>
-              <button className="text-blue">Clear Shopping Cart</button>
+              <button onClick={() => handleClearCart()} className="text-blue">Clear Shopping Cart</button>
             </div>
 
             <div className="bg-white rounded-[10px] shadow-1">
