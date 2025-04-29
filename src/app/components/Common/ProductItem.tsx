@@ -63,12 +63,15 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
             onClick={() => handleAddToCart(item)}
             disabled={item.stock === 0}
             aria-label="button for add to cart"
-            className={`flex items-center justify-center w-18 h-9 rounded-[5px] shadow-1 ease-out duration-200 ${item.stock === 0
-              ? 'text-dark bg-white cursor-not-allowed'
-              : 'text-dark bg-white hover:text-white hover:bg-blue'
-              }`}
+            className={`flex items-center justify-center w-18 h-9 rounded-[5px] shadow-1 ease-out duration-200 ${
+              item.stock === 0
+                ? 'text-dark bg-white cursor-not-allowed'
+                : 'text-dark bg-white hover:text-white hover:bg-blue'
+            }`}
           >
-            {item.stock === 0 ? 'Out of Stock' : (
+            {item.stock === 0 ? (
+              'Out of Stock'
+            ) : (
               <svg
                 className="fill-current"
                 width="16"

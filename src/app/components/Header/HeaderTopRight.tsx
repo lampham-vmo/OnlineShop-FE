@@ -8,9 +8,17 @@ import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
 
 const HeaderTopRight = () => {
-  const { toggleCart, isCartOpen, cartItems, totalPrice, getCartFromServer, totalItemCount, updateCartState} = useCartStore();
-  console.log('Total item count', totalItemCount)
-  
+  const {
+    toggleCart,
+    isCartOpen,
+    cartItems,
+    totalPrice,
+    getCartFromServer,
+    totalItemCount,
+    updateCartState,
+  } = useCartStore();
+  console.log('Total item count', totalItemCount);
+
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
 
@@ -52,10 +60,7 @@ const HeaderTopRight = () => {
   return (
     <div className="flex justify-between items-center gap-5">
       {/* Cart Button */}
-      <button
-        onClick={toggleCart}
-        className="flex items-center gap-2.5"
-      >
+      <button onClick={toggleCart} className="flex items-center gap-2.5">
         <span className="inline-block relative">
           <svg
             width="24"
@@ -95,7 +100,9 @@ const HeaderTopRight = () => {
 
         <div>
           <span className="block text-2xs text-dark-4 uppercase">cart</span>
-          <p className="font-medium text-custom-sm text-dark">${totalPrice.toLocaleString()}</p>
+          <p className="font-medium text-custom-sm text-dark">
+            ${totalPrice.toLocaleString()}
+          </p>
         </div>
       </button>
 
