@@ -134,6 +134,7 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
   const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
     {},
   );
+  const [priceDisplay, setPriceDisplay] = React.useState('');
   const [upload, setUpload] = React.useState(false);
   const [imageLink, setImageLink] = React.useState<string[]>([]);
   const [categories, setCategories] = React.useState<CategoryResponseDto[]>([]);
@@ -204,10 +205,21 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
       event.target.type === 'checkbox'
         ? event.target.checked
         : event.target.value;
+
     setFormErrors({});
-    if (['stock', 'price', 'discount', 'categoryId'].includes(field)) {
+
+    if (field === 'price') {
+      const raw = value.replace(/\./g, '').replace(/\D/g, '');
+      const number = parseInt(raw || '0', 10);
+      setPriceDisplay(number.toLocaleString('vi-VN'));
+      setFormData((prev) => ({ ...prev, price: number }));
+      return;
+    }
+
+    if (['stock', 'discount', 'categoryId'].includes(field)) {
       value = Number(value);
     }
+
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -234,11 +246,11 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
       if (formData.description.trim() == '') {
         errors.description = 'Description should not be empty';
       }
-      if(formData.price === 0){
-        errors.price = 'Price should not be empty'
+      if (formData.price === 0) {
+        errors.price = 'Price should not be empty';
       }
-      if(formData.stock=== 0){
-        errors.stock = "Stock should not be empty"
+      if (formData.stock === 0) {
+        errors.stock = 'Stock should not be empty';
       }
       productControllerCreateProductBody.parse(formData);
     } catch (error) {
@@ -265,7 +277,8 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
         loading: 'Đang tạo sản phẩm...',
         success: 'Tạo sản phẩm thành công!',
       });
-      onSuccess?.()
+      onSuccess?.();
+      setPriceDisplay('');
       // Reset form sau khi thành công
       setFormData({
         name: '',
@@ -352,14 +365,12 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
             <InputLabel htmlFor="price">Price</InputLabel>
             <OutlinedInput
               id="price"
-              type="number"
               startAdornment={
                 <InputAdornment position="start">$</InputAdornment>
               }
               label="Price"
               error={!!formErrors.price}
-              inputProps={{ min: 0, step: '0.01' }}
-              value={formData.price == 0 ? '' : formData.price}
+              value={priceDisplay}
               onChange={handleChange('price')}
             />
             {formErrors.price && (

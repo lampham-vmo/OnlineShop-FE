@@ -35,7 +35,6 @@ const OrderFormFields = () => {
   return (
     <>
       <TextField
-        // label="Recipient Name"
         label={<RequiredLabel label="Recipient Name" />}
         variant="outlined"
         fullWidth
@@ -78,6 +77,7 @@ const ButtonCheckout = () => {
   } = useFormContext<OrderFormData>();
   const [paypalEnabled, setPaypalEnabled] = useState(false);
   const [disablePlaceOrder, setDisablePlaceOrder] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const [retryOrderId, setRetryOrderId] = useState<string | null>(null);
   const [retryPaypalId, setRetryPaypalId] = useState<string | null>(null);
@@ -104,6 +104,7 @@ const ButtonCheckout = () => {
   const { getCartFromServer } = useCartStore();
 
   const onSubmit = async (data: OrderFormData) => {
+    setIsPlacingOrder(true);
     try {
       const response = await ordersControllerCreate({
         paymentId: 1,
@@ -119,6 +120,8 @@ const ButtonCheckout = () => {
     } catch (error: any) {
       await cartControllerClearCart();
       router.push(`/failed?message=${encodeURIComponent(error.message)}`);
+    } finally {
+      setIsPlacingOrder(false);
     }
   };
 
@@ -199,6 +202,7 @@ const ButtonCheckout = () => {
           color="primary"
           onClick={handleSubmit(onSubmit)}
           disabled={disablePlaceOrder}
+          loading={isPlacingOrder}
         >
           Place Order
         </Button>

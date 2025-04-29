@@ -30,6 +30,7 @@ import type { LoginUserDTO } from '@/generated/api/models';
 import { useAuthStore, type AuthState } from '@/stores/authStore';
 import { jwtDecode } from 'jwt-decode';
 import SendResetPasswordForm from '../VerifyResetToken';
+import useCartStore from '@/stores/useCartStore';
 
 // Use the Orval-generated zod schema
 const loginSchema = authControllerLoginBody;
@@ -50,6 +51,7 @@ export default function Login() {
   const authApi = getAuth();
 
   const { user, setTokens, setPermission } = useAuthStore.getState();
+  const { getCartFromServer } = useCartStore();
   // Initialize react-hook-form with zod resolver
   // Check for authentication on component mount
 
@@ -80,11 +82,12 @@ export default function Login() {
 
       // Sử dụng authStore để lưu tokens
       setPermission(result.permission);
-      console.log(result);
       setTokens({
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
       });
+
+      await getCartFromServer();
 
       // Redirect sau khi đăng nhập thành công
       const payload: any = jwtDecode(result.accessToken);

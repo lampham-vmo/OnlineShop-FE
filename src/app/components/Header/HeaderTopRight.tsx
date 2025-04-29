@@ -16,6 +16,7 @@ const HeaderTopRight = () => {
     getCartFromServer,
     totalItemCount,
     updateCartState,
+    clearCartStorage,
   } = useCartStore();
   console.log('Total item count', totalItemCount);
 
@@ -38,7 +39,7 @@ const HeaderTopRight = () => {
     { label: 'Logout', path: '/logout' },
   ];
 
-  if (AllowedRoleForAdminLayout.includes(user?.role)) {
+  if (AllowedRoleForAdminLayout.includes(user?.role!)) {
     settings.unshift({ label: 'Admin Dashboard', path: '/admin' });
   }
 
@@ -48,6 +49,7 @@ const HeaderTopRight = () => {
       // TODO: Await call API success then clearTokens and redirect to /signin
       // await authControllerLogout();
       clearTokens();
+      clearCartStorage();
       router.push('/signin');
     } else {
       router.push(path);

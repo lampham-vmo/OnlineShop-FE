@@ -1,5 +1,6 @@
 'use client';
 import { Product } from '@/generated/api/models';
+import { useAuthStore } from '@/stores/authStore';
 import useCartStore from '@/stores/useCartStore';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,6 +14,7 @@ interface IProductItemProps {
 
 const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
   const { addItemToCart } = useCartStore();
+  const { user } = useAuthStore();
   const router = useRouter();
   const listImage: string[] = JSON.parse(item.image);
 
@@ -21,6 +23,11 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
   };
 
   const handleAddToCart = (item: Product) => {
+    if (!user) {
+      router.push('/signin');
+      return;
+    }
+
     if (item.stock === 0) {
       toast.error(`${item.name} is out of stock`, { duration: 400 });
       return;
