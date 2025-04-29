@@ -98,16 +98,16 @@ const useCartStore = create<CartStore>()(
                 const existingItem = cartItems.some((item) => item.id === product.id)
                 if (existingItem) return
 
-                await cartControllerAddToCart({
-                    productId: product.id,
-                    quantity: 1
-                });
+        await cartControllerAddToCart({
+          productId: product.id,
+          quantity: 1,
+        });
 
-                const newCartItem: CartProduct = {
-                    id: product.id,
-                    product: product,
-                    quantity: 1
-                }
+        const newCartItem: CartProduct = {
+          id: product.id,
+          product: product,
+          quantity: 1,
+        };
 
                 set({cartItems: [...cartItems, newCartItem]});
                 get().updateCartState()

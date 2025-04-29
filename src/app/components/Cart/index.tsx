@@ -1,12 +1,12 @@
-'use client'
-import React from 'react'
+'use client';
+import React from 'react';
 import useCartStore from '@/stores/useCartStore';
 import Link from 'next/link';
 import SingleItem from './SingleItem';
 
 export default function Cart() {
   const { cartItems, totalPrice, clearCartItems } = useCartStore();
-    
+
   return (
     <>
       {cartItems.length > 0 ? (
@@ -20,8 +20,12 @@ export default function Cart() {
               >
                 Checkout
               </Link>
-              <div className='font-medium text-lg text-dark'>Total: ${totalPrice.toLocaleString()}</div>
-              <button onClick={clearCartItems} className="text-blue">Clear Shopping Cart</button>
+              <div className="font-medium text-lg text-dark">
+                Total: ${totalPrice.toLocaleString()}
+              </div>
+              <button onClick={clearCartItems} className="text-blue">
+                Clear Shopping Cart
+              </button>
             </div>
 
             <div className="bg-white rounded-[10px] shadow-1">
@@ -53,16 +57,12 @@ export default function Cart() {
                   {/* <!-- cart item --> */}
                   {cartItems.length > 0 &&
                     cartItems.map((item, key) => (
-                      <SingleItem 
-                      item={item} 
-                      key={key} 
-                      />
+                      <SingleItem item={item} key={key} />
                     ))}
                 </div>
               </div>
             </div>
           </div>
-          
         </section>
       ) : (
         <>
@@ -110,5 +110,5 @@ export default function Cart() {
         </>
       )}
     </>
-  )
+  );
 }
