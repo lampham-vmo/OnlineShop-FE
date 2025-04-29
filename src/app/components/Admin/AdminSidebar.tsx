@@ -70,7 +70,7 @@ const menuItems = [
     icon: <ShoppingCartIcon />,
     path: '/admin/order',
     apiPath: '/api/v1/orders',
-  }
+  },
 ];
 
 export default function AdminSidebar() {

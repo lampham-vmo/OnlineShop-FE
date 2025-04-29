@@ -6,28 +6,17 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
-import { getCart } from '@/generated/api/endpoints/cart/cart';
 
 const HeaderTopRight = () => {
-  const { toggleCart, isCartOpen, cartItems, calculateSubtotal, setCartItems } = useCartStore();
-  
-  const [error, setError] = useState<boolean>(false);
-  const { cartControllerGetCart } = getCart();
-  const fetchCart = async () => {
-        try {
-          const data = (await cartControllerGetCart()).data
-          setCartItems(data.items)
-          console.log("Logging cartItems: ",cartItems)     
-        } catch (error) {
-          setError(true);
-        }
-      };
-  
-      useEffect(() => {
-          fetchCart()
-      }, [])
-
-  const subtotal = calculateSubtotal();
+  const {
+    toggleCart,
+    isCartOpen,
+    cartItems,
+    totalPrice,
+    getCartFromServer,
+    totalItemCount,
+  } = useCartStore();
+  console.log('Total item count', totalItemCount);
 
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
@@ -48,7 +37,7 @@ const HeaderTopRight = () => {
     { label: 'Logout', path: '/logout' },
   ];
 
-  if (AllowedRoleForAdminLayout.includes(user?.role!)) {
+  if (AllowedRoleForAdminLayout.includes(user?.role)) {
     settings.unshift({ label: 'Admin Dashboard', path: '/admin' });
   }
 
@@ -64,6 +53,9 @@ const HeaderTopRight = () => {
     }
   };
 
+  useEffect(() => {
+    getCartFromServer();
+  }, []);
   return (
     <div className="flex justify-between items-center gap-5">
       {/* Cart Button */}
@@ -101,21 +93,23 @@ const HeaderTopRight = () => {
           </svg>
 
           <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
-            {cartItems.length <= 100 ? cartItems.length : <span>99+</span>}
+            {cartItems.length <= 100 ? totalItemCount : <span>99+</span>}
           </span>
         </span>
 
         <div>
           <span className="block text-2xs text-dark-4 uppercase">cart</span>
-          <p className="font-medium text-custom-sm text-dark">${subtotal.toLocaleString()}</p>
+          <p className="font-medium text-custom-sm text-dark">
+            ${totalPrice.toLocaleString()}
+          </p>
         </div>
       </button>
 
-      {/* Toggle Cart Modal */}
-      {isCartOpen && <CartSidebarModal />}
-      {/* /Toggle Cart Modal */}
       {user ? (
         <>
+          {/* Toggle Cart Modal */}
+          {isCartOpen && <CartSidebarModal />}
+          {/* /Toggle Cart Modal */}
           <div
             className="w-10 h-10 rounded-full text-white transition-all duration-300 bg-blue-600 hover:bg-blue flex items-center justify-center cursor-pointer"
             onClick={handleOpenUserMenu}

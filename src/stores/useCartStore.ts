@@ -1,104 +1,147 @@
-import { CartProduct, Product} from "@/generated/api/models";
-import {create} from "zustand"
-import { persist } from "zustand/middleware"
+import {
+  CartProduct,
+  Product,
+  UserSuccessMessageFinalResponseDTO,
+} from '@/generated/api/models';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { getCart } from '@/generated/api/endpoints/cart/cart';
 
-// TODO: define interface for CartItem
+const {
+  cartControllerGetCart,
+  cartControllerAddToCart,
+  cartControllerDeleteCart,
+  cartControllerClearCart,
+  cartControllerIncreaseQuantity,
+  cartControllerDecreaseQuantity,
+} = getCart();
+
 // TODO: define interface for CartStore
 interface CartStore {
-    isCartOpen: boolean,
-    cartItems: CartProduct[],
+  totalItemCount: number;
+  isCartOpen: boolean;
+  cartItems: CartProduct[];
+  subtotalPrice: number;
+  totalPrice: number;
 
-    increaseCartItemQuantity: (id: number) => void,
-    decreaseCartItemQuantity: (id: number) => void,
+  getCartFromServer: () => Promise<void>;
+  increaseCartItemQuantity: (id: number) => Promise<void>;
+  decreaseCartItemQuantity: (id: number) => Promise<void>;
 
-    calculateSubtotal: () => number,
-    calculateTotal: () => number,
+  updateCartState: () => void;
 
-    openCart: () => void,
-    closeCart: () => void,
-    toggleCart: () => void,
-    setCartItems: (item: CartProduct[]) => void, 
-    clearCartItems: () => void,
-    addItemToCart: (item: Product) => void,
-    removeItemFromCart: (id: number) => void,
-
+  openCart: () => void;
+  closeCart: () => void;
+  toggleCart: () => void;
+  clearCartItems: () => Promise<UserSuccessMessageFinalResponseDTO | void>;
+  addItemToCart: (item: Product) => Promise<void>;
+  removeItemFromCart: (productId: number) => Promise<void>;
 }
 
 const useCartStore = create<CartStore>()(
-    persist(
-        (set, get) => ({
-            isCartOpen: false,
-            cartItems: [],
-        
-            // TODO: increase count (this is not really useful since we already had addItemToCart() )
-            increaseCartItemQuantity: (id: number) => 
-                set((state) => ({
-                    cartItems: state.cartItems.map((item) => item.id === id ? {...item, quantity: item.quantity+1} : item),
-                })),
-        
-            decreaseCartItemQuantity: (id: number) =>
-                set((state) => ({
-                    cartItems: state.cartItems.map((item) => item.id === id ? {...item, quantity: item.quantity-1} : item),
-                })),
-        
-            // TODO: calculate price
-            calculateSubtotal: () => {
-                const itemsInCart = get().cartItems;
-                console.log(itemsInCart)
-                const result =itemsInCart.reduce((total, item) => { 
-                    console.log('item in cart: ', item)
-                    return total + (item.product.price - (item.product.price * item.product.discount/100))},0);
-                return result;
-            },   
+  persist(
+    (set, get) => ({
+      totalItemCount: 0,
+      isCartOpen: false,
+      cartItems: [],
+      subtotalPrice: 0,
+      totalPrice: 0,
 
-            calculateTotal: () => {
-                const itemsInCart = get().cartItems;
-                const result =itemsInCart.reduce((total, item) => { 
-                    return total + (item.quantity * (item.product.price - (item.product.price * item.product.discount/100)))},0);
-                return result;
-            },
-        
-            // TODO: cart open/close
-            openCart: () => set({isCartOpen: true}),
-            closeCart: () => set({isCartOpen: false}),
-            toggleCart: () => set((state) => ({ isCartOpen: !state.isCartOpen})),
-        
-            // TODO: Add all items to cart
-            setCartItems: (item) => 
-                set(() => ({
-                    cartItems: item
-                })),
+      // TODO: Add all items to cart
+      getCartFromServer: async () => {
+        const response = await cartControllerGetCart();
+        const cartItems = response.data.items;
+        set({ cartItems });
+        console.log('cartItems: ', cartItems);
+      },
 
-            clearCartItems: () => 
-                set(()=> ({
-                    cartItems: []
-                })),
-            // TODO: Add 1 item to cart
-            addItemToCart: (product: Product) => 
-               {
-                set((state) => {
-                    const existingItem = state.cartItems.some(item => item.product.id === product.id);
-                    if(existingItem){return state}
+      updateCartState: () => {
+        const itemsInCart = get().cartItems;
 
-                    const newCartItem: CartProduct = {
-                        id: product.id, // se duoc set sau
-                        product: product,
-                        quantity: 1,
-                      };
-                      return { cartItems: [...state.cartItems, newCartItem] };
-                  })
-            },
-            
-            removeItemFromCart: (productId: number) => 
-                set((state) => ({
-                cartItems:state.cartItems.filter((item) => item.id !== productId),
-                })),
-        }),
-        {
-            name: "cart-storage",
-        }
-    )
-    
-)
+        const subtotalPrice = itemsInCart.reduce((total, item) => {
+          const discountedPrice =
+            item.product.price -
+            (item.product.price * item.product.discount) / 100;
+          return total + discountedPrice;
+        }, 0);
+
+        const totalPrice = itemsInCart.reduce((total, item) => {
+          const discountedPrice =
+            item.product.price -
+            (item.product.price * item.product.discount) / 100;
+          return total + item.quantity * discountedPrice;
+        }, 0);
+
+        const totalItemCount = itemsInCart.reduce(
+          (total, item) => total + item.quantity,
+          0,
+        );
+        set({ subtotalPrice, totalPrice, totalItemCount });
+      },
+
+      // TODO: increase count
+      increaseCartItemQuantity: async (id: number) => {
+        await cartControllerIncreaseQuantity({ id: id });
+        set((state) => ({
+          cartItems: state.cartItems.map((item) =>
+            item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
+          ),
+        }));
+        get().updateCartState();
+      },
+
+      decreaseCartItemQuantity: async (id: number) => {
+        await cartControllerDecreaseQuantity({ id: id });
+        set((state) => ({
+          cartItems: state.cartItems.map((item) =>
+            item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
+          ),
+        }));
+        get().updateCartState();
+      },
+
+      // TODO: cart open/close
+      openCart: () => set({ isCartOpen: true }),
+      closeCart: () => set({ isCartOpen: false }),
+      toggleCart: () => set((state) => ({ isCartOpen: !state.isCartOpen })),
+
+      clearCartItems: async () => {
+        await cartControllerClearCart(), set({ cartItems: [] });
+      },
+
+      // TODO: Add 1 item to cart with BE
+      addItemToCart: async (product: Product) => {
+        const { cartItems } = get();
+        const existingItem = cartItems.some((item) => item.id === product.id);
+        if (existingItem) return;
+
+        await cartControllerAddToCart({
+          productId: product.id,
+          quantity: 1,
+        });
+
+        const newCartItem: CartProduct = {
+          id: product.id,
+          product: product,
+          quantity: 1,
+        };
+
+        set({ cartItems: [...cartItems, newCartItem] });
+        get().updateCartState();
+      },
+
+      // TODO: Remove an item from the cart
+      removeItemFromCart: async (productId: number) => {
+        const itemsInCart = get().cartItems;
+        await cartControllerDeleteCart({ id: productId });
+        set({ cartItems: itemsInCart.filter((item) => item.id !== productId) });
+        get().updateCartState();
+      },
+    }),
+    {
+      name: 'cart-storage',
+    },
+  ),
+);
 
 export default useCartStore;

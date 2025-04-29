@@ -12,8 +12,7 @@ interface IProductItemProps {
 }
 
 const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
-  const {addItemToCart, cartItems} = useCartStore()
-  const {cartControllerAddToCart} = getCart()
+  const { addItemToCart, cartItems } = useCartStore();
 
   const router = useRouter();
   const listImage: string[] = JSON.parse(item.image);
@@ -22,25 +21,24 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
     router.push(`/product-details/${id}`);
   };
 
-  const isAdded = cartItems.some(cartItem => cartItem.product.id === item.id)
-  const handleAddToCart = async(item: Product) => {
+  const isAdded = cartItems.some((cartItem) => cartItem.product.id === item.id);
+  const handleAddToCart = async (item: Product) => {
     // TODO: prevent adding after product is already added
     if (isAdded) {
-      toast.error(`${item.name} is already added`, {duration: 3000});
-      return
+      toast.error(`${item.name} is already added`, { duration: 3000 });
+      return;
     } else {
-      const data =await cartControllerAddToCart({quantity: 1, productId: item.id})
-      console.log(data)
-      addItemToCart(item)
+      // cartControllerAddToCart({quantity: 1, productId: item.id})
+      addItemToCart(item);
     }
 
     if (item.stock === 0) {
       toast.error(`${item.name} out of stock`, { duration: 3000 });
-      return
+      return;
     }
   };
 
-  const itemDiscountedPrice = item.price - item.price*item.discount/100
+  const itemDiscountedPrice = item.price - (item.price * item.discount) / 100;
 
   return (
     <div className="group">

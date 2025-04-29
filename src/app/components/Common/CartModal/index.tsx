@@ -1,22 +1,29 @@
 // TODO: if user not logged in, prevent add to cart
-"use client";
-import React, { useEffect, useState } from "react";
-import SingleItem from "./SingleItem";
-import Link from "next/link";
-import EmptyCart from "./EmptyCart";
-import useCartStore from "@/stores/useCartStore";
-import { getCart } from "@/generated/api/endpoints/cart/cart";
+'use client';
+import React, { useEffect, useState } from 'react';
+import SingleItem from './SingleItem';
+import Link from 'next/link';
+import EmptyCart from './EmptyCart';
+import useCartStore from '@/stores/useCartStore';
 
 const CartSidebarModal = () => {
-  const { calculateSubtotal, closeCart, isCartOpen, cartItems, removeItemFromCart} = useCartStore();
-  const subTotal = calculateSubtotal()
-  
-    const { cartControllerDeleteCart, } = getCart();
+  const {
+    subtotalPrice,
+    closeCart,
+    isCartOpen,
+    cartItems,
+    removeItemFromCart,
+    getCartFromServer,
+  } = useCartStore();
+
+  useEffect(() => {
+    getCartFromServer();
+  }, []);
 
   useEffect(() => {
     // closing modal while clicking outside
     function handleClickOutside(event: any) {
-      if (!event.target.closest(".modal-content")) {
+      if (!event.target.closest('.modal-content')) {
         closeCart();
       }
     }
@@ -29,7 +36,6 @@ const CartSidebarModal = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isCartOpen, closeCart]);
-
 
   return (
     <div
@@ -78,8 +84,7 @@ const CartSidebarModal = () => {
                     key={key}
                     item={item}
                     removeItemFromCart={() => {
-                      removeItemFromCart(item.id)
-                      cartControllerDeleteCart({id: item.id})
+                      removeItemFromCart(item.id);
                     }}
                   />
                 ))
@@ -92,8 +97,8 @@ const CartSidebarModal = () => {
           <div className="border-t border-gray-3 bg-white pt-5 pb-4 sm:pb-7.5 lg:pb-11 mt-7.5 sticky bottom-0">
             <div className="flex items-center justify-between gap-5 mb-6">
               <p className="font-medium text-xl text-dark">Subtotal:</p>
-            {/* TODO: Total price */}
-              <p className="font-medium text-xl text-dark">${subTotal.toLocaleString()}</p>
+              {/* TODO: Total price */}
+              <p className="font-medium text-xl text-dark">${subtotalPrice}</p>
             </div>
 
             <div className="flex items-center gap-4">

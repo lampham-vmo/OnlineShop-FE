@@ -1,19 +1,12 @@
-'use client'
-import React from 'react'
+'use client';
+import React from 'react';
 import useCartStore from '@/stores/useCartStore';
 import Link from 'next/link';
 import SingleItem from './SingleItem';
-import { getCart } from '@/generated/api/endpoints/cart/cart';
 
 export default function Cart() {
-  const { cartItems, calculateTotal, clearCartItems } = useCartStore();
-  const { cartControllerClearCart } = getCart()
-  // Sử dụng các attribute trong mảng để tính toán giá total bằng method calculatePrice trong zustand store
-  const handleClearCart = () => {
-    cartControllerClearCart()
-    clearCartItems()
-  }
-  
+  const { cartItems, totalPrice, clearCartItems } = useCartStore();
+
   return (
     <>
       {cartItems.length > 0 ? (
@@ -21,8 +14,18 @@ export default function Cart() {
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
             <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
               <h2 className="font-medium text-dark text-2xl">Your Cart</h2>
-              <div className='font-medium text-lg text-dark'>Total: ${calculateTotal().toLocaleString()}</div>
-              <button onClick={() => handleClearCart()} className="text-blue">Clear Shopping Cart</button>
+              <Link
+                href="/checkout"
+                className="w-50 flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
+              >
+                Checkout
+              </Link>
+              <div className="font-medium text-lg text-dark">
+                Total: ${totalPrice.toLocaleString()}
+              </div>
+              <button onClick={clearCartItems} className="text-blue">
+                Clear Shopping Cart
+              </button>
             </div>
 
             <div className="bg-white rounded-[10px] shadow-1">
@@ -54,16 +57,10 @@ export default function Cart() {
                   {/* <!-- cart item --> */}
                   {cartItems.length > 0 &&
                     cartItems.map((item, key) => (
-                      <SingleItem 
-                      item={item} 
-                      key={key} 
-                      />
+                      <SingleItem item={item} key={key} />
                     ))}
                 </div>
               </div>
-            </div>
-
-            <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-11 mt-9">
             </div>
           </div>
         </section>
@@ -113,5 +110,5 @@ export default function Cart() {
         </>
       )}
     </>
-  )
+  );
 }
