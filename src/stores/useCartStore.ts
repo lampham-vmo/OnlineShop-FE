@@ -39,6 +39,7 @@ const useCartStore = create<CartStore>()(
 
             // TODO: Add all items to cart
             getCartFromServer: async () => {
+                localStorage.removeItem('cart-storage')
                 const response = await cartControllerGetCart();
                 const cartItems = response.data.items;
                 set({ cartItems });
@@ -64,11 +65,13 @@ const useCartStore = create<CartStore>()(
         
             // TODO: increase count
             increaseCartItemQuantity: async(id: number) => {
-                await cartControllerIncreaseQuantity({id: id});
+                const response = await cartControllerIncreaseQuantity({id: id});
+                
                 set((state) => ({
                     cartItems: state.cartItems.map((item) => item.id === id ? {...item, quantity: item.quantity+1} : item),
                 }))
-                get().updateCartState()},
+                get().updateCartState()
+                },
          
         
             decreaseCartItemQuantity: async(id: number) =>{
@@ -89,7 +92,7 @@ const useCartStore = create<CartStore>()(
                 set({cartItems: []})
             },
 
-            // TODO: Add 1 item to cart with BE
+            // TODO: Add 1 item to cart with BE, check isAdded here
             addItemToCart: async(product: Product) => {
                 const { cartItems } = get()
                 const existingItem = cartItems.some((item) => item.id === product.id)
