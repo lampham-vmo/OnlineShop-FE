@@ -12,7 +12,7 @@ interface IProductItemProps {
 }
 
 const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
-  const { addItemToCart } = useCartStore();
+  const { addItemToCart, cartItems } = useCartStore();
 
   const router = useRouter();
   const listImage: string[] = JSON.parse(item.image);
