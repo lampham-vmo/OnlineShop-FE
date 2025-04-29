@@ -109,13 +109,14 @@ const useCartStore = create<CartStore>()(
 
       clearCartItems: async () => {
         await cartControllerClearCart(), set({ cartItems: [] });
+        get().updateCartState()
       },
 
       // TODO: Add 1 item to cart with BE
       addItemToCart: async (product: Product) => {
         const { cartItems } = get();
-        const existingItem = cartItems.some((item) => item.id === product.id);
-        if (existingItem) return;
+        // const existingItem = cartItems.some((item) => item.id === product.id);
+        // if (existingItem) return;
 
         await cartControllerAddToCart({
           productId: product.id,
