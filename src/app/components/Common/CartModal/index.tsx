@@ -15,6 +15,7 @@ const CartSidebarModal = () => {
     cartItems,
     removeItemFromCart,
     getCartFromServer,
+    totalItemCount
   } = useCartStore();
 
   useEffect(() => {
