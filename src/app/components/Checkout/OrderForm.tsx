@@ -12,6 +12,7 @@ import { getPaymentMethod } from '@/generated/api/endpoints/payment-method/payme
 import { PaymentMethodResponseDto } from '@/generated/api/models';
 import toast from 'react-hot-toast';
 import { getCart } from '@/generated/api/endpoints/cart/cart';
+import useCartStore from '@/stores/useCartStore';
 
 const orderSchema = z.object({
   fullName: z.string().min(1, 'Recipient name is required'),
@@ -100,6 +101,7 @@ const ButtonCheckout = () => {
   };
 
   const { ordersControllerCreate, ordersControllerCaptureOrder } = getOrders();
+  const { getCartFromServer } = useCartStore()
 
   const onSubmit = async (data: OrderFormData) => {
     try {
@@ -110,6 +112,8 @@ const ButtonCheckout = () => {
         delivery_address: data.address,
       });
       if (response.success) {
+        localStorage.removeItem("cart-storage")
+        getCartFromServer()
         router.push('/success');
       }
     } catch (error: any) {
@@ -164,6 +168,8 @@ const ButtonCheckout = () => {
       );
 
       if (response.success) {
+        localStorage.removeItem("cart-storage")
+        getCartFromServer()
         router.push('/success');
       }
     } catch (error: any) {

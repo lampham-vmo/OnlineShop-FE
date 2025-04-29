@@ -38,12 +38,6 @@ const useCartStore = create<CartStore>()(
             totalPrice: 0,
 
             // TODO: Add all items to cart
-            getCartFromServer: async () => {
-                const response = await cartControllerGetCart();
-                const cartItems = response.data.items;
-                set({ cartItems });
-                console.log('cartItems: ', cartItems)
-            },
 
             updateCartState: () => {
                 const itemsInCart = get().cartItems;
@@ -62,6 +56,14 @@ const useCartStore = create<CartStore>()(
                 set({ subtotalPrice, totalPrice, totalItemCount });
             },
         
+            getCartFromServer: async () => {
+              localStorage.removeItem("cart-storage")
+              const response = await cartControllerGetCart();
+              const cartItems = response.data.items;
+              set({ cartItems });
+              get().updateCartState()
+              console.log('cartItems: ', cartItems)
+          },
             // TODO: increase count
             increaseCartItemQuantity: async(id: number) => {
                 await cartControllerIncreaseQuantity({id: id});
