@@ -101,7 +101,7 @@ const ButtonCheckout = () => {
   };
 
   const { ordersControllerCreate, ordersControllerCaptureOrder } = getOrders();
-  const { getCartFromServer } = useCartStore()
+  const { getCartFromServer } = useCartStore();
 
   const onSubmit = async (data: OrderFormData) => {
     try {
@@ -112,8 +112,8 @@ const ButtonCheckout = () => {
         delivery_address: data.address,
       });
       if (response.success) {
-        localStorage.removeItem("cart-storage")
-        getCartFromServer()
+        localStorage.removeItem('cart-storage');
+        getCartFromServer();
         router.push('/success');
       }
     } catch (error: any) {
@@ -168,8 +168,8 @@ const ButtonCheckout = () => {
       );
 
       if (response.success) {
-        localStorage.removeItem("cart-storage")
-        getCartFromServer()
+        localStorage.removeItem('cart-storage');
+        getCartFromServer();
         router.push('/success');
       }
     } catch (error: any) {
