@@ -8,9 +8,16 @@ import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
 
 const HeaderTopRight = () => {
-  const { toggleCart, isCartOpen, cartItems, totalPrice, getCartFromServer, totalItemCount} = useCartStore();
-  console.log('Total item count', totalItemCount)
-  
+  const {
+    toggleCart,
+    isCartOpen,
+    cartItems,
+    totalPrice,
+    getCartFromServer,
+    totalItemCount,
+  } = useCartStore();
+  console.log('Total item count', totalItemCount);
+
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
 
@@ -47,15 +54,12 @@ const HeaderTopRight = () => {
   };
 
   useEffect(() => {
-      getCartFromServer()
-  }, [])
+    getCartFromServer();
+  }, []);
   return (
     <div className="flex justify-between items-center gap-5">
       {/* Cart Button */}
-      <button
-        onClick={toggleCart}
-        className="flex items-center gap-2.5"
-      >
+      <button onClick={toggleCart} className="flex items-center gap-2.5">
         <span className="inline-block relative">
           <svg
             width="24"
@@ -95,16 +99,17 @@ const HeaderTopRight = () => {
 
         <div>
           <span className="block text-2xs text-dark-4 uppercase">cart</span>
-          <p className="font-medium text-custom-sm text-dark">${totalPrice.toLocaleString()}</p>
+          <p className="font-medium text-custom-sm text-dark">
+            ${totalPrice.toLocaleString()}
+          </p>
         </div>
       </button>
 
-
       {user ? (
         <>
-      {/* Toggle Cart Modal */}
-      {isCartOpen && <CartSidebarModal />}
-      {/* /Toggle Cart Modal */}
+          {/* Toggle Cart Modal */}
+          {isCartOpen && <CartSidebarModal />}
+          {/* /Toggle Cart Modal */}
           <div
             className="w-10 h-10 rounded-full text-white transition-all duration-300 bg-blue-600 hover:bg-blue flex items-center justify-center cursor-pointer"
             onClick={handleOpenUserMenu}

@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [hasHydrated, setHasHydrated] = useState(false);
-  const {cartItems, getCartFromServer} = useCartStore();
+  const { cartItems, getCartFromServer } = useCartStore();
 
   useEffect(() => {
     if (useAuthStore.persist.hasHydrated()) {
@@ -40,7 +40,6 @@ export default function RootLayout({
       return unsub;
     }
   }, []);
-
 
   return (
     <html lang="en" suppressHydrationWarning>
