@@ -47,8 +47,8 @@ const HeaderTopRight = () => {
   };
 
   useEffect(() => {
-      getCartFromServer()
-  }, [])
+    getCartFromServer();
+  }, []);
   return (
     <div className="flex justify-between items-center gap-5">
       {/* Cart Button */}
@@ -99,12 +99,11 @@ const HeaderTopRight = () => {
         </div>
       </button>
 
-
       {user ? (
         <>
-      {/* Toggle Cart Modal */}
-      {isCartOpen && <CartSidebarModal />}
-      {/* /Toggle Cart Modal */}
+          {/* Toggle Cart Modal */}
+          {isCartOpen && <CartSidebarModal />}
+          {/* /Toggle Cart Modal */}
           <div
             className="w-10 h-10 rounded-full text-white transition-all duration-300 bg-blue-600 hover:bg-blue flex items-center justify-center cursor-pointer"
             onClick={handleOpenUserMenu}
@@ -112,7 +111,7 @@ const HeaderTopRight = () => {
             {user.email[0].toUpperCase()}
           </div>
           <Menu
-            sx={{ mt: '45px', zIndex: 10000 }}
+            sx={{ mt: '45px', zIndex: 1000 }}
             id="menu-appbar"
             anchorEl={anchorElUser}
             anchorOrigin={{

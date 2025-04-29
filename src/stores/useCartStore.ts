@@ -38,13 +38,6 @@ const useCartStore = create<CartStore>()(
             totalPrice: 0,
 
             // TODO: Add all items to cart
-            getCartFromServer: async () => {
-                localStorage.removeItem('cart-storage')
-                const response = await cartControllerGetCart();
-                const cartItems = response.data.items;
-                set({ cartItems });
-                console.log('cartItems: ', cartItems)
-            },
 
             updateCartState: () => {
                 const itemsInCart = get().cartItems;
@@ -63,15 +56,21 @@ const useCartStore = create<CartStore>()(
                 set({ subtotalPrice, totalPrice, totalItemCount });
             },
         
+            getCartFromServer: async () => {
+              localStorage.removeItem("cart-storage")
+              const response = await cartControllerGetCart();
+              const cartItems = response.data.items;
+              set({ cartItems });
+              get().updateCartState()
+              console.log('cartItems: ', cartItems)
+          },
             // TODO: increase count
             increaseCartItemQuantity: async(id: number) => {
-                const response = await cartControllerIncreaseQuantity({id: id});
-                
+                await cartControllerIncreaseQuantity({id: id});
                 set((state) => ({
                     cartItems: state.cartItems.map((item) => item.id === id ? {...item, quantity: item.quantity+1} : item),
                 }))
-                get().updateCartState()
-                },
+                get().updateCartState()},
          
         
             decreaseCartItemQuantity: async(id: number) =>{
@@ -92,22 +91,22 @@ const useCartStore = create<CartStore>()(
                 set({cartItems: []})
             },
 
-            // TODO: Add 1 item to cart with BE, check isAdded here
+            // TODO: Add 1 item to cart with BE
             addItemToCart: async(product: Product) => {
                 const { cartItems } = get()
                 const existingItem = cartItems.some((item) => item.id === product.id)
                 if (existingItem) return
 
-        await cartControllerAddToCart({
-          productId: product.id,
-          quantity: 1,
-        });
+                await cartControllerAddToCart({
+                    productId: product.id,
+                    quantity: 1
+                });
 
-        const newCartItem: CartProduct = {
-          id: product.id,
-          product: product,
-          quantity: 1,
-        };
+                const newCartItem: CartProduct = {
+                    id: product.id,
+                    product: product,
+                    quantity: 1
+                }
 
                 set({cartItems: [...cartItems, newCartItem]});
                 get().updateCartState()
