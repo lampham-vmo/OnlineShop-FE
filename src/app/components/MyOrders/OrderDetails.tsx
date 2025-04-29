@@ -7,11 +7,13 @@ import {
   Stack,
   Typography,
   Divider,
+  Chip,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState } from 'react';
 import { OrderResponseDTO } from '@/generated/api/models';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { getStatusColor } from '.';
 
 const style = {
   position: 'absolute' as const,
@@ -80,8 +82,14 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
               <strong className="text-blue">Address:</strong>{' '}
               {order.delivery_address}
             </Typography>
-            <Typography>
-              <strong className="text-blue">Status:</strong> {order.status}
+            <Typography component="div">
+              <strong className="text-blue">Status:</strong>
+              <Chip
+                label={order.status}
+                color={getStatusColor(order.status)}
+                size="small"
+                className="ml-2"
+              />
             </Typography>
             <Typography>
               <strong className="text-blue">SubTotal:</strong> $

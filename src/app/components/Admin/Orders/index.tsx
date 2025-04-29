@@ -18,6 +18,7 @@ import {
   Select,
   Stack,
 } from '@mui/material';
+import OrderDetails from '../../MyOrders/OrderDetails';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -128,6 +129,7 @@ export default function CustomizedTables() {
               <StyledTableCell>Created At</StyledTableCell>
               <StyledTableCell>Status</StyledTableCell>
               <StyledTableCell>Action</StyledTableCell>
+              <StyledTableCell>View Details</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -248,6 +250,9 @@ export default function CustomizedTables() {
                       </>
                     )}
                   </div>
+                </StyledTableCell>
+                <StyledTableCell>
+                  <OrderDetails order={row} />
                 </StyledTableCell>
               </StyledTableRow>
             ))}
