@@ -23,13 +23,14 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
   };
 
   const isAdded = cartItems.some(cartItem => cartItem.product.id === item.id)
-  const handleAddToCart = (item: Product) => {
+  const handleAddToCart = async(item: Product) => {
     // TODO: prevent adding after product is already added
     if (isAdded) {
       toast.error(`${item.name} is already added`, {duration: 3000});
       return
     } else {
-      cartControllerAddToCart({quantity: 1, productId: item.id})
+      const data =await cartControllerAddToCart({quantity: 1, productId: item.id})
+      console.log(data)
       addItemToCart(item)
     }
 
