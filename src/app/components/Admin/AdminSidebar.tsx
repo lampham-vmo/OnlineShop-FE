@@ -65,6 +65,12 @@ const menuItems = [
     path: '/admin/payment-method',
     apiPath: '/api/v1/payment-method',
   },
+  {
+    label: 'Orders',
+    icon: <ShoppingCartIcon />,
+    path: '/admin/order',
+    apiPath: '/api/v1/orders',
+  },
 ];
 
 export default function AdminSidebar() {

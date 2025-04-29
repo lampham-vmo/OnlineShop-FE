@@ -1,36 +1,43 @@
 import { getCart } from '@/generated/api/endpoints/cart/cart';
 import { CartProduct } from '@/generated/api/models';
 import useCartStore from '@/stores/useCartStore';
-import React, { memo, useState } from 'react'
+import React, { memo, useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface SingleItemProps {
   item: CartProduct;
 }
 
-function SingleItem({ item}:SingleItemProps) {
-  const {increaseCartItemQuantity, decreaseCartItemQuantity, removeItemFromCart} = useCartStore()
+function SingleItem({ item }: SingleItemProps) {
+  const {
+    increaseCartItemQuantity,
+    decreaseCartItemQuantity,
+    removeItemFromCart,
+  } = useCartStore();
 
-
-  const itemInCart = item.product
+  const itemInCart = item.product;
   const itemFirstImage = JSON.parse(itemInCart.image)[0];
-  
+
   // TODO: handle remove
   const handleRemoveFromCart = () => {
-    removeItemFromCart(item.id)
+    removeItemFromCart(item.id);
   };
 
   const priceAfterDiscount = () => {
-    const result = itemInCart.price - (itemInCart.price * itemInCart.discount/100)
-    return result
-  }
+    const result =
+      itemInCart.price - (itemInCart.price * itemInCart.discount) / 100;
+    return result;
+  };
   // TODO: increase decrease quantity
   const handleIncreaseQuantity = () => {
     if (item.quantity >= item.product.stock) {
-      toast.error(`Item ${item.product.name} has reached maximum amount of stock!`, { duration: 3000 });
+      toast.error(
+        `Item ${item.product.name} has reached maximum amount of stock!`,
+        { duration: 3000 },
+      );
       return;
     }
-    increaseCartItemQuantity(item.id)
+    increaseCartItemQuantity(item.id);
   };
   // doesn't work, might be BE
   const handleDecreaseQuantity = () => {
@@ -39,7 +46,7 @@ function SingleItem({ item}:SingleItemProps) {
       return;
     }
     decreaseCartItemQuantity(item.id);
-  }
+  };
 
   return (
     <div className="flex items-center border-t border-gray-3 py-5 px-7.5">
@@ -47,7 +54,12 @@ function SingleItem({ item}:SingleItemProps) {
         <div className="flex items-center justify-between gap-5">
           <div className="w-full flex items-center gap-5.5">
             <div className="flex items-center justify-center rounded-[5px] bg-gray-2 max-w-[80px] w-full h-17.5">
-              <img width={200} height={200} src={itemFirstImage} alt="product" />
+              <img
+                width={200}
+                height={200}
+                src={itemFirstImage}
+                alt="product"
+              />
             </div>
 
             <div>
@@ -118,7 +130,9 @@ function SingleItem({ item}:SingleItemProps) {
       </div>
 
       <div className="min-w-[200px]">
-        <p className="text-dark">${(priceAfterDiscount() * item.quantity).toLocaleString()}</p>
+        <p className="text-dark">
+          ${(priceAfterDiscount() * item.quantity).toLocaleString()}
+        </p>
       </div>
 
       <div className="min-w-[50px] flex justify-end">
@@ -157,6 +171,6 @@ function SingleItem({ item}:SingleItemProps) {
         </button>
       </div>
     </div>
-  )
+  );
 }
-export default SingleItem
+export default SingleItem;

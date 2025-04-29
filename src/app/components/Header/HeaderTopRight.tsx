@@ -8,7 +8,7 @@ import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
 
 const HeaderTopRight = () => {
-  const { toggleCart, isCartOpen, cartItems, totalPrice, getCartFromServer, totalItemCount} = useCartStore();
+  const { toggleCart, isCartOpen, cartItems, subtotalPrice, getCartFromServer, totalItemCount, updateCartState} = useCartStore();
   console.log('Total item count', totalItemCount)
   
   const router = useRouter();
@@ -30,7 +30,7 @@ const HeaderTopRight = () => {
     { label: 'Logout', path: '/logout' },
   ];
 
-  if (AllowedRoleForAdminLayout.includes(user?.role)) {
+  if (AllowedRoleForAdminLayout.includes(user?.role!)) {
     settings.unshift({ label: 'Admin Dashboard', path: '/admin' });
   }
 
@@ -47,15 +47,12 @@ const HeaderTopRight = () => {
   };
 
   useEffect(() => {
-      getCartFromServer()
-  }, [])
+    getCartFromServer();
+  }, []);
   return (
     <div className="flex justify-between items-center gap-5">
       {/* Cart Button */}
-      <button
-        onClick={toggleCart}
-        className="flex items-center gap-2.5"
-      >
+      <button onClick={toggleCart} className="flex items-center gap-2.5">
         <span className="inline-block relative">
           <svg
             width="24"
@@ -89,22 +86,21 @@ const HeaderTopRight = () => {
           </svg>
 
           <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
-            {cartItems.length <= 100 ? totalItemCount : <span>99+</span>}
+            {cartItems.length <= 100 ? cartItems.length : <span>99+</span>}
           </span>
         </span>
 
         <div>
           <span className="block text-2xs text-dark-4 uppercase">cart</span>
-          <p className="font-medium text-custom-sm text-dark">${totalPrice.toLocaleString()}</p>
+          <p className="font-medium text-custom-sm text-dark">${subtotalPrice.toLocaleString()}</p>
         </div>
       </button>
 
-
       {user ? (
         <>
-      {/* Toggle Cart Modal */}
-      {isCartOpen && <CartSidebarModal />}
-      {/* /Toggle Cart Modal */}
+          {/* Toggle Cart Modal */}
+          {isCartOpen && <CartSidebarModal />}
+          {/* /Toggle Cart Modal */}
           <div
             className="w-10 h-10 rounded-full text-white transition-all duration-300 bg-blue-600 hover:bg-blue flex items-center justify-center cursor-pointer"
             onClick={handleOpenUserMenu}
@@ -112,7 +108,7 @@ const HeaderTopRight = () => {
             {user.email[0].toUpperCase()}
           </div>
           <Menu
-            sx={{ mt: '45px', zIndex: 10000 }}
+            sx={{ mt: '45px', zIndex: 1000 }}
             id="menu-appbar"
             anchorEl={anchorElUser}
             anchorOrigin={{
