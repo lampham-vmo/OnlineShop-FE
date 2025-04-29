@@ -53,7 +53,7 @@ export default function Header() {
   }, [text]);
 
   return (
-    <header className="sticky left-0 top-0 w-full z-9999 bg-white shadow">
+    <header className="sticky left-0 top-0 w-full z-[999] bg-white shadow">
       <div className="max-w-[1170px] mx-auto px-4 xl:px-0">
         <div className="flex gap-5 items-end lg:items-center justify-between py-4">
           {/* <!-- header top left --> */}
@@ -69,6 +69,8 @@ export default function Header() {
                   onClose={() => setOpen(false)}
                   disablePortal
                   disableClearable
+                  value={selectedProduct!}
+                  inputValue={text}
                   getOptionLabel={(option) => option?.name || ''}
                   isOptionEqualToValue={(option, value) =>
                     option.id === value.id
@@ -76,6 +78,7 @@ export default function Header() {
                   onChange={(event, value) => {
                     if (value && value.id) {
                       router.push(`/product-details/${value.id}`);
+                      setText('')
                       setOpen(false);
                     }
                   }}

@@ -37,7 +37,7 @@ const HeaderTopRight = () => {
     { label: 'Logout', path: '/logout' },
   ];
 
-  if (AllowedRoleForAdminLayout.includes(user?.role)) {
+  if (AllowedRoleForAdminLayout.includes(user?.role!)) {
     settings.unshift({ label: 'Admin Dashboard', path: '/admin' });
   }
 
@@ -117,7 +117,7 @@ const HeaderTopRight = () => {
             {user.email[0].toUpperCase()}
           </div>
           <Menu
-            sx={{ mt: '45px', zIndex: 10000 }}
+            sx={{ mt: '45px', zIndex: 1000 }}
             id="menu-appbar"
             anchorEl={anchorElUser}
             anchorOrigin={{
