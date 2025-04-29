@@ -1,26 +1,60 @@
 'use client';
 
-import { Box, Typography, Container, Paper, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Container,
+  Paper,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Select,
+  MenuItem,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { getOrders } from '../../../generated/api/endpoints/orders/orders';
 import { OrderMonthTotal, SoldQuantityProduct } from '@/generated/api/models';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 
 export default function AdminDashboardMain() {
   const [totalOrders, setTotalOrders] = useState<number | null>(null);
   const [totalRevenue, setTotalRevenue] = useState<number | null>(null);
-  const [ordersByMonth, setOrdersByMonth] = useState<OrderMonthTotal[] | null>(null);
-  const [topProducts, setTopProducts] = useState<SoldQuantityProduct[] | null>(null);
+  const [ordersByMonth, setOrdersByMonth] = useState<OrderMonthTotal[] | null>(
+    null,
+  );
+  const [topProducts, setTopProducts] = useState<SoldQuantityProduct[] | null>(
+    null,
+  );
   const [topProductCount, setTopProductCount] = useState<number>(5);
 
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
         const ordersApi = getOrders();
-        const totalOrdersResponse = await ordersApi.ordersControllerGetTotalOrders();
-        const totalRevenueResponse = await ordersApi.ordersControllerGetTotalRevenue();
-        const ordersByMonthResponse = await ordersApi.ordersControllerGetOrdersByMonth();
-        const topProductsResponse = await ordersApi.ordersControllerGetTopProduct(topProductCount.toString());
+        const totalOrdersResponse =
+          await ordersApi.ordersControllerGetTotalOrders();
+        const totalRevenueResponse =
+          await ordersApi.ordersControllerGetTotalRevenue();
+        const ordersByMonthResponse =
+          await ordersApi.ordersControllerGetOrdersByMonth();
+        const topProductsResponse =
+          await ordersApi.ordersControllerGetTopProduct(
+            topProductCount.toString(),
+          );
 
         setTotalOrders(totalOrdersResponse.data);
         setTotalRevenue(totalRevenueResponse.data);
@@ -51,7 +85,7 @@ export default function AdminDashboardMain() {
             Dashboard Statistics
           </Typography>
           <Grid container spacing={2}>
-            <Grid >
+            <Grid>
               <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
                 <Typography variant="h6">Total Orders</Typography>
                 <Typography variant="h4">
@@ -59,7 +93,7 @@ export default function AdminDashboardMain() {
                 </Typography>
               </Paper>
             </Grid>
-            <Grid >
+            <Grid>
               <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
                 <Typography variant="h6">Total Revenue</Typography>
                 <Typography variant="h4">

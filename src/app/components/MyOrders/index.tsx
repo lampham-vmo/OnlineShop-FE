@@ -14,10 +14,42 @@ import {
   Typography,
   Box,
   Pagination,
+  Chip,
 } from '@mui/material';
 import { getOrders } from '@/generated/api/endpoints/orders/orders';
 import { OrderResponseDTO, PaginationDTO } from '@/generated/api/models';
 import OrderDetails from './OrderDetails';
+
+export enum EOrderStatus {
+  UNPAID = 'UNPAID',
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  SHIPPING = 'SHIPPING',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+  FAILED = 'FAILED',
+}
+
+export const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'PENDING':
+      return 'warning';
+    case 'UNPAID':
+      return 'default';
+    case 'CONFIRMED':
+      return 'info'; // CONFIRMED sẽ là màu "info"
+    case 'SHIPPING':
+      return 'primary'; // SHIPPING nên là primary (đang vận chuyển)
+    case 'DELIVERED':
+      return 'success'; // giao thành công
+    case 'CANCELLED':
+      return 'error'; // hủy
+    case 'FAILED':
+      return 'error'; // lỗi giao cũng error
+    default:
+      return 'default';
+  }
+};
 
 const MyOrders = () => {
   const [orders, setOrders] = useState<OrderResponseDTO[]>([]);
@@ -116,7 +148,13 @@ const MyOrders = () => {
                             <TableCell>
                               {order.total.toLocaleString()}
                             </TableCell>
-                            <TableCell>{order.status}</TableCell>
+                            <TableCell>
+                              <Chip
+                                label={order.status}
+                                color={getStatusColor(order.status)}
+                                size="small"
+                              />
+                            </TableCell>
                             <TableCell>
                               {new Date(order.createdAt).toLocaleString()}
                             </TableCell>
