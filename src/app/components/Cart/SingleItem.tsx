@@ -30,11 +30,10 @@ function SingleItem({ item }: SingleItemProps) {
   };
   // TODO: increase decrease quantity
   const handleIncreaseQuantity = () => {
-    if (item.quantity >= item.product.stock) {
+    if (item.quantity === item.product.stock) {
       toast.error(
         `Item ${item.product.name} has reached maximum amount of stock!`,
-        { duration: 3000 },
-      );
+        { duration: 1000 },);
       return;
     }
     increaseCartItemQuantity(item.id);
@@ -42,7 +41,7 @@ function SingleItem({ item }: SingleItemProps) {
   // doesn't work, might be BE
   const handleDecreaseQuantity = () => {
     if (item.quantity <= 1) {
-      toast.error(`Item ${item.product.name} cannot go below 1!`);
+      toast.error(`Item ${item.product.name} cannot go below 1!`, { duration: 1000 });
       return;
     }
     decreaseCartItemQuantity(item.id);

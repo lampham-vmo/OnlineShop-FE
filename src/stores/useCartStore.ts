@@ -50,6 +50,7 @@ import {
         // TODO: Add all items to cart
   
         updateCartState: () => {
+          localStorage.removeItem('cart-storage')
           const itemsInCart = get().cartItems;
   
           const subtotalPrice = itemsInCart.reduce((total, item) => {
@@ -115,9 +116,11 @@ import {
         // TODO: Add 1 item to cart with BE
         addItemToCart: async (product: Product) => {
           const { cartItems } = get();
-          // const existingItem = cartItems.some((item) => item.id === product.id);
-          // if (existingItem) return;
-  
+          const existingItem = cartItems.some((item) => item.id === product.id);
+          if (existingItem){
+            get().increaseCartItemQuantity(product.id)
+          };
+
           await cartControllerAddToCart({
             productId: product.id,
             quantity: 1,
@@ -131,6 +134,7 @@ import {
   
           set({ cartItems: [...cartItems, newCartItem] });
           get().updateCartState();
+          get().getCartFromServer();
         },
   
         // TODO: Remove an item from the cart

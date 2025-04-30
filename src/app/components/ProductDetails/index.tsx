@@ -4,8 +4,10 @@ import { useParams } from 'next/navigation';
 import Breadcrumb from '../Common/Breadcrumb';
 import { useEffect, useState } from 'react';
 import { getProduct } from '@/generated/api/endpoints/product/product';
-import { ProductResponse } from '@/generated/api/models';
+import { Product, ProductResponse } from '@/generated/api/models';
 import { Box, CircularProgress } from '@mui/material';
+import toast from 'react-hot-toast';
+import useCartStore from '@/stores/useCartStore';
 
 const ProductDetails = () => {
   const routeParams = useParams();
@@ -43,6 +45,16 @@ const ProductDetails = () => {
   }
 
   const listImage: string[] = JSON.parse(productData?.image || '[]');
+
+  // const {addItemToCart} = useCartStore()
+  // const handleAddToCart = (item: Product) => {
+  //   if (item.stock === 0) {
+  //     toast.error(`${item.name} is out of stock`, { duration: 400 });
+  //     return;
+  //   }
+  //   addItemToCart(item);
+  //   toast.success(`${item.name} added to cart`, { duration: 400 });
+  // };
 
   return (
     <div>

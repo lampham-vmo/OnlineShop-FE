@@ -9,13 +9,12 @@ import { getCart } from '@/generated/api/endpoints/cart/cart';
 
 const CartSidebarModal = () => {
   const {
-    subtotalPrice,
+    totalPrice,
     closeCart,
     isCartOpen,
     cartItems,
     removeItemFromCart,
     getCartFromServer,
-    totalItemCount,
   } = useCartStore();
 
   useEffect(() => {
@@ -101,7 +100,7 @@ const CartSidebarModal = () => {
               <p className="font-medium text-xl text-dark">Subtotal:</p>
               {/* TODO: Total price */}
               <p className="font-medium text-xl text-dark">
-                ${subtotalPrice.toLocaleString()}
+                ${totalPrice.toLocaleString()}
               </p>
             </div>
 
