@@ -20,7 +20,6 @@ import { getAuth } from '@/generated/api/endpoints/auth/auth';
 
 // Update the Zod schema to validate Gmail addresses
 
-
 type FormData = z.infer<typeof authControllerCreateBody>;
 
 export default function SignUpForm() {
