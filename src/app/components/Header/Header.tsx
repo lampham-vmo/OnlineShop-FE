@@ -69,6 +69,8 @@ export default function Header() {
                   onClose={() => setOpen(false)}
                   disablePortal
                   disableClearable
+                  value={selectedProduct!}
+                  inputValue={text}
                   getOptionLabel={(option) => option?.name || ''}
                   isOptionEqualToValue={(option, value) =>
                     option.id === value.id
@@ -76,6 +78,7 @@ export default function Header() {
                   onChange={(event, value) => {
                     if (value && value.id) {
                       router.push(`/product-details/${value.id}`);
+                      setText('');
                       setOpen(false);
                     }
                   }}

@@ -17,7 +17,10 @@ import {
   Pagination,
   Select,
   Stack,
+  TextField, // Thêm TextField cho ô Search
 } from '@mui/material';
+import ConfirmModalOrder from './confirm.modal';
+import OrderDetails from '../../MyOrders/OrderDetails';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -33,60 +36,19 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
   '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
 
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number,
-) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-
 export default function CustomizedTables() {
   const { ordersControllerFindAll, ordersControllerChangeStatus } = getOrders();
   const [orderData, SetOrderData] = React.useState<OrderResponseDTO[]>([]);
-  const [params, setParams] = React.useState({ page: 1 });
+  const [params, setParams] = React.useState({ page: 1, search: '' });
   const [totalPages, setTotalPages] = React.useState(1);
   const [totalItems, setTotalItems] = React.useState(0);
-  const [status, setStatus] = React.useState<Status>();
-  const handleChangePage = (_: React.ChangeEvent<unknown>, value: number) => {
-    setParams((prev) => ({ ...prev, page: value }));
-  };
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'PENDING':
-        return 'warning';
-      case 'UNPAID':
-        return 'default';
-      case 'CONFIRMED':
-        return 'info'; // CONFIRMED sẽ là màu "info"
-      case 'SHIPPING':
-        return 'primary'; // SHIPPING nên là primary (đang vận chuyển)
-      case 'DELIVERED':
-        return 'success'; // giao thành công
-      case 'CANCELLED':
-        return 'error'; // hủy
-      case 'FAILED':
-        return 'error'; // lỗi giao cũng error
-      default:
-        return 'default';
-    }
-  };
+
+  const [searchValue, setSearchValue] = React.useState('');
 
   enum Status {
     UNPAID = 'UNPAID',
@@ -97,24 +59,84 @@ export default function CustomizedTables() {
     CANCELLED = 'CANCELLED',
     FAILED = 'FAILED',
   }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return 'warning';
+      case 'UNPAID':
+        return 'default';
+      case 'CONFIRMED':
+        return 'info';
+      case 'SHIPPING':
+        return 'primary';
+      case 'DELIVERED':
+        return 'success';
+      case 'CANCELLED':
+      case 'FAILED':
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
+
   const getListOrder = async () => {
     const data = await ordersControllerFindAll(params);
     SetOrderData(data.data.order);
     setTotalPages(data.data.pagination.totalPages || 1);
     setTotalItems(data.data.pagination.totalItems || 0);
   };
+
   const updateStatus = async (id: number, status: Status) => {
-    const data = await ordersControllerChangeStatus({
+    await ordersControllerChangeStatus({
       id: id.toString(),
       status: status,
     });
     getListOrder();
   };
+
+  const handleChangePage = (_: React.ChangeEvent<unknown>, value: number) => {
+    setParams((prev) => ({ ...prev, page: value }));
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    setParams({ ...params, page: 1, search: searchValue });
+  };
+
   React.useEffect(() => {
     getListOrder();
   }, [params]);
+
   return (
     <>
+      {/* Search Bar */}
+      <div className="flex justify-between items-center mb-4">
+        <TextField
+          label="Search Order"
+          variant="outlined"
+          size="small"
+          value={searchValue}
+          onChange={handleSearchChange}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSearchSubmit();
+            }
+          }}
+          sx={{ width: 300 }}
+        />
+        {/* Optional: Button search nếu muốn */}
+        {/* 
+        <Button variant="contained" onClick={handleSearchSubmit}>
+          Search
+        </Button> 
+        */}
+      </div>
+
+      {/* Table */}
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
@@ -133,9 +155,7 @@ export default function CustomizedTables() {
           <TableBody>
             {orderData.map((row) => (
               <StyledTableRow key={row.id}>
-                <StyledTableCell component="th" scope="row">
-                  {row.id}
-                </StyledTableCell>
+                <StyledTableCell>{row.id}</StyledTableCell>
                 <StyledTableCell>{row.receiver}</StyledTableCell>
                 <StyledTableCell>{row.receiver_phone}</StyledTableCell>
                 <StyledTableCell>{row.delivery_address}</StyledTableCell>
@@ -161,90 +181,62 @@ export default function CustomizedTables() {
                     size="small"
                   />
                 </StyledTableCell>
-
                 <StyledTableCell>
-                  <div className="flex gap-x-2">
+                  <div className="flex flex-wrap gap-2">
                     {row.status === Status.PENDING && (
                       <>
-                        <Button
-                          variant="contained"
-                          onClick={() => {
-                            updateStatus(row.id, Status.CONFIRMED);
-                            setStatus(Status.CONFIRMED);
+                        <ConfirmModalOrder
+                          title="Accept"
+                          onConfirm={async () => {
+                            await updateStatus(row.id, Status.CONFIRMED);
                           }}
-                        >
-                          Accept
-                        </Button>
-                        <Button
-                          variant="contained"
-                          onClick={() => {
-                            updateStatus(row.id, Status.CANCELLED);
-                            setStatus(Status.CANCELLED);
+                        />
+                        <ConfirmModalOrder
+                          title="Cancel"
+                          onConfirm={async () => {
+                            await updateStatus(row.id, Status.CANCELLED);
                           }}
-                          color="error"
-                        >
-                          Cancel
-                        </Button>
+                        />
                       </>
                     )}
-
                     {row.status === Status.CONFIRMED && (
-                      <Button
-                        variant="contained"
-                        onClick={() => {
-                          updateStatus(row.id, Status.SHIPPING);
-                          setStatus(Status.SHIPPING);
+                      <ConfirmModalOrder
+                        title="Shipping"
+                        onConfirm={async () => {
+                          await updateStatus(row.id, Status.SHIPPING);
                         }}
-                      >
-                        Shipping
-                      </Button>
+                      />
                     )}
-
                     {row.status === Status.SHIPPING && (
                       <>
-                        <Button
-                          variant="contained"
-                          onClick={() => {
-                            updateStatus(row.id, Status.DELIVERED);
-                            setStatus(Status.DELIVERED);
+                        <ConfirmModalOrder
+                          title="Delivered"
+                          onConfirm={async () => {
+                            await updateStatus(row.id, Status.DELIVERED);
                           }}
-                        >
-                          Delivered
-                        </Button>
-                        <Button
-                          variant="contained"
-                          onClick={() => {
-                            updateStatus(row.id, Status.FAILED);
-                            setStatus(Status.FAILED);
+                        />
+                        <ConfirmModalOrder
+                          title="Failed"
+                          onConfirm={async () => {
+                            await updateStatus(row.id, Status.FAILED);
                           }}
-                          color="warning"
-                        >
-                          Failed
-                        </Button>
+                        />
                       </>
                     )}
-
                     {row.status === Status.FAILED && (
                       <>
-                        <Button
-                          variant="contained"
-                          onClick={() => {
-                            updateStatus(row.id, Status.SHIPPING);
-                            setStatus(Status.SHIPPING);
+                        <ConfirmModalOrder
+                          title="Re-Delivery"
+                          onConfirm={async () => {
+                            await updateStatus(row.id, Status.SHIPPING);
                           }}
-                        >
-                          Re-Delivery
-                        </Button>
-                        <Button
-                          variant="contained"
-                          onClick={() => {
-                            updateStatus(row.id, Status.CANCELLED);
-                            setStatus(Status.CANCELLED);
+                        />
+                        <ConfirmModalOrder
+                          title="Cancel"
+                          onConfirm={async () => {
+                            await updateStatus(row.id, Status.CANCELLED);
                           }}
-                          color="error"
-                        >
-                          Cancel
-                        </Button>
+                        />
                       </>
                     )}
                   </div>
@@ -254,12 +246,13 @@ export default function CustomizedTables() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Pagination */}
       <div className="flex justify-center mt-10">
         <Stack spacing={2}>
           <Pagination
             count={totalPages}
             page={params.page}
-            defaultPage={1}
             onChange={handleChangePage}
             color="primary"
           />

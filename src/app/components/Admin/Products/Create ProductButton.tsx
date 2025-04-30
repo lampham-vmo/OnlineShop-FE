@@ -134,6 +134,7 @@ export default function BasicModal() {
   const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
     {},
   );
+  const [upload, setUpload] = React.useState(false);
   const [imageLink, setImageLink] = React.useState<string[]>([]);
   const [categories, setCategories] = React.useState<CategoryResponseDto[]>([]);
   const [uploadedFiles, setUploadedFiles] =
@@ -151,6 +152,7 @@ export default function BasicModal() {
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    setUpload(true);
     const files = event.target.files;
     if (files) {
       const validImages = Array.from(files).filter((file) =>
@@ -178,6 +180,7 @@ export default function BasicModal() {
             error: 'Upload Failed',
           },
         );
+        setUpload(false);
         setImageLink((prev) => {
           const updated = [...prev, res.data];
           setFormData((form) => ({
@@ -273,7 +276,7 @@ export default function BasicModal() {
         handleClose();
       }, 600);
     } catch (error: any) {
-      // ✅ Xử lý lỗi trả về từ API (message là array hoặc string)
+      // Xử lý lỗi trả về từ API (message là array hoặc string)
       const message = error?.message;
 
       if (Array.isArray(message)) {
@@ -371,10 +374,13 @@ export default function BasicModal() {
           />
 
           <Button
+            fullWidth
+            loadingPosition="start"
             component="label"
             role={undefined}
             variant="contained"
             tabIndex={-1}
+            loading={upload}
             startIcon={<CloudUploadIcon />}
           >
             Upload Images
