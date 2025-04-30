@@ -8,9 +8,17 @@ import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
 
 const HeaderTopRight = () => {
-  const { toggleCart, isCartOpen, cartItems, subtotalPrice, getCartFromServer, totalItemCount, updateCartState} = useCartStore();
-  console.log('Total item count', totalItemCount)
-  
+  const {
+    toggleCart,
+    isCartOpen,
+    cartItems,
+    totalPrice,
+    getCartFromServer,
+    totalItemCount,
+    updateCartState,
+  } = useCartStore();
+  console.log('Total item count', totalItemCount);
+
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
 
@@ -30,7 +38,7 @@ const HeaderTopRight = () => {
     { label: 'Logout', path: '/logout' },
   ];
 
-  if (AllowedRoleForAdminLayout.includes(user?.role!)) {
+  if (AllowedRoleForAdminLayout.includes(user?.role)) {
     settings.unshift({ label: 'Admin Dashboard', path: '/admin' });
   }
 
@@ -86,13 +94,15 @@ const HeaderTopRight = () => {
           </svg>
 
           <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
-            {cartItems.length <= 100 ? cartItems.length : <span>99+</span>}
+            {cartItems.length <= 100 ? totalItemCount : <span>99+</span>}
           </span>
         </span>
 
         <div>
           <span className="block text-2xs text-dark-4 uppercase">cart</span>
-          <p className="font-medium text-custom-sm text-dark">${subtotalPrice.toLocaleString()}</p>
+          <p className="font-medium text-custom-sm text-dark">
+            ${totalPrice.toLocaleString()}
+          </p>
         </div>
       </button>
 
