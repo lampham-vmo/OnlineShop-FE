@@ -77,9 +77,7 @@ const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
                 : 'text-dark bg-white hover:text-white hover:bg-blue'
             }`}
           >
-            {item.stock === 0 ? (
-              'Out of Stock'
-            ) : 'Add' }
+            {item.stock === 0 ? 'Out of Stock' : 'Add'}
           </button>
         </div>
       </div>
