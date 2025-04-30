@@ -78,7 +78,7 @@ export default function Header() {
                   onChange={(event, value) => {
                     if (value && value.id) {
                       router.push(`/product-details/${value.id}`);
-                      setText('')
+                      setText('');
                       setOpen(false);
                     }
                   }}

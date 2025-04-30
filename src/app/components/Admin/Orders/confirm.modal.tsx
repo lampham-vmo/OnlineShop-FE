@@ -49,11 +49,7 @@ const ConfirmModalOrder = ({ onConfirm, title }: IConfirmModalProps) => {
 
   return (
     <>
-      <Button
-        variant="contained"
-        size="small"
-        onClick={handleOpen}
-      >
+      <Button variant="contained" size="small" onClick={handleOpen}>
         {title}
       </Button>
 

@@ -109,7 +109,7 @@ const useCartStore = create<CartStore>()(
 
       clearCartItems: async () => {
         await cartControllerClearCart(), set({ cartItems: [] });
-        get().updateCartState()
+        get().updateCartState();
       },
 
       // TODO: Add 1 item to cart with BE
