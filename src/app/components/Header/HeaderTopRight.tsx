@@ -54,9 +54,6 @@ const HeaderTopRight = () => {
     }
   };
 
-  useEffect(() => {
-    getCartFromServer();
-  }, []);
   return (
     <div className="flex justify-between items-center gap-5">
       {/* Cart Button */}
@@ -93,8 +90,8 @@ const HeaderTopRight = () => {
             />
           </svg>
 
-          <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
-            {cartItems.length <= 100 ? totalItemCount : <span>99+</span>}
+          <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 w-4.5 h-4.5 rounded-100 text-blue">
+            {totalItemCount <= 100 ? totalItemCount : <span>99+</span>}
           </span>
         </span>
 
