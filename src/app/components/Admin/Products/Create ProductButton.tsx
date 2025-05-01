@@ -124,7 +124,7 @@ function SortableImage({
   );
 }
 
-export default function BasicModal() {
+export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
   const { productControllerCreateProduct } = getProduct();
   const { categoryControllerGetAll } = getCategory();
   const { uploadControllerUploadImage } = getUpload();
@@ -259,7 +259,7 @@ export default function BasicModal() {
         loading: 'Đang tạo sản phẩm...',
         success: 'Tạo sản phẩm thành công!',
       });
-
+      onSuccess?.()
       // Reset form sau khi thành công
       setFormData({
         name: '',
