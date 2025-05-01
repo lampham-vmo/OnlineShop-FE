@@ -28,6 +28,7 @@ import {
 import { getProduct } from '@/generated/api/endpoints/product/product';
 import UpdateButton from './UpdateButton';
 import DeleteProduct from './DeleteButton';
+import BasicModal from './Create ProductButton';
 
 interface TablePaginationActionsProps {
   count: number;
@@ -175,13 +176,13 @@ export default function CustomizedTables() {
     setTotalPages(data.result.pagination.totalPages || 1);
     setTotalItems(data.result.pagination.totalItems || 0);
   };
-  const handleUpdate = () => {};
   React.useEffect(() => {
     getListProduct();
   }, [params]);
   // Avoid a layout jump when reaching the last page with empty rows.
   return (
     <>
+      <BasicModal onSuccess={handleUpdateSuccess}/>
       <div>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
