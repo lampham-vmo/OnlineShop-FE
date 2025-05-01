@@ -182,7 +182,7 @@ export default function CustomizedTables() {
   // Avoid a layout jump when reaching the last page with empty rows.
   return (
     <>
-      <BasicModal onSuccess={handleUpdateSuccess}/>
+      <BasicModal onSuccess={handleUpdateSuccess} />
       <div>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
