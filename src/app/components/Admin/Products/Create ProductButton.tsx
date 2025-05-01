@@ -3,7 +3,22 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import CloseIcon from '@mui/icons-material/Close';
 import Modal from '@mui/material/Modal';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import {
   Checkbox,
@@ -16,7 +31,9 @@ import {
   OutlinedInput,
   Select,
   styled,
+  Box as MuiBox,
   TextField,
+  IconButton,
 } from '@mui/material';
 import { getProduct } from '@/generated/api/endpoints/product/product';
 import {
@@ -58,8 +75,56 @@ const style = {
   flexDirection: 'column',
   gap: '10px',
 };
+function SortableImage({
+  url,
+  index,
+  onRemove,
+}: {
+  url: string;
+  index: number;
+  onRemove: (index: number) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: url });
 
-export default function BasicModal() {
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <MuiBox
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="relative"
+    >
+      <img
+        src={url}
+        alt={`img-${index}`}
+        className="w-16 h-16 object-cover rounded cursor-move"
+      />
+      <IconButton
+        size="small"
+        onClick={() => onRemove(index)}
+        sx={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          color: 'white',
+          '&:hover': { backgroundColor: 'rgba(0,0,0,0.8)' },
+          padding: '2px',
+        }}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </MuiBox>
+  );
+}
+
+export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
   const { productControllerCreateProduct } = getProduct();
   const { categoryControllerGetAll } = getCategory();
   const { uploadControllerUploadImage } = getUpload();
@@ -69,6 +134,7 @@ export default function BasicModal() {
   const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
     {},
   );
+  const [upload, setUpload] = React.useState(false);
   const [imageLink, setImageLink] = React.useState<string[]>([]);
   const [categories, setCategories] = React.useState<CategoryResponseDto[]>([]);
   const [uploadedFiles, setUploadedFiles] =
@@ -86,6 +152,7 @@ export default function BasicModal() {
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    setUpload(true);
     const files = event.target.files;
     if (files) {
       const validImages = Array.from(files).filter((file) =>
@@ -113,6 +180,7 @@ export default function BasicModal() {
             error: 'Upload Failed',
           },
         );
+        setUpload(false);
         setImageLink((prev) => {
           const updated = [...prev, res.data];
           setFormData((form) => ({
@@ -191,7 +259,7 @@ export default function BasicModal() {
         loading: 'Đang tạo sản phẩm...',
         success: 'Tạo sản phẩm thành công!',
       });
-
+      onSuccess?.()
       // Reset form sau khi thành công
       setFormData({
         name: '',
@@ -208,7 +276,7 @@ export default function BasicModal() {
         handleClose();
       }, 600);
     } catch (error: any) {
-      // ✅ Xử lý lỗi trả về từ API (message là array hoặc string)
+      // Xử lý lỗi trả về từ API (message là array hoặc string)
       const message = error?.message;
 
       if (Array.isArray(message)) {
@@ -306,35 +374,63 @@ export default function BasicModal() {
           />
 
           <Button
+            fullWidth
+            loadingPosition="start"
             component="label"
             role={undefined}
             variant="contained"
             tabIndex={-1}
+            loading={upload}
             startIcon={<CloudUploadIcon />}
           >
-            Upload files
+            Upload Images
             <VisuallyHiddenInput
               accept="image/*"
               type="file"
               onChange={handleImageUpload}
             />
           </Button>
-          <Box display="flex" flexWrap="wrap" gap={2}>
-            {imageLink.map((link, index) => (
-              <Box key={index}>
-                <img
-                  src={link}
-                  alt={`Uploaded ${index + 1}`}
-                  style={{
-                    width: 60,
-                    height: 60,
-                    objectFit: 'cover',
-                    borderRadius: 8,
-                  }}
-                />
-              </Box>
-            ))}
-          </Box>
+          <DndContext
+            sensors={useSensors(useSensor(PointerSensor))}
+            collisionDetection={closestCenter}
+            onDragEnd={({ active, over }) => {
+              if (active.id !== over?.id) {
+                const oldIndex = imageLink.findIndex(
+                  (url) => url === active.id,
+                );
+                const newIndex = imageLink.findIndex((url) => url === over?.id);
+                const reordered = arrayMove(imageLink, oldIndex, newIndex);
+                setImageLink(reordered);
+                setFormData((prev) => ({
+                  ...prev,
+                  image: JSON.stringify(reordered),
+                }));
+              }
+            }}
+          >
+            <SortableContext
+              items={imageLink}
+              strategy={verticalListSortingStrategy}
+            >
+              <MuiBox className="flex flex-wrap gap-2">
+                {imageLink.map((url, index) => (
+                  <SortableImage
+                    key={url}
+                    url={url}
+                    index={index}
+                    onRemove={(i) => {
+                      const updated = imageLink.filter((_, idx) => idx !== i);
+                      setImageLink(updated);
+                      setFormData((prev) => ({
+                        ...prev,
+                        image: JSON.stringify(updated),
+                      }));
+                    }}
+                  />
+                ))}
+              </MuiBox>
+            </SortableContext>
+          </DndContext>
 
           {formErrors.image && (
             <Typography variant="caption" color="error">

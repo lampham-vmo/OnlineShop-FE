@@ -18,6 +18,8 @@ import { useUserStore } from '@/stores/useUserStore';
 import { authControllerCreateBody } from '@/generated/api/schemas/auth/auth.zod';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 
+// Update the Zod schema to validate Gmail addresses
+
 type FormData = z.infer<typeof authControllerCreateBody>;
 
 export default function SignUpForm() {
@@ -26,23 +28,30 @@ export default function SignUpForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(authControllerCreateBody),
+    resolver: zodResolver(authControllerCreateBody), // Use the updated schema
   });
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false); // Add loading state
   const setUser = useUserStore((state) => state.setUser);
 
   const onSubmit = async (data: FormData) => {
+    setLoading(true); // Set loading to true when submission starts
     try {
       const res = await getAuth().authControllerCreate(data);
       setUser(res.data);
-      setSuccess('Account created successfully!');
+      setSuccess(
+        'Account created successfully, please check your email to activate the account!',
+      );
       setError('');
     } catch (err: any) {
-      const message = err.response?.data?.message || 'Signup failed';
+      const message = err.message || 'Signup failed';
+      console.log(message);
       setError(message);
       setSuccess('');
+    } finally {
+      setLoading(false); // Set loading to false after submission completes
     }
   };
 
@@ -129,8 +138,13 @@ export default function SignUpForm() {
             </Grid>
 
             <Grid size={12}>
-              <Button fullWidth variant="contained" type="submit">
-                Sign Up
+              <Button
+                fullWidth
+                variant="contained"
+                type="submit"
+                disabled={loading || !!success} // Disable button if loading or success
+              >
+                {loading ? 'Loading...' : success ? 'Success!' : 'Sign Up'}
               </Button>
             </Grid>
             {/* Add the "Already have an account? Sign in" text */}

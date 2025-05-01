@@ -54,7 +54,7 @@ export default function AdminHeader() {
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
-            onClose={() => setAnchorEl(null)}
+            onClose={handleMenuClose}
             anchorOrigin={{
               vertical: 'bottom',
               horizontal: 'right',
@@ -66,7 +66,6 @@ export default function AdminHeader() {
           >
             <MenuItem
               onClick={() => {
-                handleMenuClose();
                 router.push('/profile');
               }}
             >
@@ -74,7 +73,6 @@ export default function AdminHeader() {
             </MenuItem>
             <MenuItem
               onClick={() => {
-                handleMenuClose();
                 handleLogout();
               }}
             >

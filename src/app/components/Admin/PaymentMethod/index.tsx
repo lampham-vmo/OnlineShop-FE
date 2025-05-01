@@ -1,7 +1,10 @@
 'use client';
 
 import { useAuthStore } from '@/stores/authStore';
-import { EPaymentMethodStatus, EPermissionPaymentMethod } from './payment-method.validation';
+import {
+  EPaymentMethodStatus,
+  EPermissionPaymentMethod,
+} from './payment-method.validation';
 import { useEffect, useState } from 'react';
 import { PaymentMethodResponseDto } from '@/generated/api/models';
 import { getPaymentMethod } from '@/generated/api/endpoints/payment-method/payment-method';
@@ -37,7 +40,7 @@ const columns: ColumnData[] = [
   {
     label: 'Name',
     dataKey: 'name',
-  }
+  },
 ];
 
 const ManagePaymentMethod = () => {
@@ -138,13 +141,24 @@ const ManagePaymentMethod = () => {
                     {isAcceptPermission([
                       EPermissionPaymentMethod.CHANGE_STATUS_PAYMENT_METHOD,
                     ]) ? (
-                      <ChangeStatusPaymentMethod paymentMethod={item} onSuccess={getListPaymentMethod} />
+                      <ChangeStatusPaymentMethod
+                        paymentMethod={item}
+                        onSuccess={getListPaymentMethod}
+                      />
                     ) : (
                       <>
                         {item.status === EPaymentMethodStatus.ACTIVE ? (
-                          <Chip label={item.status.toUpperCase()} color="success" variant="filled" />
+                          <Chip
+                            label={item.status.toUpperCase()}
+                            color="success"
+                            variant="filled"
+                          />
                         ) : (
-                          <Chip label={item.status.toUpperCase()} color="error" variant="filled" />
+                          <Chip
+                            label={item.status.toUpperCase()}
+                            color="error"
+                            variant="filled"
+                          />
                         )}
                       </>
                     )}

@@ -21,9 +21,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  useEffect(() => {
-    useAuthStore.getState().initAuth();
-  }, []);
+  const user = useAuthStore((state) => state.user);
+
+  if (user) {
+    window.location.href = '/';
+    return null;
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body

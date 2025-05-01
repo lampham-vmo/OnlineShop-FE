@@ -1,4 +1,4 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Box,
   Button,
@@ -7,26 +7,25 @@ import {
   Stack,
   TextField,
   Typography,
-} from "@mui/material";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import CloseIcon from "@mui/icons-material/Close";
-import RequiredLabel from "../../Common/RequiredLabel";
+} from '@mui/material';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import CloseIcon from '@mui/icons-material/Close';
+import RequiredLabel from '../../Common/RequiredLabel';
 import {
   PaymentMethodFormData,
   PaymentMethodCreateDtoValidation,
-} from "./payment-method.validation";
-import { getPaymentMethod } from "@/generated/api/endpoints/payment-method/payment-method";
-
+} from './payment-method.validation';
+import { getPaymentMethod } from '@/generated/api/endpoints/payment-method/payment-method';
 
 const style = {
-  position: "absolute" as const,
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+  position: 'absolute' as const,
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
   width: 500,
-  bgcolor: "background.paper",
+  bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
   borderRadius: 2,
@@ -40,7 +39,7 @@ const CreatePaymentMethod = ({ onSuccess }: ICreatePaymentMethodProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const {paymentMethodControllerCreate} = getPaymentMethod()
+  const { paymentMethodControllerCreate } = getPaymentMethod();
 
   const {
     register,
@@ -60,14 +59,14 @@ const CreatePaymentMethod = ({ onSuccess }: ICreatePaymentMethodProps) => {
     setLoading(true);
     try {
       const response = await paymentMethodControllerCreate(data);
-      if(response.success) {
-        toast.success("Create payment method uccessfully!");
+      if (response.success) {
+        toast.success('Create payment method uccessfully!');
         handleCloseModal();
         onSuccess();
       }
     } catch (error: any) {
       toast.error(
-        Array.isArray(error.message) ? error.message[0] : error.message
+        Array.isArray(error.message) ? error.message[0] : error.message,
       );
     } finally {
       setLoading(false);
@@ -77,7 +76,11 @@ const CreatePaymentMethod = ({ onSuccess }: ICreatePaymentMethodProps) => {
   return (
     <>
       <Box display="flex" justifyContent="flex-end" mb={2}>
-        <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setOpen(true)}
+        >
           Create
         </Button>
       </Box>
@@ -85,7 +88,7 @@ const CreatePaymentMethod = ({ onSuccess }: ICreatePaymentMethodProps) => {
       <Modal
         open={open}
         onClose={(_, reason: string) => {
-          if (reason !== "backdropClick") {
+          if (reason !== 'backdropClick') {
             handleCloseModal();
           }
         }}
@@ -94,7 +97,7 @@ const CreatePaymentMethod = ({ onSuccess }: ICreatePaymentMethodProps) => {
           <IconButton
             onClick={handleCloseModal}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               top: 8,
               right: 8,
             }}
@@ -110,7 +113,7 @@ const CreatePaymentMethod = ({ onSuccess }: ICreatePaymentMethodProps) => {
               <TextField
                 label={<RequiredLabel label="Name" />}
                 fullWidth
-                {...register("name")}
+                {...register('name')}
                 error={!!errors.name}
                 helperText={errors.name?.message}
               />
