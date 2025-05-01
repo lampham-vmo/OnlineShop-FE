@@ -36,6 +36,7 @@ interface CartStore {
   clearCartItems: () => Promise<UserSuccessMessageFinalResponseDTO | void>;
   addItemToCart: (item: Product) => Promise<void>;
   removeItemFromCart: (productId: number) => Promise<void>;
+  clearCartStorage: () => void;
 }
 
 const useCartStore = create<CartStore>()(
@@ -143,6 +144,17 @@ const useCartStore = create<CartStore>()(
         await cartControllerDeleteCart({ id: productId });
         set({ cartItems: itemsInCart.filter((item) => item.id !== productId) });
         get().updateCartState();
+      },
+
+      // TODO: Clear cart in local storage
+      clearCartStorage: () => {
+        set({
+          totalItemCount: 0,
+          isCartOpen: false,
+          cartItems: [],
+          subtotalPrice: 0,
+          totalPrice: 0,
+        });
       },
     }),
     {
