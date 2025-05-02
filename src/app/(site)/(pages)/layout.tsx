@@ -8,8 +8,6 @@ import ScrollToTop from '../../components/Common/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
-import { getCart } from '@/generated/api/endpoints/cart/cart';
-import useCartStore from '@/stores/useCartStore';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -27,7 +25,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [hasHydrated, setHasHydrated] = useState(false);
-  const { cartItems, getCartFromServer } = useCartStore();
 
   useEffect(() => {
     if (useAuthStore.persist.hasHydrated()) {
