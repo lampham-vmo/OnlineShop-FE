@@ -234,6 +234,12 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
       if (formData.description.trim() == '') {
         errors.description = 'Description should not be empty';
       }
+      if(formData.price === 0){
+        errors.price = 'Price should not be empty'
+      }
+      if(formData.stock=== 0){
+        errors.stock = "Stock should not be empty"
+      }
       productControllerCreateProductBody.parse(formData);
     } catch (error) {
       if (error instanceof ZodError) {
@@ -292,7 +298,7 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
   React.useEffect(() => {
     getAllCategory();
     console.log(uploadedFiles);
-  }, [imageLink, formData]);
+  }, []);
   return (
     <div className="flex justify-end mb-2">
       <Button onClick={handleOpen} variant="contained">

@@ -113,29 +113,6 @@ export default function CustomizedTables() {
 
   return (
     <>
-      {/* Search Bar */}
-      <div className="flex justify-between items-center mb-4">
-        <TextField
-          label="Search Order"
-          variant="outlined"
-          size="small"
-          value={searchValue}
-          onChange={handleSearchChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleSearchSubmit();
-            }
-          }}
-          sx={{ width: 300 }}
-        />
-        {/* Optional: Button search nếu muốn */}
-        {/* 
-        <Button variant="contained" onClick={handleSearchSubmit}>
-          Search
-        </Button> 
-        */}
-      </div>
-
       {/* Table */}
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
