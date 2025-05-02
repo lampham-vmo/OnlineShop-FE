@@ -265,7 +265,7 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
         loading: 'Đang tạo sản phẩm...',
         success: 'Tạo sản phẩm thành công!',
       });
-      onSuccess?.()
+      onSuccess?.();
       // Reset form sau khi thành công
       setFormData({
         name: '',
