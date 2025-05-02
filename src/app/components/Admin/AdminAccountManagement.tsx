@@ -33,7 +33,6 @@ import { getUsers } from '@/generated/api/endpoints/users/users';
 import {
   GetUserAccountDTO,
   Role,
-  RoleListResponseDto,
 } from '@/generated/api/models';
 import { getRole } from '@/generated/api/endpoints/role/role';
 

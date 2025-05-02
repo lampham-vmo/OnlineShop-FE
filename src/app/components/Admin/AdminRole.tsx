@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -78,14 +78,11 @@ const MethodChip = ({ method }: { method: string }) => {
 };
 
 export const ManageRole = () => {
-  const router = useRouter();
   const [roles, setRoles] = useState<Role[]>();
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
-  const [roleName, setRoleName] = useState('');
-  const [roleDescription, setRoleDescription] = useState('');
+
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const { isAcceptPermission } = useAuthStore.getState();
@@ -96,28 +93,30 @@ export const ManageRole = () => {
   } = getRole();
   const { permissionControllerFindAll } = getPermission();
 
-  useEffect(() => {
-    fetchRoles();
-    fetchPermissions();
-  }, []);
 
-  const fetchRoles = async () => {
+
+  const fetchRoles = useCallback( async () => {
     try {
       const response = await roleControllerFindAll();
       setRoles(response.data);
     } catch (error) {
       console.error('Failed to fetch roles:', error);
     }
-  };
+  }, []);
 
-  const fetchPermissions = async () => {
+  const fetchPermissions = useCallback( async () => {
     try {
       const response = await permissionControllerFindAll();
       setPermissions(response.data);
     } catch (error) {
       console.error('Failed to fetch permissions:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchRoles();
+    fetchPermissions();
+  }, [fetchRoles, fetchPermissions]);
 
   const handleAddRole = () => {
     setIsModalOpen(true);
@@ -125,9 +124,7 @@ export const ManageRole = () => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setRoleName('');
-    setRoleDescription('');
-    setSelectedPermissions([]);
+
   };
 
   const handleViewPermissions = (role: Role) => {
@@ -154,7 +151,6 @@ export const ManageRole = () => {
     const {
       control,
       handleSubmit,
-      reset,
       formState: { errors },
     } = useForm({
       resolver: zodResolver(
@@ -172,7 +168,7 @@ export const ManageRole = () => {
         permissionIds: [],
       },
     });
-
+   
     const onSubmit = async (data: any) => {
       try {
         await roleControllerAddRole(data);
