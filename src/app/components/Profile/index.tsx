@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { getUsers } from '@/generated/api/endpoints/users/users';
 import { Profile, UpdatePasswordDTO } from '@/generated/api/models';
 import {
@@ -47,7 +47,7 @@ export default function ProfileComponent() {
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleOpenModal = (field: any) => {
     if (profile) {
       setFieldToEdit(field);
@@ -65,7 +65,7 @@ export default function ProfileComponent() {
     reset();
   };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     console.log('hello');
     console.log(profile, user);
@@ -201,15 +201,7 @@ export default function ProfileComponent() {
               <Typography variant="body1">
                 <strong>{item.label}:</strong> {item.value}
               </Typography>
-              {item.field !== 'email'  && (
-                <IconButton
-                  size="small"
-                  onClick={() => handleOpenModal(item.field)}
-                >
-                  <EditIcon fontSize="small" />
-                </IconButton>
-              )}
-              {item.field !== 'role'  && (
+              {(item.field !== 'role' && item.field !== 'email') && (
                 <IconButton
                   size="small"
                   onClick={() => handleOpenModal(item.field)}
