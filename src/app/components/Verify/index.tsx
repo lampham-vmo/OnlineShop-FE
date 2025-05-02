@@ -25,6 +25,26 @@ export const VerifyEmail = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const user = useAuthStore((state) => state.user);
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
+
+  useEffect(() => {
+    if (!token || typeof token !== 'string') return;
+
+    const verify = async () => {
+      try {
+        await authControllerConfirmEmail(token);
+        setStatus('success');
+      } catch (err) {
+        console.log(err);
+        setStatus('error');
+      }
+    };
+
+    verify();
+  }, [token]);
+
 
   if (!token) {
     if (!user) {
@@ -35,25 +55,9 @@ export const VerifyEmail = () => {
     return null;
   }
 
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading',
-  );
+ 
 
-  useEffect(() => {
-    if (!token || typeof token !== 'string') return;
-
-    const verify = async () => {
-      try {
-        const res = await authControllerConfirmEmail(token);
-        setStatus('success');
-      } catch (err) {
-        console.log(err);
-        setStatus('error');
-      }
-    };
-
-    verify();
-  }, [token]);
+  
 
   return (
     <Container
@@ -129,14 +133,7 @@ const ResetPasswordForm = () => {
   const token = searchParams.get('token');
   const user = useAuthStore((state) => state.user);
 
-  if (!token) {
-    if (!user) {
-      window.location.href = '/signin';
-    } else {
-      window.location.href = '/';
-    }
-    return null;
-  }
+ 
 
   const [status, setStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
@@ -152,15 +149,25 @@ const ResetPasswordForm = () => {
     resolver: zodResolver(schema),
   });
 
+  if (!token) {
+    if (!user) {
+      window.location.href = '/signin';
+    } else {
+      window.location.href = '/';
+    }
+    return null;
+  }
   const onSubmit = async (data: z.infer<typeof schema>) => {
     setStatus('loading');
     try {
       await authControllerConfirmResetPasswordToken(token, data);
       setStatus('success');
     } catch (err) {
+      console.log(err);
       setStatus('error');
     }
   };
+
 
   return (
     <Container

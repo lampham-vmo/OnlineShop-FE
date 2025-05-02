@@ -25,11 +25,10 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
-import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Permission } from '@/generated/api/models';
+import { CreateRoleDTO, Permission, UpdateRoleDTO } from '@/generated/api/models';
 import { Role } from '@/generated/api/models/role';
 import { getRole } from '@/generated/api/endpoints/role/role';
 import { useAuthStore } from '@/stores/authStore';
@@ -102,7 +101,7 @@ export const ManageRole = () => {
     } catch (error) {
       console.error('Failed to fetch roles:', error);
     }
-  }, []);
+  }, [roleControllerFindAll]);
 
   const fetchPermissions = useCallback( async () => {
     try {
@@ -111,7 +110,7 @@ export const ManageRole = () => {
     } catch (error) {
       console.error('Failed to fetch permissions:', error);
     }
-  }, []);
+  }, [permissionControllerFindAll]);
 
   useEffect(() => {
     fetchRoles();
@@ -169,7 +168,7 @@ export const ManageRole = () => {
       },
     });
    
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: CreateRoleDTO) => {
       try {
         await roleControllerAddRole(data);
         handleModalClose();
@@ -320,9 +319,9 @@ export const ManageRole = () => {
           permissionIds: selectedRole.permissions.map((p) => p.id),
         });
       }
-    }, [selectedRole, reset]);
+    }, [ reset]);
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: UpdateRoleDTO) => {
       try {
         await roleControllerUpdateRole(data);
         handleEditModalClose();
