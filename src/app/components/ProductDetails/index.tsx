@@ -243,12 +243,12 @@ const ProductDetails = () => {
                           </button>
                         </div>
 
-                        <a
+                        {/* <a
                           href="#"
                           className="inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark"
                         >
                           Purchase Now
-                        </a>
+                        </a> */}
 
                         <button className="inline-flex font-medium text-white bg-dark py-3 px-7 rounded-md ease-out duration-200 hover:bg-dark-2 false">
                           Add to Cart
