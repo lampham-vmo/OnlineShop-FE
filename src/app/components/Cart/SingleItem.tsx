@@ -1,7 +1,6 @@
-import { getCart } from '@/generated/api/endpoints/cart/cart';
 import { CartProduct } from '@/generated/api/models';
 import useCartStore from '@/stores/useCartStore';
-import React, { memo, useState } from 'react';
+import React from 'react';
 import toast from 'react-hot-toast';
 
 interface SingleItemProps {
@@ -28,7 +27,8 @@ function SingleItem({ item }: SingleItemProps) {
       itemInCart.price - (itemInCart.price * itemInCart.discount) / 100;
     return result;
   };
-  // TODO: increase decrease quantity
+
+  // TODO: increase quantity
   const handleIncreaseQuantity = () => {
     if (item.quantity === item.product.stock) {
       toast.error(
@@ -39,7 +39,8 @@ function SingleItem({ item }: SingleItemProps) {
     }
     increaseCartItemQuantity(item.id);
   };
-  // doesn't work, might be BE
+
+  // TODO: decrease quantity
   const handleDecreaseQuantity = () => {
     if (item.quantity <= 1) {
       toast.error(`Item ${item.product.name} cannot go below 1!`, {
@@ -66,7 +67,10 @@ function SingleItem({ item }: SingleItemProps) {
 
             <div>
               <h3 className="text-dark ease-out duration-200 hover:text-blue">
-                <a href="#"> {itemInCart.name} </a>
+                <a href={`/product-details/${item.product.id}`}>
+                  {' '}
+                  {itemInCart.name}{' '}
+                </a>
               </h3>
             </div>
           </div>
@@ -80,7 +84,7 @@ function SingleItem({ item }: SingleItemProps) {
       <div className="min-w-[275px]">
         <div className="w-max flex items-center rounded-md border border-gray-3">
           <button
-            disabled={item.quantity <= 1}
+            // disabled={item.quantity <= 1}
             onClick={() => handleDecreaseQuantity()}
             aria-label="button for remove product"
             className="flex items-center justify-center w-11.5 h-11.5 ease-out duration-200 hover:text-blue"
@@ -105,7 +109,7 @@ function SingleItem({ item }: SingleItemProps) {
           </span>
 
           <button
-            disabled={item.quantity === item.product.stock}
+            // disabled={item.quantity === item.product.stock}
             onClick={() => handleIncreaseQuantity()}
             aria-label="button for add product"
             className="flex items-center justify-center w-11.5 h-11.5 ease-out duration-200 hover:text-blue"
