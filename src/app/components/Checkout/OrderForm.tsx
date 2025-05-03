@@ -11,7 +11,6 @@ import { useRouter } from 'next/navigation';
 import { getPaymentMethod } from '@/generated/api/endpoints/payment-method/payment-method';
 import { PaymentMethodResponseDto } from '@/generated/api/models';
 import toast from 'react-hot-toast';
-import { getCart } from '@/generated/api/endpoints/cart/cart';
 import useCartStore from '@/stores/useCartStore';
 
 const orderSchema = z.object({
@@ -87,7 +86,6 @@ const ButtonCheckout = () => {
   >([]);
 
   const { paymentMethodControllerFindAll } = getPaymentMethod();
-  const { cartControllerClearCart } = getCart();
 
   const initialOptions = {
     clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || '',
@@ -101,7 +99,7 @@ const ButtonCheckout = () => {
   };
 
   const { ordersControllerCreate, ordersControllerCaptureOrder } = getOrders();
-  const { getCartFromServer } = useCartStore();
+  const { getCartFromServer, clearCartItems } = useCartStore();
 
   const onSubmit = async (data: OrderFormData) => {
     setIsPlacingOrder(true);
@@ -113,12 +111,11 @@ const ButtonCheckout = () => {
         delivery_address: data.address,
       });
       if (response.success) {
-        localStorage.removeItem('cart-storage');
-        getCartFromServer();
+        await getCartFromServer();
         router.push('/success');
       }
     } catch (error: any) {
-      await cartControllerClearCart();
+      await clearCartItems();
       router.push(`/failed?message=${encodeURIComponent(error.message)}`);
     } finally {
       setIsPlacingOrder(false);
@@ -134,7 +131,7 @@ const ButtonCheckout = () => {
     (method) => method.id === 2 && method.status === 'active',
   );
 
-  const handleCrearePaypalOrder = async () => {
+  const handleCreatePaypalOrder = async () => {
     try {
       if (retryPaypalId) {
         return retryPaypalId;
@@ -154,7 +151,7 @@ const ButtonCheckout = () => {
 
       return orderPaypalId;
     } catch (error: any) {
-      await cartControllerClearCart();
+      await clearCartItems();
       router.push(`/failed?message=${encodeURIComponent(error.message)}`);
       return '';
     }
@@ -171,8 +168,7 @@ const ButtonCheckout = () => {
       );
 
       if (response.success) {
-        localStorage.removeItem('cart-storage');
-        getCartFromServer();
+        await getCartFromServer();
         router.push('/success');
       }
     } catch (error: any) {
@@ -220,7 +216,7 @@ const ButtonCheckout = () => {
                 forceReRender={[paypalEnabled]}
                 disabled={!paypalEnabled}
                 onClick={handlePaypalClick}
-                createOrder={handleCrearePaypalOrder}
+                createOrder={handleCreatePaypalOrder}
                 onApprove={({ orderID }, actions) =>
                   handleCapturePaypalOrder(orderID, actions)
                 }

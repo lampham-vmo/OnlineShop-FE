@@ -8,7 +8,6 @@ import ScrollToTop from '../../components/Common/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
-import { getCart } from '@/generated/api/endpoints/cart/cart';
 import useCartStore from '@/stores/useCartStore';
 
 const geistSans = Geist({
@@ -27,18 +26,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [hasHydrated, setHasHydrated] = useState(false);
-  const { cartItems, getCartFromServer } = useCartStore();
+
+  const authPersist = useAuthStore.persist;
+  const cartPersist = useCartStore.persist;
 
   useEffect(() => {
-    if (useAuthStore.persist.hasHydrated()) {
-      setHasHydrated(true);
-    } else {
-      const unsub = useAuthStore.persist.onHydrate(() => {
+    const checkHydration = () => {
+      if (authPersist.hasHydrated() && cartPersist.hasHydrated()) {
         setHasHydrated(true);
-      });
-      useAuthStore.persist.rehydrate();
-      return unsub;
-    }
+      } else {
+        const unsubAuth = authPersist.onHydrate(() => {
+          if (cartPersist.hasHydrated()) setHasHydrated(true);
+        });
+
+        const unsubCart = cartPersist.onHydrate(() => {
+          if (authPersist.hasHydrated()) setHasHydrated(true);
+        });
+
+        authPersist.rehydrate();
+        cartPersist.rehydrate();
+
+        return () => {
+          unsubAuth();
+          unsubCart();
+        };
+      }
+    };
+
+    checkHydration();
   }, []);
 
   return (

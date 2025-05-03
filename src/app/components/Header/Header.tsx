@@ -41,7 +41,6 @@ export default function Header() {
   };
 
   useEffect(() => {
-    console.log(text);
     const delayDebounce = setTimeout(() => {
       if (text) {
         getAllProductByText();
