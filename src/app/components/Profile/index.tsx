@@ -181,14 +181,14 @@ export default function ProfileComponent() {
             {
               label: 'Full Name',
               value: profile.fullname,
-              field: 'fullname' as 'fullname',
+              field: 'fullname' as const,
             },
-            { label: 'Email', value: profile.email, field: 'email' as 'email' },
-            { label: 'Phone', value: profile.phone, field: 'phone' as 'phone' },
+            { label: 'Email', value: profile.email, field: 'email' as const },
+            { label: 'Phone', value: profile.phone, field: 'phone' as const },
             {
               label: 'Address',
               value: profile.address,
-              field: 'address' as 'address',
+              field: 'address' as const,
             },
             { label: 'Role', value: profile.role?.name || '', field: 'role' },
           ].map((item) => (
