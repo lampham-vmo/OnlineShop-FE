@@ -1,10 +1,10 @@
 'use client';
-import { Product } from '@/generated/api/models';
+import { ProductResponse } from '@/generated/api/models';
 import Image from 'next/image';
 import Link from 'next/link';
 
 interface IProductItemProps {
-  item: Product;
+  item: ProductResponse;
   bgWhite: boolean;
 }
 

@@ -45,6 +45,7 @@ const DeleteCategory = ({ id, name, onSuccess }: IDeleteCategoryProps) => {
         onSuccess();
         handleClose();
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(
         Array.isArray(error.message) ? error.message[0] : error.message,
@@ -85,8 +86,9 @@ const DeleteCategory = ({ id, name, onSuccess }: IDeleteCategoryProps) => {
           </IconButton>
 
           <Typography variant="h6" mb={3}>
-            Are you sure you want to delete the category "
-            {<span className="text-red-light">{name}</span>}"?
+            Are you sure you want to delete the category &quot;
+            {<span className="text-red-light">{name}</span>}
+            &quot;?
           </Typography>
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">

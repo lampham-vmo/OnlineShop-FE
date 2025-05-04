@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -114,6 +115,7 @@ const ButtonCheckout = () => {
         await getCartFromServer();
         router.push('/success');
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       await clearCartItems();
       router.push(`/failed?message=${encodeURIComponent(error.message)}`);
@@ -150,6 +152,7 @@ const ButtonCheckout = () => {
       setRetryOrderId(orderId);
 
       return orderPaypalId;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       await clearCartItems();
       router.push(`/failed?message=${encodeURIComponent(error.message)}`);
@@ -159,6 +162,7 @@ const ButtonCheckout = () => {
 
   const handleCapturePaypalOrder = async (
     orderPaypalId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     actions: OnApproveActions,
   ) => {
     try {
@@ -171,7 +175,8 @@ const ButtonCheckout = () => {
         await getCartFromServer();
         router.push('/success');
       }
-    } catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
       toast.error('Failed to complete your order, please try again!');
       setDisablePlaceOrder(true);
     }

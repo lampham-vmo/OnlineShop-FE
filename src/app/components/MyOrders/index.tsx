@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,7 +10,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
   CircularProgress,
   Typography,
   Box,
@@ -68,6 +68,7 @@ const MyOrders = () => {
       });
       setOrders(response.data.order);
       setPagination(response.data.pagination);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(true);
     } finally {
@@ -106,7 +107,7 @@ const MyOrders = () => {
     <>
       {orders.length === 0 ? (
         <Box display="flex" justifyContent="center" my={5}>
-          <Typography variant="body1">There aren't any orders</Typography>
+          <Typography variant="body1">There aren&apos;t any orders</Typography>
         </Box>
       ) : (
         <>
