@@ -32,7 +32,7 @@ const HeaderTopRight = () => {
     { label: 'Logout', path: '/logout' },
   ];
 
-  if (AllowedRoleForAdminLayout.includes(user?.role!)) {
+  if (AllowedRoleForAdminLayout.includes(Number(user?.role))) {
     settings.unshift({ label: 'Admin Dashboard', path: '/admin' });
   }
 

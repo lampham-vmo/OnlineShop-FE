@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import { useParams } from 'next/navigation';
@@ -30,6 +31,7 @@ const ProductDetails = () => {
         await getProduct().productControllerGetProductById(productId);
       setProductData(data.result);
       setStock(data.result.stock);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(true);
     }
@@ -67,7 +69,7 @@ const ProductDetails = () => {
       <div className="overflow-hidden relative pb-20 pt-5 lg:pt-20 xl:pt-28">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <p className="text-3xl text-center text-blue-600 font-semibold">
-            Product doesn't existed
+            Product doesn&apos;t existed
           </p>
         </div>
       </div>
