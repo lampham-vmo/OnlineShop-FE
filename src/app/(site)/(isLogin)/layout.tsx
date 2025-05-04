@@ -9,6 +9,7 @@ import { Toaster } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'next/navigation';
+import useCartStore from '@/stores/useCartStore';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,12 +31,33 @@ export default function RootLayout({
 
   const { user } = useAuthStore();
 
+  const authPersist = useAuthStore.persist;
+  const cartPersist = useCartStore.persist;
+
   useEffect(() => {
-    if (useAuthStore.persist.hasHydrated()) {
-      setHasHydrated(true);
-    } else {
-      const unsub = useAuthStore.persist.onHydrate(() => {
+    const checkHydration = () => {
+      if (authPersist.hasHydrated() && cartPersist.hasHydrated()) {
         setHasHydrated(true);
+      } else {
+        const unsubAuth = authPersist.onHydrate(() => {
+          if (cartPersist.hasHydrated()) setHasHydrated(true);
+        });
+
+        const unsubCart = cartPersist.onHydrate(() => {
+          if (authPersist.hasHydrated()) setHasHydrated(true);
+        });
+
+        authPersist.rehydrate();
+        cartPersist.rehydrate();
+
+        return () => {
+          unsubAuth();
+          unsubCart();
+        };
+      }
+    };
+
+    checkHydration();
       });
       useAuthStore.persist.rehydrate();
       return unsub;
