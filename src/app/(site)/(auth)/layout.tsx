@@ -2,7 +2,6 @@
 import { Geist, Geist_Mono } from 'next/font/google';
 // import "../globals.css";
 
-import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { Toaster } from 'react-hot-toast';
 

@@ -1,4 +1,4 @@
-`use client`;
+"use client";
 // import ManageAccount from '@/app/components/ManageAccount'
 // import React from 'react'
 

@@ -36,6 +36,7 @@ export default function SignUpForm() {
   const [loading, setLoading] = useState(false); // Add loading state
   const setUser = useUserStore((state) => state.setUser);
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const onSubmit = async (data: FormData) => {
     setLoading(true); // Set loading to true when submission starts
     try {

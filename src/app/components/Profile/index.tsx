@@ -1,6 +1,6 @@
 'use client';
 import { getUsers } from '@/generated/api/endpoints/users/users';
-import { Profile } from '@/generated/api/models';
+import { Profile, UpdatePasswordDTO } from '@/generated/api/models';
 import {
   userControllerUpdateProfileBody,
   userControllerUpdatePasswordBody,
@@ -16,8 +16,6 @@ import {
   Modal,
   TextField,
   Button,
-  Snackbar,
-  Alert,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { useForm, Controller } from 'react-hook-form';
@@ -47,9 +45,9 @@ export default function ProfileComponent() {
     },
   });
 
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleOpenModal = (field: any) => {
     if (profile) {
       setFieldToEdit(field);
@@ -67,10 +65,7 @@ export default function ProfileComponent() {
     reset();
   };
 
-  const handleCloseSnackbar = () => {
-    setSuccessMessage(null);
-  };
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     console.log('hello');
     console.log(profile, user);
@@ -90,6 +85,7 @@ export default function ProfileComponent() {
         console.error('Failed to update profile:', response);
         setErrorMessage('Failed to update profile.');
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setErrorMessage(error.message);
     }
@@ -105,7 +101,7 @@ export default function ProfileComponent() {
       setProfile(response.data);
     };
     fetchProfile();
-  }, [user]);
+  }, [user, userControllerGetProfileById]);
 
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
 
@@ -132,7 +128,7 @@ export default function ProfileComponent() {
     resetPasswordForm();
   };
 
-  const onChangePassword = async (data: any) => {
+  const onChangePassword = async (data: UpdatePasswordDTO) => {
     if (!user) return;
 
     try {
@@ -148,6 +144,7 @@ export default function ProfileComponent() {
         console.error('Failed to update password:', response);
         window.alert('Failed to update password.');
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       window.alert(error.message || 'An error occurred.');
     }
@@ -181,14 +178,14 @@ export default function ProfileComponent() {
             {
               label: 'Full Name',
               value: profile.fullname,
-              field: 'fullname' as 'fullname',
+              field: 'fullname' as const,
             },
-            { label: 'Email', value: profile.email, field: 'email' as 'email' },
-            { label: 'Phone', value: profile.phone, field: 'phone' as 'phone' },
+            { label: 'Email', value: profile.email, field: 'email' as const },
+            { label: 'Phone', value: profile.phone, field: 'phone' as const },
             {
               label: 'Address',
               value: profile.address,
-              field: 'address' as 'address',
+              field: 'address' as const,
             },
             { label: 'Role', value: profile.role?.name || '', field: 'role' },
           ].map((item) => (
@@ -204,7 +201,7 @@ export default function ProfileComponent() {
               <Typography variant="body1">
                 <strong>{item.label}:</strong> {item.value}
               </Typography>
-              {item.field !== 'role' && (
+              {(item.field !== 'role' && item.field !== 'email') && (
                 <IconButton
                   size="small"
                   onClick={() => handleOpenModal(item.field)}
