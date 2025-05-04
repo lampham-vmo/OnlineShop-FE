@@ -28,7 +28,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { CreateRoleDTO, Permission, UpdateRoleDTO } from '@/generated/api/models';
+import {
+  CreateRoleDTO,
+  Permission,
+  UpdateRoleDTO,
+} from '@/generated/api/models';
 import { Role } from '@/generated/api/models/role';
 import { getRole } from '@/generated/api/endpoints/role/role';
 import { useAuthStore } from '@/stores/authStore';
@@ -92,9 +96,7 @@ export const ManageRole = () => {
   } = getRole();
   const { permissionControllerFindAll } = getPermission();
 
-
-
-  const fetchRoles = useCallback( async () => {
+  const fetchRoles = useCallback(async () => {
     try {
       const response = await roleControllerFindAll();
       setRoles(response.data);
@@ -103,7 +105,7 @@ export const ManageRole = () => {
     }
   }, [roleControllerFindAll]);
 
-  const fetchPermissions = useCallback( async () => {
+  const fetchPermissions = useCallback(async () => {
     try {
       const response = await permissionControllerFindAll();
       setPermissions(response.data);
@@ -123,7 +125,6 @@ export const ManageRole = () => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-
   };
 
   const handleViewPermissions = (role: Role) => {
@@ -167,7 +168,7 @@ export const ManageRole = () => {
         permissionIds: [],
       },
     });
-   
+
     const onSubmit = async (data: CreateRoleDTO) => {
       try {
         await roleControllerAddRole(data);
@@ -319,7 +320,7 @@ export const ManageRole = () => {
           permissionIds: selectedRole.permissions.map((p) => p.id),
         });
       }
-    }, [ reset]);
+    }, [reset]);
 
     const onSubmit = async (data: UpdateRoleDTO) => {
       try {

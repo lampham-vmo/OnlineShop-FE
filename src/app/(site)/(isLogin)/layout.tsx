@@ -59,18 +59,13 @@ export default function RootLayout({
     };
 
     checkHydration();
-      });
-      useAuthStore.persist.rehydrate();
-      return unsub;
-    }
-
   }, []);
 
   useEffect(() => {
     if (hasHydrated && !user) {
       router.push('/signin');
     }
-  }, [hasHydrated, user, router]);
+  }, [hasHydrated]);
 
   return (
     <html lang="en" suppressHydrationWarning>

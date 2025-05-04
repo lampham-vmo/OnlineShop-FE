@@ -65,7 +65,6 @@ export default function AdminDashboardMain() {
     fetchStatistics();
   }, [topProductCount]);
 
-
   return (
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ p: 4, mt: 8, borderRadius: 3 }}>

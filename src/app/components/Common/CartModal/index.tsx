@@ -17,6 +17,7 @@ const CartSidebarModal = () => {
 
   useEffect(() => {
     // closing modal while clicking outside
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function handleClickOutside(event: any) {
       if (!event.target.closest('.modal-content')) {
         closeCartModal();

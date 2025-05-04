@@ -30,10 +30,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
 import { getUsers } from '@/generated/api/endpoints/users/users';
-import {
-  GetUserAccountDTO,
-  Role,
-} from '@/generated/api/models';
+import { GetUserAccountDTO, Role } from '@/generated/api/models';
 import { getRole } from '@/generated/api/endpoints/role/role';
 
 const {
