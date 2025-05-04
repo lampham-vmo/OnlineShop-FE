@@ -201,7 +201,7 @@ export default function ProfileComponent() {
               <Typography variant="body1">
                 <strong>{item.label}:</strong> {item.value}
               </Typography>
-              {(item.field !== 'role' && item.field !== 'email') && (
+              {item.field !== 'role' && item.field !== 'email' && (
                 <IconButton
                   size="small"
                   onClick={() => handleOpenModal(item.field)}

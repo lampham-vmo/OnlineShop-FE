@@ -45,7 +45,6 @@ export const VerifyEmail = () => {
     verify();
   }, [token]);
 
-
   if (!token) {
     if (!user) {
       window.location.href = '/signin';
@@ -54,10 +53,6 @@ export const VerifyEmail = () => {
     }
     return null;
   }
-
- 
-
-  
 
   return (
     <Container
@@ -133,8 +128,6 @@ const ResetPasswordForm = () => {
   const token = searchParams.get('token');
   const user = useAuthStore((state) => state.user);
 
- 
-
   const [status, setStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
   >('idle');
@@ -167,7 +160,6 @@ const ResetPasswordForm = () => {
       setStatus('error');
     }
   };
-
 
   return (
     <Container

@@ -1,6 +1,6 @@
 'use client';
 
-import {useState } from 'react';
+import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -16,10 +16,7 @@ import {
   CircularProgress,
   Modal,
 } from '@mui/material';
-import {
-  CheckCircle,
-  Replay,
-} from '@mui/icons-material';
+import { CheckCircle, Replay } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { authControllerLoginBody } from '@/generated/api/schemas/auth/auth.zod';
@@ -34,11 +31,11 @@ const loginSchema = authControllerLoginBody;
 
 // Infer TypeScript type from schema
 type LoginFormData = LoginUserDTO;
-interface tokenPayload{
-  accessToken: string,
-  role: number,
-  refreshToken: string,
-  permission: Permission
+interface tokenPayload {
+  accessToken: string;
+  role: number;
+  refreshToken: string;
+  permission: Permission;
 }
 export default function Login() {
   const router = useRouter();
@@ -232,7 +229,7 @@ export default function Login() {
                   required
                   fullWidth
                   label="Password"
-                  type = 'password'
+                  type="password"
                   // type={showPassword ? 'text' : 'password'}
                   id="password"
                   autoComplete="current-password"
