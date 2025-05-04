@@ -95,7 +95,7 @@ export const ManageRole = () => {
     roleControllerUpdateRole,
   } = getRole();
   const { permissionControllerFindAll } = getPermission();
-
+// eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchRoles = useCallback(async () => {
     try {
       const response = await roleControllerFindAll();
@@ -103,8 +103,8 @@ export const ManageRole = () => {
     } catch (error) {
       console.error('Failed to fetch roles:', error);
     }
-  }, [roleControllerFindAll]);
-
+  }, []);
+// eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchPermissions = useCallback(async () => {
     try {
       const response = await permissionControllerFindAll();
@@ -112,8 +112,8 @@ export const ManageRole = () => {
     } catch (error) {
       console.error('Failed to fetch permissions:', error);
     }
-  }, [permissionControllerFindAll]);
-
+  }, []);
+// eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchRoles();
     fetchPermissions();
