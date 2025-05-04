@@ -20,7 +20,7 @@ import { getProduct } from '@/generated/api/endpoints/product/product';
 import UpdateButton from './UpdateButton';
 import DeleteProduct from './DeleteButton';
 import BasicModal from './Create ProductButton';
-import Image from 'next/image';
+
 
 
 
@@ -109,7 +109,7 @@ export default function CustomizedTables() {
                       try {
                         const images = JSON.parse(row.image);
                         return Array.isArray(images) ? (
-                          <Image
+                          <img
                             src={images[0]}
                             alt="product"
                             style={{

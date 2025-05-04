@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import { useParams } from 'next/navigation';
@@ -83,10 +84,10 @@ const ProductsWithCategory = () => {
       categoryId: categoryId,
       ...params,
     });
-    setProducts(data.result.products);
-    setTotalPages(data.result.pagination.totalPages || 1);
-    setTotalItems(data.result.pagination.totalItems || 0);
-    setCategoryName(data.result.products[0]?.categoryName);
+    setProducts(data.data.products);
+    setTotalPages(data.data.pagination.totalPages || 1);
+    setTotalItems(data.data.pagination.totalItems || 0);
+    setCategoryName(data.data.products[0]?.categoryName || 'Category');
   };
 
   const handleChangePage = (_: React.ChangeEvent<unknown>, value: number) => {
@@ -124,7 +125,7 @@ const ProductsWithCategory = () => {
     <>
       {products.length === 0 ? (
         <div className="py-20 text-center text-blue-500 text-3xl font-semibold">
-          Doesn't exist products in this category
+          Doesn&apos;t exist products in this category
         </div>
       ) : (
         <>

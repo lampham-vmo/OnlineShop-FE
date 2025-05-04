@@ -21,9 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import {
-  Checkbox,
   FormControl,
-  FormControlLabel,
   FormHelperText,
   InputAdornment,
   InputLabel,
@@ -39,14 +37,12 @@ import { getProduct } from '@/generated/api/endpoints/product/product';
 import {
   CategoryResponseDto,
   ProductRequest,
-  UploadControllerUploadImageBody,
 } from '@/generated/api/models';
 import { getUpload } from '@/generated/api/endpoints/upload/upload';
 import toast from 'react-hot-toast';
 import { getCategory } from '@/generated/api/endpoints/category/category';
 import { productControllerCreateProductBody } from '@/generated/api/schemas/product/product.zod';
 import { ZodError } from 'zod';
-import { error } from 'console';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -138,8 +134,6 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
   const [upload, setUpload] = React.useState(false);
   const [imageLink, setImageLink] = React.useState<string[]>([]);
   const [categories, setCategories] = React.useState<CategoryResponseDto[]>([]);
-  const [uploadedFiles, setUploadedFiles] =
-    React.useState<UploadControllerUploadImageBody | null>(null);
   const [formData, setFormData] = React.useState<ProductRequest>({
     name: '',
     description: '',
@@ -199,7 +193,7 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
     setCategories(data.data);
     return data.data;
   };
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (field: string) => (event: any) => {
     let value =
       event.target.type === 'checkbox'
@@ -294,6 +288,7 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
       setTimeout(() => {
         handleClose();
       }, 600);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // Xử lý lỗi trả về từ API (message là array hoặc string)
       const message = error?.message;
@@ -310,7 +305,6 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
 
   React.useEffect(() => {
     getAllCategory();
-    console.log(uploadedFiles);
   }, []);
   return (
     <div className="flex justify-end mb-2">
@@ -470,7 +464,7 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
             >
               <MenuItem value={-1}>Select Category</MenuItem>
               {categories.map((category) => (
-                <MenuItem value={category.id}>{category.name}</MenuItem>
+                <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
               ))}
               {/* Thay bằng danh sách động từ API nếu cần */}
             </Select>

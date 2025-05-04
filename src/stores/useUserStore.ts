@@ -2,7 +2,9 @@
 import { create } from 'zustand';
 
 type UserState = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUser: (user: any) => void;
 };
 

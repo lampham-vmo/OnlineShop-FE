@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -25,11 +25,14 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
-import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Permission } from '@/generated/api/models';
+import {
+  CreateRoleDTO,
+  Permission,
+  UpdateRoleDTO,
+} from '@/generated/api/models';
 import { Role } from '@/generated/api/models/role';
 import { getRole } from '@/generated/api/endpoints/role/role';
 import { useAuthStore } from '@/stores/authStore';
@@ -78,14 +81,11 @@ const MethodChip = ({ method }: { method: string }) => {
 };
 
 export const ManageRole = () => {
-  const router = useRouter();
   const [roles, setRoles] = useState<Role[]>();
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
-  const [roleName, setRoleName] = useState('');
-  const [roleDescription, setRoleDescription] = useState('');
+
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const { isAcceptPermission } = useAuthStore.getState();
@@ -96,28 +96,28 @@ export const ManageRole = () => {
   } = getRole();
   const { permissionControllerFindAll } = getPermission();
 
-  useEffect(() => {
-    fetchRoles();
-    fetchPermissions();
-  }, []);
-
-  const fetchRoles = async () => {
+  const fetchRoles = useCallback(async () => {
     try {
       const response = await roleControllerFindAll();
       setRoles(response.data);
     } catch (error) {
       console.error('Failed to fetch roles:', error);
     }
-  };
+  }, [roleControllerFindAll]);
 
-  const fetchPermissions = async () => {
+  const fetchPermissions = useCallback(async () => {
     try {
       const response = await permissionControllerFindAll();
       setPermissions(response.data);
     } catch (error) {
       console.error('Failed to fetch permissions:', error);
     }
-  };
+  }, [permissionControllerFindAll]);
+
+  useEffect(() => {
+    fetchRoles();
+    fetchPermissions();
+  }, []);
 
   const handleAddRole = () => {
     setIsModalOpen(true);
@@ -125,9 +125,6 @@ export const ManageRole = () => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setRoleName('');
-    setRoleDescription('');
-    setSelectedPermissions([]);
   };
 
   const handleViewPermissions = (role: Role) => {
@@ -154,7 +151,6 @@ export const ManageRole = () => {
     const {
       control,
       handleSubmit,
-      reset,
       formState: { errors },
     } = useForm({
       resolver: zodResolver(
@@ -173,7 +169,7 @@ export const ManageRole = () => {
       },
     });
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: CreateRoleDTO) => {
       try {
         await roleControllerAddRole(data);
         handleModalClose();
@@ -324,9 +320,9 @@ export const ManageRole = () => {
           permissionIds: selectedRole.permissions.map((p) => p.id),
         });
       }
-    }, [selectedRole, reset]);
+    }, [reset]);
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: UpdateRoleDTO) => {
       try {
         await roleControllerUpdateRole(data);
         handleEditModalClose();

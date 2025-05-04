@@ -1,25 +1,13 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import {
-  Container,
-  Typography,
-  CircularProgress,
-  Alert,
-  Box,
-  Button,
-  Paper,
-} from '@mui/material';
+import { useState } from 'react';
+import { Container, CircularProgress, Alert, Button } from '@mui/material';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
-import { useAuthStore } from '@/stores/authStore';
 import { authControllerResetPasswordBody } from '@/generated/api/schemas/auth/auth.zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TextField, Snackbar } from '@mui/material';
 
 const { authControllerResetPassword } = getAuth();
-
-const VerifyResetToken = () => {};
 
 const SendResetPasswordForm = () => {
   const {
@@ -49,6 +37,7 @@ const SendResetPasswordForm = () => {
         setSeverity('error');
         setMessage('Failed to send reset password link.');
       }
+      /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (error: any) {
       setSeverity('error');
       setMessage(error.message || 'An error occurred.');

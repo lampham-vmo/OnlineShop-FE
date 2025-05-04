@@ -34,6 +34,7 @@ const ChangeStatusPaymentMethod = ({
         toast.success('Update status successfully!');
         onSuccess();
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error('Update status failed!');
     } finally {
