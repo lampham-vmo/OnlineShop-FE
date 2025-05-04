@@ -84,10 +84,10 @@ const ProductsWithCategory = () => {
       categoryId: categoryId,
       ...params,
     });
-    setProducts(data.result.products);
-    setTotalPages(data.result.pagination.totalPages || 1);
-    setTotalItems(data.result.pagination.totalItems || 0);
-    setCategoryName(data.result.products[0]?.categoryName || 'Category');
+    setProducts(data.data.products);
+    setTotalPages(data.data.pagination.totalPages || 1);
+    setTotalItems(data.data.pagination.totalItems || 0);
+    setCategoryName(data.data.products[0]?.categoryName || 'Category');
   };
 
   const handleChangePage = (_: React.ChangeEvent<unknown>, value: number) => {

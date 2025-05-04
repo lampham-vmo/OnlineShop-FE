@@ -11,13 +11,9 @@ import Paper from '@mui/material/Paper';
 import { getOrders } from '@/generated/api/endpoints/orders/orders';
 import { OrderResponseDTO } from '@/generated/api/models';
 import {
-  Button,
   Chip,
-  MenuItem,
   Pagination,
-  Select,
   Stack,
-  TextField, // Thêm TextField cho ô Search
 } from '@mui/material';
 import ConfirmModalOrder from './confirm.modal';
 import OrderDetails from '../../MyOrders/OrderDetails';
@@ -48,7 +44,6 @@ export default function CustomizedTables() {
   const [totalPages, setTotalPages] = React.useState(1);
   const [totalItems, setTotalItems] = React.useState(0);
 
-  const [searchValue, setSearchValue] = React.useState('');
 
   enum Status {
     UNPAID = 'UNPAID',
@@ -85,6 +80,7 @@ export default function CustomizedTables() {
     SetOrderData(data.data.order);
     setTotalPages(data.data.pagination.totalPages || 1);
     setTotalItems(data.data.pagination.totalItems || 0);
+    console.log(totalItems)
   };
 
   const updateStatus = async (id: number, status: Status) => {
@@ -97,14 +93,6 @@ export default function CustomizedTables() {
 
   const handleChangePage = (_: React.ChangeEvent<unknown>, value: number) => {
     setParams((prev) => ({ ...prev, page: value }));
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-  };
-
-  const handleSearchSubmit = () => {
-    setParams({ ...params, page: 1, search: searchValue });
   };
 
   React.useEffect(() => {

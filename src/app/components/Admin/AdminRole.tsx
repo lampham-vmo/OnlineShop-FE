@@ -117,7 +117,7 @@ export const ManageRole = () => {
   useEffect(() => {
     fetchRoles();
     fetchPermissions();
-  }, [fetchRoles, fetchPermissions]);
+  }, []);
 
   const handleAddRole = () => {
     setIsModalOpen(true);

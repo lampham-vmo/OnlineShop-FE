@@ -3,7 +3,7 @@ import Link from 'next/link';
 import useCartStore from '@/stores/useCartStore';
 
 const EmptyCart = () => {
-  const { closeCart } = useCartStore();
+  const { closeCartModal } = useCartStore();
 
   return (
     <div className="text-center">
@@ -38,7 +38,7 @@ const EmptyCart = () => {
       <p className="pb-6">Your cart is empty!</p>
 
       <Link
-        onClick={() => closeCart()}
+        onClick={() => closeCartModal()}
         href="/"
         className="w-full lg:w-10/12 mx-auto flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
       >

@@ -29,8 +29,8 @@ const ProductDetails = () => {
     try {
       const data =
         await getProduct().productControllerGetProductById(productId);
-      setProductData(data.result);
-      setStock(data.result.stock);
+      setProductData(data.data);
+      setStock(data.data.stock);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(true);

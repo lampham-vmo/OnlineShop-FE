@@ -1,11 +1,11 @@
 'use client';
 import { VerifyEmail } from '@/app/components/Verify';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 export default function VerifyPage() {
   return (
-    <div>
+    <Suspense fallback={<div>Loading...</div>}>
       <VerifyEmail />
-    </div>
+    </Suspense>
   );
 }
