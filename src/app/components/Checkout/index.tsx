@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import Link from 'next/link';
@@ -33,6 +34,7 @@ const Checkout = () => {
       });
       setTotal(totalPrice);
       setItems(newItems);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(true);
     } finally {

@@ -19,7 +19,7 @@
 //   );
 // }, [setCartItem]);
 
-let cartItemsList = [
+const cartItemsList = [
   {
     id: 1,
     imgs: '',

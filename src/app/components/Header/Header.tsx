@@ -14,7 +14,6 @@ import {
 import { useRouter } from 'next/navigation';
 import { getProduct } from '@/generated/api/endpoints/product/product';
 import {
-  ProductControllerSearchProductByNameParams,
   ProductResponse,
 } from '@/generated/api/models';
 import HeaderTopRight from './HeaderTopRight';
@@ -24,13 +23,18 @@ export default function Header() {
   const [options, setOption] = useState<ProductResponse[]>([]);
   const [text, setText] = useState('');
   const [open, setOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const selectedProduct = null
   const router = useRouter();
 
   const getAllProductByText = async () => {
-    const data = await productControllerSearchProductByName({ text: text });
-    setOption(data.result);
+    const data = await productControllerSearchProductByName({ text });
+    if (Array.isArray(data.data)) {
+      setOption(data.data.filter((item) => item && typeof item === 'object' && 'id' in item));
+    } else {
+      setOption([]);
+    }
   };
+  
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' && text != '') {
@@ -41,7 +45,6 @@ export default function Header() {
   };
 
   useEffect(() => {
-    console.log(text);
     const delayDebounce = setTimeout(() => {
       if (text) {
         getAllProductByText();
@@ -94,6 +97,7 @@ export default function Header() {
                     const { key, ...rest } = props;
                     console.log(option);
                     return (
+                      
                       <Box
                         {...rest}
                         component="li"

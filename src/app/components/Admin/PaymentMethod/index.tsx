@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import { useAuthStore } from '@/stores/authStore';
@@ -58,6 +59,7 @@ const ManagePaymentMethod = () => {
     try {
       const response = await paymentMethodControllerFindAll();
       setDataPaymentMethods(response.data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(true);
     } finally {

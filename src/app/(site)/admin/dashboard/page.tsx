@@ -1,4 +1,4 @@
-`use client`;
+'use client';
 import AdminDashboard from '@/app/components/Admin';
 import React from 'react';
 

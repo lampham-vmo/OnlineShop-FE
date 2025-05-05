@@ -15,6 +15,7 @@ import {
   MenuItem,
   IconButton,
   styled,
+  SelectChangeEvent,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -167,14 +168,20 @@ export default function UpdateProductModal({
   }, [open]);
 
   const handleChange =
-    (field: keyof ProductRequest) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      let value: string | number = e.target.value;
-      if (['stock', 'price', 'discount', 'categoryId'].includes(field)) {
-        value = Number(value);
-      }
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    };
+  (field: keyof ProductRequest) =>
+  (
+    e:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | SelectChangeEvent
+  ) => {
+    let value: string | number = e.target.value;
+
+    if (['stock', 'price', 'discount', 'categoryId'].includes(field)) {
+      value = Number(value);
+    }
+
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setUpload(true);
@@ -239,6 +246,7 @@ export default function UpdateProductModal({
       );
       onSuccess?.();
       handleClose();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       const msg = e?.message;
       toast.error(
@@ -375,12 +383,12 @@ export default function UpdateProductModal({
             <InputLabel id="cat-label">Category</InputLabel>
             <Select
               labelId="cat-label"
-              value={formData.categoryId}
+              value={String(formData.categoryId)}
               onChange={handleChange('categoryId')}
             >
               <MenuItem value={-1}>Select Category</MenuItem>
               {categories.map((c) => (
-                <MenuItem key={c.id} value={c.id}>
+                <MenuItem key={c.id} value={String(c.id)}>
                   {c.name}
                 </MenuItem>
               ))}

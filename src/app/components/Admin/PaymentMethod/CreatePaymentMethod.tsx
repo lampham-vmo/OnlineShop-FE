@@ -64,6 +64,7 @@ const CreatePaymentMethod = ({ onSuccess }: ICreatePaymentMethodProps) => {
         handleCloseModal();
         onSuccess();
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(
         Array.isArray(error.message) ? error.message[0] : error.message,

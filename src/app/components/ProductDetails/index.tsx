@@ -1,11 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import { useParams } from 'next/navigation';
 import Breadcrumb from '../Common/Breadcrumb';
 import { useEffect, useState } from 'react';
 import { getProduct } from '@/generated/api/endpoints/product/product';
-import { Product, ProductResponse } from '@/generated/api/models';
+import { ProductResponse } from '@/generated/api/models';
 import { Box, CircularProgress } from '@mui/material';
+import { useAuthStore } from '@/stores/authStore';
 import toast from 'react-hot-toast';
 import useCartStore from '@/stores/useCartStore';
 
@@ -17,15 +19,45 @@ const ProductDetails = () => {
   const [error, setError] = useState<boolean>(false);
 
   const [previewImg, setPreviewImg] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [stock, setStock] = useState(0);
+
+  const { user } = useAuthStore();
+  const { cartItems, addItemToCart } = useCartStore();
 
   const fetchProduct = async () => {
     try {
       const data =
         await getProduct().productControllerGetProductById(productId);
-      setProductData(data.result);
+      setProductData(data.data);
+      setStock(data.data.stock);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(true);
     }
+  };
+
+  const itemInCart = cartItems.find((item) => item.product.id === productId);
+  const isAdded = !!itemInCart;
+
+  const handleDecrease = () => {
+    if (!user || isAdded) return;
+    setQuantity((prev) => Math.max(1, prev - 1));
+  };
+
+  const handleIncrease = () => {
+    if (!user || isAdded) return;
+    if (quantity < stock) {
+      setQuantity((prev) => prev + 1);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      toast.error('You have to sign in!', { duration: 2000 });
+      return;
+    }
+    await addItemToCart(Number(productData?.id), quantity);
   };
 
   useEffect(() => {
@@ -37,7 +69,7 @@ const ProductDetails = () => {
       <div className="overflow-hidden relative pb-20 pt-5 lg:pt-20 xl:pt-28">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <p className="text-3xl text-center text-blue-600 font-semibold">
-            Product doesn't existed
+            Product doesn&apos;t existed
           </p>
         </div>
       </div>
@@ -45,16 +77,6 @@ const ProductDetails = () => {
   }
 
   const listImage: string[] = JSON.parse(productData?.image || '[]');
-
-  // const {addItemToCart} = useCartStore()
-  // const handleAddToCart = (item: Product) => {
-  //   if (item.stock === 0) {
-  //     toast.error(`${item.name} is out of stock`, { duration: 400 });
-  //     return;
-  //   }
-  //   addItemToCart(item);
-  //   toast.success(`${item.name} added to cart`, { duration: 400 });
-  // };
 
   return (
     <div>
@@ -197,7 +219,7 @@ const ProductDetails = () => {
                           <button
                             aria-label="button for remove product"
                             className="flex items-center justify-center w-12 h-12 ease-out duration-200 hover:text-blue"
-                            // onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                            onClick={handleDecrease}
                           >
                             <svg
                               className="fill-current"
@@ -215,11 +237,11 @@ const ProductDetails = () => {
                           </button>
 
                           <span className="flex items-center justify-center w-16 h-12 border-x border-gray-4">
-                            {1}
+                            {quantity}
                           </span>
 
                           <button
-                            // onClick={() => setQuantity(quantity + 1)}
+                            onClick={handleIncrease}
                             aria-label="button for add product"
                             className="flex items-center justify-center w-12 h-12 ease-out duration-200 hover:text-blue"
                           >
@@ -243,15 +265,16 @@ const ProductDetails = () => {
                           </button>
                         </div>
 
-                        {/* <a
-                          href="#"
-                          className="inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark"
+                        <button
+                          disabled={isAdded}
+                          onClick={!isAdded ? handleAddToCart : undefined}
+                          className={`inline-flex font-medium text-white py-3 px-7 rounded-md ${
+                            isAdded
+                              ? 'bg-dark-2 cursor-not-allowed'
+                              : 'bg-dark hover:bg-dark-2'
+                          }`}
                         >
-                          Purchase Now
-                        </a> */}
-
-                        <button className="inline-flex font-medium text-white bg-dark py-3 px-7 rounded-md ease-out duration-200 hover:bg-dark-2 false">
-                          Add to Cart
+                          {isAdded ? 'Added' : 'Add to Cart'}
                         </button>
                       </div>
                     </form>
