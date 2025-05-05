@@ -205,7 +205,7 @@ const ButtonCheckout = () => {
           disabled={disablePlaceOrder}
           loading={isPlacingOrder}
         >
-          Place Order
+          Cash on delivery
         </Button>
 
         {paypalAvailable && (

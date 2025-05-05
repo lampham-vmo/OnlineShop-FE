@@ -2,6 +2,7 @@
 import { ProductResponse } from '@/generated/api/models';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface IProductItemProps {
   item: ProductResponse;
@@ -9,12 +10,23 @@ interface IProductItemProps {
 }
 
 const ProductItem = ({ item, bgWhite = true }: IProductItemProps) => {
+  const router = useRouter();
+
   const listImage: string[] = JSON.parse(item.image);
 
   const itemDiscountedPrice = item.price - (item.price * item.discount) / 100;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleViewDetails = (id: number): any => {
+    router.push(`/product-details/${id}`);
+  };
+
   return (
-    <div className="group">
+    <div
+      className="group cursor-pointer"
+      role="button"
+      onClick={() => handleViewDetails(item.id)}
+    >
       <div
         className={`relative overflow-hidden flex items-center justify-center rounded-lg min-h-[270px] mb-4 ${bgWhite ? 'bg-white' : 'bg-[#F6F7FB]'}`}
       >
