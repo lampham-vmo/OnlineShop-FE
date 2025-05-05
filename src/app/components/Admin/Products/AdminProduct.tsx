@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { styled} from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -8,10 +8,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import {
-  Pagination,
-  Stack,
-} from '@mui/material';
+import { Pagination, Stack } from '@mui/material';
 import {
   ProductControllerGetAllProductParams,
   ProductResponse,
@@ -20,11 +17,6 @@ import { getProduct } from '@/generated/api/endpoints/product/product';
 import UpdateButton from './UpdateButton';
 import DeleteProduct from './DeleteButton';
 import BasicModal from './Create ProductButton';
-
-
-
-
-
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -45,7 +37,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     border: 0,
   },
 }));
-
 
 export default function CustomizedTables() {
   const [params, setParams] =
@@ -71,7 +62,7 @@ export default function CustomizedTables() {
     setProductList(data.data.products);
     setTotalPages(data.data.pagination.totalPages || 1);
     setTotalItems(data.data.pagination.totalItems || 0);
-    console.log(totalItems)
+    console.log(totalItems);
   };
   React.useEffect(() => {
     getListProduct();
@@ -129,7 +120,9 @@ export default function CustomizedTables() {
                   <StyledTableCell>{row.discount}%</StyledTableCell>
                   <StyledTableCell>{row.rating}</StyledTableCell>
                   <StyledTableCell>{row.categoryName}</StyledTableCell>
-                  <StyledTableCell>{row.createdAt}</StyledTableCell>
+                  <StyledTableCell>
+                    {new Date(row.createdAt).toLocaleString()}
+                  </StyledTableCell>
                   <StyledTableCell>
                     <div className="flex gap-x-2">
                       <UpdateButton

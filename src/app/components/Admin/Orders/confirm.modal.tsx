@@ -40,7 +40,7 @@ const ConfirmModalOrder = ({ onConfirm, title }: IConfirmModalProps) => {
       await onConfirm();
       toast.success('Update successful');
       handleClose();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || 'Update failed');
     } finally {
