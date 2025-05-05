@@ -10,11 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { getOrders } from '@/generated/api/endpoints/orders/orders';
 import { OrderResponseDTO } from '@/generated/api/models';
-import {
-  Chip,
-  Pagination,
-  Stack,
-} from '@mui/material';
+import { Chip, Pagination, Stack } from '@mui/material';
 import ConfirmModalOrder from './confirm.modal';
 import OrderDetails from '../../MyOrders/OrderDetails';
 
@@ -43,7 +39,6 @@ export default function CustomizedTables() {
   const [params, setParams] = React.useState({ page: 1, search: '' });
   const [totalPages, setTotalPages] = React.useState(1);
   const [totalItems, setTotalItems] = React.useState(0);
-
 
   enum Status {
     UNPAID = 'UNPAID',
@@ -80,7 +75,7 @@ export default function CustomizedTables() {
     SetOrderData(data.data.order);
     setTotalPages(data.data.pagination.totalPages || 1);
     setTotalItems(data.data.pagination.totalItems || 0);
-    console.log(totalItems)
+    console.log(totalItems);
   };
 
   const updateStatus = async (id: number, status: Status) => {

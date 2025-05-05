@@ -46,7 +46,7 @@ const DeleteProduct = ({ id, name, onSuccess }: IDeleteCategoryProps) => {
       });
       onSuccess?.();
       setTimeout(handleClose, 300);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message || 'Delete failed!');
     } finally {
@@ -87,7 +87,6 @@ const DeleteProduct = ({ id, name, onSuccess }: IDeleteCategoryProps) => {
             Are you sure you want to delete the product&nbsp;
             <span className="text-red-light">&quot;{name}&quot;</span>?
           </Typography>
-
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">
             <Button variant="outlined" onClick={handleClose}>
