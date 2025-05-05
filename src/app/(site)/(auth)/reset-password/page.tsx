@@ -11,9 +11,8 @@ export default function VerifyPage() {
     return null;
   }
   return (
-        <Suspense fallback={<div>Loading...</div>}>
-          <ResetPasswordForm />
-        </Suspense>
-
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

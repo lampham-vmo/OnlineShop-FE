@@ -3,10 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import CategoryDropdown from './CategoryDropdown';
 
 import ProductItem from '../Common/ProductItem';
-import {
-  Pagination,
-  Stack,
-} from '@mui/material';
+import { Pagination, Stack } from '@mui/material';
 import CustomSelect from '../ProductsWithCategory/CustomSelect';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { getCategory } from '@/generated/api/endpoints/category/category';
@@ -38,7 +35,7 @@ const ShopWithSidebar = () => {
     pageSize: 9,
     categoryId: undefined,
   });
-  const stickyMenu = false
+  const stickyMenu = false;
   const [categories, setCategories] = useState<CategoryResponseDto[]>([]);
   const sortBlockRef = useRef<HTMLDivElement>(null);
 
@@ -134,12 +131,10 @@ const ShopWithSidebar = () => {
     } else return;
   }, [params, query]);
   if (pathName == '/product-search') {
-    options.filter(
-      (opt) => opt.value !== '1' && opt.value !== '2',
-    );
+    options.filter((opt) => opt.value !== '1' && opt.value !== '2');
   } else {
     const filteredOptions = options;
-    console.log(filteredOptions)
+    console.log(filteredOptions);
   }
 
   return (
