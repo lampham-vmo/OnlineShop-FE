@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,7 +12,6 @@ import { useRouter } from 'next/navigation';
 import { getPaymentMethod } from '@/generated/api/endpoints/payment-method/payment-method';
 import { PaymentMethodResponseDto } from '@/generated/api/models';
 import toast from 'react-hot-toast';
-import { getCart } from '@/generated/api/endpoints/cart/cart';
 import useCartStore from '@/stores/useCartStore';
 
 const orderSchema = z.object({
@@ -87,7 +87,6 @@ const ButtonCheckout = () => {
   >([]);
 
   const { paymentMethodControllerFindAll } = getPaymentMethod();
-  const { cartControllerClearCart } = getCart();
 
   const initialOptions = {
     clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || '',
@@ -101,7 +100,7 @@ const ButtonCheckout = () => {
   };
 
   const { ordersControllerCreate, ordersControllerCaptureOrder } = getOrders();
-  const { getCartFromServer } = useCartStore();
+  const { getCartFromServer, clearCartItems } = useCartStore();
 
   const onSubmit = async (data: OrderFormData) => {
     setIsPlacingOrder(true);
@@ -113,12 +112,12 @@ const ButtonCheckout = () => {
         delivery_address: data.address,
       });
       if (response.success) {
-        localStorage.removeItem('cart-storage');
-        getCartFromServer();
+        await getCartFromServer();
         router.push('/success');
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      await cartControllerClearCart();
+      await clearCartItems();
       router.push(`/failed?message=${encodeURIComponent(error.message)}`);
     } finally {
       setIsPlacingOrder(false);
@@ -134,7 +133,7 @@ const ButtonCheckout = () => {
     (method) => method.id === 2 && method.status === 'active',
   );
 
-  const handleCrearePaypalOrder = async () => {
+  const handleCreatePaypalOrder = async () => {
     try {
       if (retryPaypalId) {
         return retryPaypalId;
@@ -153,8 +152,9 @@ const ButtonCheckout = () => {
       setRetryOrderId(orderId);
 
       return orderPaypalId;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      await cartControllerClearCart();
+      await clearCartItems();
       router.push(`/failed?message=${encodeURIComponent(error.message)}`);
       return '';
     }
@@ -162,6 +162,7 @@ const ButtonCheckout = () => {
 
   const handleCapturePaypalOrder = async (
     orderPaypalId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     actions: OnApproveActions,
   ) => {
     try {
@@ -171,11 +172,11 @@ const ButtonCheckout = () => {
       );
 
       if (response.success) {
-        localStorage.removeItem('cart-storage');
-        getCartFromServer();
+        await getCartFromServer();
         router.push('/success');
       }
-    } catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
       toast.error('Failed to complete your order, please try again!');
       setDisablePlaceOrder(true);
     }
@@ -220,7 +221,7 @@ const ButtonCheckout = () => {
                 forceReRender={[paypalEnabled]}
                 disabled={!paypalEnabled}
                 onClick={handlePaypalClick}
-                createOrder={handleCrearePaypalOrder}
+                createOrder={handleCreatePaypalOrder}
                 onApprove={({ orderID }, actions) =>
                   handleCapturePaypalOrder(orderID, actions)
                 }

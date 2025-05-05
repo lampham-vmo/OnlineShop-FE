@@ -25,9 +25,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
 
 export default function AdminDashboardMain() {
@@ -67,8 +64,6 @@ export default function AdminDashboardMain() {
 
     fetchStatistics();
   }, [topProductCount]);
-
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28DFF'];
 
   return (
     <Container maxWidth="md">

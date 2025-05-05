@@ -25,16 +25,6 @@ export const VerifyEmail = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const user = useAuthStore((state) => state.user);
-
-  if (!token) {
-    if (!user) {
-      window.location.href = '/signin';
-    } else {
-      window.location.href = '/';
-    }
-    return null;
-  }
-
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
     'loading',
   );
@@ -44,7 +34,7 @@ export const VerifyEmail = () => {
 
     const verify = async () => {
       try {
-        const res = await authControllerConfirmEmail(token);
+        await authControllerConfirmEmail(token);
         setStatus('success');
       } catch (err) {
         console.log(err);
@@ -54,6 +44,15 @@ export const VerifyEmail = () => {
 
     verify();
   }, [token]);
+
+  if (!token) {
+    if (!user) {
+      window.location.href = '/signin';
+    } else {
+      window.location.href = '/';
+    }
+    return null;
+  }
 
   return (
     <Container
@@ -129,15 +128,6 @@ const ResetPasswordForm = () => {
   const token = searchParams.get('token');
   const user = useAuthStore((state) => state.user);
 
-  if (!token) {
-    if (!user) {
-      window.location.href = '/signin';
-    } else {
-      window.location.href = '/';
-    }
-    return null;
-  }
-
   const [status, setStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
   >('idle');
@@ -152,12 +142,21 @@ const ResetPasswordForm = () => {
     resolver: zodResolver(schema),
   });
 
+  if (!token) {
+    if (!user) {
+      window.location.href = '/signin';
+    } else {
+      window.location.href = '/';
+    }
+    return null;
+  }
   const onSubmit = async (data: z.infer<typeof schema>) => {
     setStatus('loading');
     try {
       await authControllerConfirmResetPasswordToken(token, data);
       setStatus('success');
     } catch (err) {
+      console.log(err);
       setStatus('error');
     }
   };

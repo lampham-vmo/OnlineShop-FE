@@ -1,9 +1,8 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import {
   Box,
   Paper,
@@ -17,29 +16,29 @@ import {
   CircularProgress,
   Modal,
 } from '@mui/material';
-import {
-  Visibility,
-  VisibilityOff,
-  CheckCircle,
-  Replay,
-} from '@mui/icons-material';
+import { CheckCircle, Replay } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { authControllerLoginBody } from '@/generated/api/schemas/auth/auth.zod';
-import type { LoginUserDTO } from '@/generated/api/models';
-import { useAuthStore, type AuthState } from '@/stores/authStore';
+import type { LoginUserDTO, Permission } from '@/generated/api/models';
+import { useAuthStore } from '@/stores/authStore';
 import { jwtDecode } from 'jwt-decode';
 import SendResetPasswordForm from '../VerifyResetToken';
+import useCartStore from '@/stores/useCartStore';
 
 // Use the Orval-generated zod schema
 const loginSchema = authControllerLoginBody;
 
 // Infer TypeScript type from schema
 type LoginFormData = LoginUserDTO;
-
+interface tokenPayload {
+  accessToken: string;
+  role: number;
+  refreshToken: string;
+  permission: Permission;
+}
 export default function Login() {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailNotVerified, setEmailNotVerified] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
@@ -49,7 +48,8 @@ export default function Login() {
   const [openResetPasswordModal, setOpenResetPasswordModal] = useState(false);
   const authApi = getAuth();
 
-  const { user, setTokens, setPermission } = useAuthStore.getState();
+  const { setTokens, setPermission } = useAuthStore.getState();
+  const { getCartFromServer } = useCartStore();
   // Initialize react-hook-form with zod resolver
   // Check for authentication on component mount
 
@@ -80,19 +80,21 @@ export default function Login() {
 
       // Sử dụng authStore để lưu tokens
       setPermission(result.permission);
-      console.log(result);
       setTokens({
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
       });
 
+      await getCartFromServer();
+
       // Redirect sau khi đăng nhập thành công
-      const payload: any = jwtDecode(result.accessToken);
+      const payload: tokenPayload = jwtDecode(result.accessToken);
       if (payload.role == 1) {
         router.push('/admin');
       } else {
         router.push('/');
       }
+      /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (err: any) {
       console.log(err);
       setError(err.message || 'Login failed. Please try again.');
@@ -109,6 +111,7 @@ export default function Login() {
     try {
       await authApi.authControllerReSendConfirmationEmail(email);
       setResendStatus('success');
+      /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (err: any) {
       alert('Failed to resend confirmation email: ' + err.message);
       setResendStatus('idle');
@@ -226,7 +229,8 @@ export default function Login() {
                   required
                   fullWidth
                   label="Password"
-                  type={showPassword ? 'text' : 'password'}
+                  type="password"
+                  // type={showPassword ? 'text' : 'password'}
                   id="password"
                   autoComplete="current-password"
                   error={!!errors.password}
@@ -259,7 +263,7 @@ export default function Login() {
             </Button>
             {/* Add the signup link here */}
             <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <a
                 href="/signup"
                 style={{ textDecoration: 'none', color: '#1976d2' }}

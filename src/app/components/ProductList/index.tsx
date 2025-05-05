@@ -4,16 +4,11 @@ import CategoryDropdown from './CategoryDropdown';
 
 import ProductItem from '../Common/ProductItem';
 import {
-  FormControl,
-  InputLabel,
-  MenuItem,
   Pagination,
-  Select,
   Stack,
 } from '@mui/material';
-import { number } from 'zod';
 import CustomSelect from '../ProductsWithCategory/CustomSelect';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { getCategory } from '@/generated/api/endpoints/category/category';
 import { getProduct } from '@/generated/api/endpoints/product/product';
 import {
@@ -23,9 +18,7 @@ import {
 } from '@/generated/api/models';
 
 const ShopWithSidebar = () => {
-  const router = useRouter();
   const pathName = usePathname();
-  console.log(pathName);
   const searchParams = useSearchParams();
   const [query, setQuery] = useState<string>('');
   useEffect(() => {
@@ -45,7 +38,7 @@ const ShopWithSidebar = () => {
     pageSize: 9,
     categoryId: undefined,
   });
-  const [stickyMenu, setStickyMenu] = useState(false);
+  const stickyMenu = false
   const [categories, setCategories] = useState<CategoryResponseDto[]>([]);
   const sortBlockRef = useRef<HTMLDivElement>(null);
 
@@ -59,18 +52,18 @@ const ShopWithSidebar = () => {
       ...params,
       text: query,
     });
-    setProductList(data.result.products);
-    setTotalPages(data.result.pagination.totalPages || 1);
-    setTotalItems(data.result.pagination.totalItems || 0);
+    setProductList(data.data.products);
+    setTotalPages(data.data.pagination.totalPages || 1);
+    setTotalItems(data.data.pagination.totalItems || 0);
   };
 
   const getListProduct = async () => {
     const data = await productControllerGetAllProduct({
       ...params,
     });
-    setProductList(data.result.products);
-    setTotalPages(data.result.pagination.totalPages || 1);
-    setTotalItems(data.result.pagination.totalItems || 0);
+    setProductList(data.data.products);
+    setTotalPages(data.data.pagination.totalPages || 1);
+    setTotalItems(data.data.pagination.totalItems || 0);
   };
 
   const handleChangePage = (_: React.ChangeEvent<unknown>, value: number) => {
@@ -141,11 +134,12 @@ const ShopWithSidebar = () => {
     } else return;
   }, [params, query]);
   if (pathName == '/product-search') {
-    const filteredOptions = options.filter(
+    options.filter(
       (opt) => opt.value !== '1' && opt.value !== '2',
     );
   } else {
     const filteredOptions = options;
+    console.log(filteredOptions)
   }
 
   return (

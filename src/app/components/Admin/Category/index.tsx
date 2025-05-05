@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import {
@@ -167,6 +168,7 @@ const ManageCategory = () => {
     try {
       const response = await getCategory().categoryControllerGetList(params);
       setDataCategories(response.data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError(true);
     } finally {

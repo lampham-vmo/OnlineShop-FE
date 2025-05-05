@@ -14,7 +14,7 @@ const Shopping = () => {
       page: 1,
       pageSize: 8,
     });
-    setProducts(data.result.products);
+    setProducts(data.data.products);
   };
 
   useEffect(() => {

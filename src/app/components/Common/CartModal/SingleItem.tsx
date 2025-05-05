@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { CartProduct, Product } from '@/generated/api/models';
-import useCartStore from '@/stores/useCartStore';
+import React from 'react';
+import { CartProduct } from '@/generated/api/models';
 
 interface SingleItemProps {
-  // de any thi chay duoc nhung se return ra id va quantity
   item: CartProduct;
   removeItemFromCart: (id: number) => void;
 }
@@ -14,7 +12,6 @@ const SingleItem = ({ item, removeItemFromCart }: SingleItemProps) => {
   const itemFirstImage = JSON.parse(itemInCart.image)[0];
 
   const handleRemoveFromCart = () => {
-    // console.log(`Removing: ${item.id}`);
     removeItemFromCart(item.id);
   };
 
@@ -36,10 +33,13 @@ const SingleItem = ({ item, removeItemFromCart }: SingleItemProps) => {
 
         <div>
           <h3 className="font-medium text-dark mb-1 ease-out duration-200 hover:text-blue">
-            <a href="#"> {itemInCart.name} </a>
+            <a href={`/product-details/${item.product.id}`}>
+              {' '}
+              {itemInCart.name}{' '}
+            </a>
           </h3>
           <p className="text-custom-sm">
-            Price: ${priceAfterDiscount().toLocaleString()}
+            Price: ${priceAfterDiscount()} - Quantity: {item.quantity}
           </p>
         </div>
       </div>

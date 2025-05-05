@@ -21,9 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import {
-  Checkbox,
   FormControl,
-  FormControlLabel,
   FormHelperText,
   InputAdornment,
   InputLabel,
@@ -39,14 +37,12 @@ import { getProduct } from '@/generated/api/endpoints/product/product';
 import {
   CategoryResponseDto,
   ProductRequest,
-  UploadControllerUploadImageBody,
 } from '@/generated/api/models';
 import { getUpload } from '@/generated/api/endpoints/upload/upload';
 import toast from 'react-hot-toast';
 import { getCategory } from '@/generated/api/endpoints/category/category';
 import { productControllerCreateProductBody } from '@/generated/api/schemas/product/product.zod';
 import { ZodError } from 'zod';
-import { error } from 'console';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -134,11 +130,10 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
   const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
     {},
   );
+  const [priceDisplay, setPriceDisplay] = React.useState('');
   const [upload, setUpload] = React.useState(false);
   const [imageLink, setImageLink] = React.useState<string[]>([]);
   const [categories, setCategories] = React.useState<CategoryResponseDto[]>([]);
-  const [uploadedFiles, setUploadedFiles] =
-    React.useState<UploadControllerUploadImageBody | null>(null);
   const [formData, setFormData] = React.useState<ProductRequest>({
     name: '',
     description: '',
@@ -198,16 +193,27 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
     setCategories(data.data);
     return data.data;
   };
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (field: string) => (event: any) => {
     let value =
       event.target.type === 'checkbox'
         ? event.target.checked
         : event.target.value;
+
     setFormErrors({});
-    if (['stock', 'price', 'discount', 'categoryId'].includes(field)) {
+
+    if (field === 'price') {
+      const raw = value.replace(/\./g, '').replace(/\D/g, '');
+      const number = parseInt(raw || '0', 10);
+      setPriceDisplay(number.toLocaleString('vi-VN'));
+      setFormData((prev) => ({ ...prev, price: number }));
+      return;
+    }
+
+    if (['stock', 'discount', 'categoryId'].includes(field)) {
       value = Number(value);
     }
+
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -234,6 +240,12 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
       if (formData.description.trim() == '') {
         errors.description = 'Description should not be empty';
       }
+      if (formData.price === 0) {
+        errors.price = 'Price should not be empty';
+      }
+      if (formData.stock === 0) {
+        errors.stock = 'Stock should not be empty';
+      }
       productControllerCreateProductBody.parse(formData);
     } catch (error) {
       if (error instanceof ZodError) {
@@ -259,7 +271,8 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
         loading: 'Đang tạo sản phẩm...',
         success: 'Tạo sản phẩm thành công!',
       });
-      onSuccess?.()
+      onSuccess?.();
+      setPriceDisplay('');
       // Reset form sau khi thành công
       setFormData({
         name: '',
@@ -275,6 +288,7 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
       setTimeout(() => {
         handleClose();
       }, 600);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // Xử lý lỗi trả về từ API (message là array hoặc string)
       const message = error?.message;
@@ -291,8 +305,7 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
 
   React.useEffect(() => {
     getAllCategory();
-    console.log(uploadedFiles);
-  }, [imageLink, formData]);
+  }, []);
   return (
     <div className="flex justify-end mb-2">
       <Button onClick={handleOpen} variant="contained">
@@ -346,14 +359,12 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
             <InputLabel htmlFor="price">Price</InputLabel>
             <OutlinedInput
               id="price"
-              type="number"
               startAdornment={
                 <InputAdornment position="start">$</InputAdornment>
               }
               label="Price"
               error={!!formErrors.price}
-              inputProps={{ min: 0, step: '0.01' }}
-              value={formData.price == 0 ? '' : formData.price}
+              value={priceDisplay}
               onChange={handleChange('price')}
             />
             {formErrors.price && (
@@ -453,7 +464,7 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
             >
               <MenuItem value={-1}>Select Category</MenuItem>
               {categories.map((category) => (
-                <MenuItem value={category.id}>{category.name}</MenuItem>
+                <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
               ))}
               {/* Thay bằng danh sách động từ API nếu cần */}
             </Select>

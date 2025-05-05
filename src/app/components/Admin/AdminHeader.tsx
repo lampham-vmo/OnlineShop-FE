@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuthStore } from '@/stores/authStore';
+import useCartStore from '@/stores/useCartStore';
 import {
   AppBar,
   Toolbar,
@@ -14,6 +15,7 @@ import { useState } from 'react';
 
 export default function AdminHeader() {
   const { user, clearTokens } = useAuthStore();
+  const { clearCartStorage } = useCartStore();
   const router = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -30,6 +32,7 @@ export default function AdminHeader() {
     // TODO: logout logic
     // await authControllerLogout();
     clearTokens();
+    clearCartStorage();
     router.push('/signin');
   };
 

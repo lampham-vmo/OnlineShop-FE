@@ -1,8 +1,4 @@
-import {
-  CartProduct,
-  Product,
-  UserSuccessMessageFinalResponseDTO,
-} from '@/generated/api/models';
+import { CartProduct } from '@/generated/api/models';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getCart } from '@/generated/api/endpoints/cart/cart';
@@ -18,71 +14,97 @@ const {
 
 // TODO: define interface for CartStore
 interface CartStore {
-  totalItemCount: number;
-  isCartOpen: boolean;
+  isCartModalOpen: boolean;
   cartItems: CartProduct[];
-  subtotalPrice: number;
-  totalPrice: number;
+  subTotal: number;
+  total: number;
 
+  closeCartModal: () => void;
+  toggleCartModal: () => void;
+
+  calculateTotal: () => void;
   getCartFromServer: () => Promise<void>;
+  clearCartStorage: () => void;
+
+  addItemToCart: (id: number, quantity?: number) => Promise<void>;
+  removeItemFromCart: (cartProductId: number) => Promise<void>;
+  clearCartItems: () => Promise<void>;
   increaseCartItemQuantity: (id: number) => Promise<void>;
   decreaseCartItemQuantity: (id: number) => Promise<void>;
-
-  updateCartState: () => void;
-
-  openCart: () => void;
-  closeCart: () => void;
-  toggleCart: () => void;
-  clearCartItems: () => Promise<UserSuccessMessageFinalResponseDTO | void>;
-  addItemToCart: (item: Product) => Promise<void>;
-  removeItemFromCart: (productId: number) => Promise<void>;
 }
 
 const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
-      totalItemCount: 0,
-      isCartOpen: false,
+      isCartModalOpen: false,
       cartItems: [],
-      subtotalPrice: 0,
-      totalPrice: 0,
+      subTotal: 0,
+      total: 0,
 
-      // TODO: Add all items to cart
+      // TODO: ToggleCartModal
+      closeCartModal: () => set({ isCartModalOpen: false }),
+      toggleCartModal: () =>
+        set((state) => ({ isCartModalOpen: !state.isCartModalOpen })),
 
-      updateCartState: () => {
-        localStorage.removeItem('cart-storage');
+      // TODO: Calculate total
+      calculateTotal: () => {
         const itemsInCart = get().cartItems;
-
-        const subtotalPrice = itemsInCart.reduce((total, item) => {
-          const discountedPrice =
-            item.product.price -
-            (item.product.price * item.product.discount) / 100;
-          return total + discountedPrice;
-        }, 0);
-
-        const totalPrice = itemsInCart.reduce((total, item) => {
-          const discountedPrice =
-            item.product.price -
-            (item.product.price * item.product.discount) / 100;
-          return total + item.quantity * discountedPrice;
-        }, 0);
-
-        const totalItemCount = itemsInCart.reduce(
-          (total, item) => total + item.quantity,
+        const total = itemsInCart.reduce(
+          (sum, item) => sum + item.product.price * item.quantity,
           0,
         );
-        set({ subtotalPrice, totalPrice, totalItemCount });
+        const subtotal = itemsInCart.reduce(
+          (sum, item) =>
+            sum +
+            item.product.price *
+              (1 - item.product.discount / 100) *
+              item.quantity,
+          0,
+        );
+        set({ subTotal: subtotal, total: total });
       },
 
+      // TODO: getCartFromServer
       getCartFromServer: async () => {
-        localStorage.removeItem('cart-storage');
         const response = await cartControllerGetCart();
-        const cartItems = response.data.items;
-        set({ cartItems });
-        get().updateCartState();
-        console.log('cartItems: ', cartItems);
+        set({
+          cartItems: response.data.items,
+          total: response.data.total,
+          subTotal: response.data.subtotal,
+        });
       },
-      // TODO: increase count
+
+      // TODO: Clear cart in local storage
+      clearCartStorage: () => {
+        set({
+          isCartModalOpen: false,
+          cartItems: [],
+          subTotal: 0,
+          total: 0,
+        });
+      },
+
+      // TODO: Add new item to cart
+      addItemToCart: async (id: number, quantity = 1) => {
+        await cartControllerAddToCart({ productId: id, quantity: quantity });
+        await get().getCartFromServer();
+      },
+
+      // TODO: Remove an item from the cart
+      removeItemFromCart: async (id: number) => {
+        const itemsInCart = get().cartItems;
+        await cartControllerDeleteCart({ id: id });
+        set({ cartItems: itemsInCart.filter((item) => item.id !== id) });
+        get().calculateTotal();
+      },
+
+      // TODO: Clear all items in cart
+      clearCartItems: async () => {
+        await cartControllerClearCart();
+        get().clearCartStorage();
+      },
+
+      // TODO: Increase item in cart
       increaseCartItemQuantity: async (id: number) => {
         await cartControllerIncreaseQuantity({ id: id });
         set((state) => ({
@@ -90,9 +112,10 @@ const useCartStore = create<CartStore>()(
             item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
           ),
         }));
-        get().updateCartState();
+        get().calculateTotal();
       },
 
+      // TODO: Decrease item in cart
       decreaseCartItemQuantity: async (id: number) => {
         await cartControllerDecreaseQuantity({ id: id });
         set((state) => ({
@@ -100,53 +123,17 @@ const useCartStore = create<CartStore>()(
             item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
           ),
         }));
-        get().updateCartState();
-      },
-
-      // TODO: cart open/close
-      openCart: () => set({ isCartOpen: true }),
-      closeCart: () => set({ isCartOpen: false }),
-      toggleCart: () => set((state) => ({ isCartOpen: !state.isCartOpen })),
-
-      clearCartItems: async () => {
-        await cartControllerClearCart(), set({ cartItems: [] });
-        get().updateCartState();
-      },
-
-      // TODO: Add 1 item to cart with BE
-      addItemToCart: async (product: Product) => {
-        const { cartItems } = get();
-        const existingItem = cartItems.some((item) => item.id === product.id);
-        if (existingItem) {
-          get().increaseCartItemQuantity(product.id);
-        }
-
-        await cartControllerAddToCart({
-          productId: product.id,
-          quantity: 1,
-        });
-
-        const newCartItem: CartProduct = {
-          id: product.id,
-          product: product,
-          quantity: 1,
-        };
-
-        set({ cartItems: [...cartItems, newCartItem] });
-        get().updateCartState();
-        get().getCartFromServer();
-      },
-
-      // TODO: Remove an item from the cart
-      removeItemFromCart: async (productId: number) => {
-        const itemsInCart = get().cartItems;
-        await cartControllerDeleteCart({ id: productId });
-        set({ cartItems: itemsInCart.filter((item) => item.id !== productId) });
-        get().updateCartState();
+        get().calculateTotal();
       },
     }),
     {
       name: 'cart-storage',
+      partialize: (state) => ({
+        isCartModalOpen: state.isCartModalOpen,
+        cartItems: state.cartItems,
+        subTotal: state.subTotal,
+        total: state.total,
+      }),
     },
   ),
 );

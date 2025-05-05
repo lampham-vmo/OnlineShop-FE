@@ -3,24 +3,18 @@ import { useAuthStore } from '@/stores/authStore';
 import { Menu, MenuItem, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import CartSidebarModal from '../Common/CartModal';
 import useCartStore from '@/stores/useCartStore';
 
 const HeaderTopRight = () => {
-  const {
-    toggleCart,
-    isCartOpen,
-    cartItems,
-    totalPrice,
-    getCartFromServer,
-    totalItemCount,
-    updateCartState,
-  } = useCartStore();
-  console.log('Total item count', totalItemCount);
+  const { toggleCartModal, isCartModalOpen, cartItems, clearCartStorage } =
+    useCartStore();
 
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
+
+  const totalCount = cartItems.length;
 
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -38,7 +32,7 @@ const HeaderTopRight = () => {
     { label: 'Logout', path: '/logout' },
   ];
 
-  if (AllowedRoleForAdminLayout.includes(user?.role!)) {
+  if (AllowedRoleForAdminLayout.includes(Number(user?.role))) {
     settings.unshift({ label: 'Admin Dashboard', path: '/admin' });
   }
 
@@ -48,16 +42,33 @@ const HeaderTopRight = () => {
       // TODO: Await call API success then clearTokens and redirect to /signin
       // await authControllerLogout();
       clearTokens();
+      clearCartStorage();
       router.push('/signin');
     } else {
       router.push(path);
     }
   };
 
-  return (
-    <div className="flex justify-between items-center gap-5">
-      {/* Cart Button */}
-      <button onClick={toggleCart} className="flex items-center gap-2.5">
+  const ButtonCart = () => {
+    const handleToggleCartModal = () => {
+      if (!user) {
+        return;
+      }
+
+      toggleCartModal();
+    };
+
+    const renderNumberInCart = (): string => {
+      if (!user) return '0';
+      if (totalCount <= 100) return totalCount.toString();
+      return '99+';
+    };
+
+    return (
+      <button
+        onClick={handleToggleCartModal}
+        className="flex items-center gap-2.5"
+      >
         <span className="inline-block relative">
           <svg
             width="24"
@@ -91,22 +102,22 @@ const HeaderTopRight = () => {
           </svg>
 
           <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 w-4.5 h-4.5 rounded-100 text-blue">
-            {totalItemCount <= 100 ? totalItemCount : <span>99+</span>}
+            {renderNumberInCart()}
           </span>
         </span>
-
-        <div>
-          <span className="block text-2xs text-dark-4 uppercase">cart</span>
-          <p className="font-medium text-custom-sm text-dark">
-            ${totalPrice.toLocaleString()}
-          </p>
-        </div>
       </button>
+    );
+  };
+
+  return (
+    <div className="flex justify-between items-center gap-5">
+      {/* Cart Button */}
+      <ButtonCart />
 
       {user ? (
         <>
           {/* Toggle Cart Modal */}
-          {isCartOpen && <CartSidebarModal />}
+          {isCartModalOpen && <CartSidebarModal />}
           {/* /Toggle Cart Modal */}
           <div
             className="w-10 h-10 rounded-full text-white transition-all duration-300 bg-blue-600 hover:bg-blue flex items-center justify-center cursor-pointer"

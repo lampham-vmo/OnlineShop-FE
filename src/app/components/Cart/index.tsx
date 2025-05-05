@@ -5,7 +5,7 @@ import Link from 'next/link';
 import SingleItem from './SingleItem';
 
 export default function Cart() {
-  const { cartItems, totalPrice, clearCartItems } = useCartStore();
+  const { cartItems, subTotal, clearCartItems } = useCartStore();
 
   return (
     <>
@@ -21,7 +21,7 @@ export default function Cart() {
                 Checkout
               </Link>
               <div className="font-medium text-lg text-dark">
-                Total: ${totalPrice.toLocaleString()}
+                Total: ${subTotal.toLocaleString()}
               </div>
               <button onClick={clearCartItems} className="text-blue">
                 Clear Shopping Cart
