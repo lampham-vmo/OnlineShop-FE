@@ -16,7 +16,6 @@ const CategoryItem = ({ category, selected, onSelect }: PropCateCard) => {
         selected ? 'text-blue' : ''
       } group flex items-center justify-between ease-out duration-200 hover:text-blue`}
       onClick={() => {
-        console.log(category.id);
         onSelect(category.id);
       }}
     >

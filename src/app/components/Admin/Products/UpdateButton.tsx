@@ -97,7 +97,6 @@ function SortableImage({
         size="large"
         onClick={(e) => {
           e.stopPropagation(); // Ngăn sự kiện lan lên ảnh hoặc container
-          console.log(index);
           onRemove(index);
         }}
         sx={{

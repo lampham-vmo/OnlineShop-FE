@@ -97,7 +97,6 @@ function SortableImage({
         size="large"
         onClick={(e) => {
           e.stopPropagation(); // Ngăn sự kiện lan lên ảnh hoặc container
-          console.log(index);
           onRemove(index);
         }}
         sx={{
@@ -230,7 +229,6 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
 
     // Validate với Zod
     try {
-      console.log(formData);
       if (formData.name.trim() == '') {
         errors.name = 'Name should not be empty';
       }
@@ -255,7 +253,6 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
     }
 
     if (Object.keys(errors).length > 0) {
-      console.log(errors);
       setFormErrors(errors);
       toast.error('Vui lòng kiểm tra lại thông tin!');
       return;
@@ -428,7 +425,6 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
                     index={index}
                     onRemove={(i) => {
                       const updated = imageLink.filter((_, idx) => idx !== i);
-                      // console.log(updated);
                       setImageLink(updated);
                       setFormData((prev) => ({
                         ...prev,

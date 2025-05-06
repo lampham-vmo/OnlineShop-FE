@@ -67,19 +67,15 @@ export default function ProfileComponent() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
-    console.log('hello');
-    console.log(profile, user);
     if (!profile || !user) return;
 
     try {
       const updatedProfile = { ...profile, ...data };
       const response = await userControllerUpdateProfile(user.id, data);
-      console.log(response);
       if (response.success) {
         setProfile(updatedProfile);
         window.alert('Profile updated successfully!');
         setErrorMessage('');
-        console.log('Updated Profile:', updatedProfile);
         setOpenModal(false);
       } else {
         console.error('Failed to update profile:', response);
