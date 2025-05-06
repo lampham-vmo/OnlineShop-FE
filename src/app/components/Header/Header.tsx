@@ -49,7 +49,6 @@ export default function Header() {
     const delayDebounce = setTimeout(() => {
       if (text) {
         getAllProductByText();
-        console.log(options);
       }
     }, 300);
 
@@ -96,7 +95,6 @@ export default function Header() {
                   sx={{ width: 400 }}
                   renderOption={(props, option) => {
                     const { key, ...rest } = props;
-                    console.log(option);
                     return (
                       <Box
                         {...rest}

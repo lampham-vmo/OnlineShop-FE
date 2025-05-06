@@ -96,7 +96,6 @@ export default function Login() {
       }
       /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (err: any) {
-      console.log(err);
       setError(err.message || 'Login failed. Please try again.');
       if (err.message === 'email not verified!') {
         setEmailNotVerified(true);
