@@ -86,21 +86,20 @@ function SortableImage({
   };
 
   return (
-    <MuiBox
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="relative"
-    >
+    <MuiBox ref={setNodeRef} style={style} {...attributes} className="relative">
       <img
         src={url}
+        {...listeners} // Chỉ ảnh mới được dùng để kéo
         alt={`img-${index}`}
-        className="w-16 h-16 object-cover rounded cursor-move"
+        className="w-20 h-20 object-cover rounded cursor-move"
       />
       <IconButton
-        size="small"
-        onClick={() => onRemove(index)}
+        size="large"
+        onClick={(e) => {
+          e.stopPropagation(); // Ngăn sự kiện lan lên ảnh hoặc container
+          console.log(index);
+          onRemove(index);
+        }}
         sx={{
           position: 'absolute',
           top: 0,
@@ -109,6 +108,7 @@ function SortableImage({
           color: 'white',
           '&:hover': { backgroundColor: 'rgba(0,0,0,0.8)' },
           padding: '2px',
+          zIndex: 2000,
         }}
       >
         <CloseIcon fontSize="small" />
@@ -428,6 +428,7 @@ export default function BasicModal({ onSuccess }: { onSuccess?: () => void }) {
                     index={index}
                     onRemove={(i) => {
                       const updated = imageLink.filter((_, idx) => idx !== i);
+                      // console.log(updated);
                       setImageLink(updated);
                       setFormData((prev) => ({
                         ...prev,
