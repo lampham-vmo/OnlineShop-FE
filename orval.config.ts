@@ -1,6 +1,6 @@
 export default {
   api: {
-    input: 'http://localhost:4000/api-json',
+    input: 'https://deploy-shoppe.onrender.com/api-json',
     output: {
       mode: 'tags-split',
       target: './src/generated/api/endpoints',
@@ -16,7 +16,7 @@ export default {
   },
 
   apiZod: {
-    input: 'http://localhost:4000/api-json',
+    input: 'https://deploy-shoppe.onrender.com/api-json',
     output: {
       mode: 'tags-split',
       target: './src/generated/api/schemas',
