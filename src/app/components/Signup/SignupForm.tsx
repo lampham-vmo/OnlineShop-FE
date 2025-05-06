@@ -48,7 +48,6 @@ export default function SignUpForm() {
       setError('');
     } catch (err: any) {
       const message = err.message || 'Signup failed';
-      console.log(message);
       setError(message);
       setSuccess('');
     } finally {
